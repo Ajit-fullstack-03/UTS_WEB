@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
-
 import "./Navbar.css";
 import logo from "../../../assets/image/umpire_tax_logo.png";
 
@@ -17,31 +16,20 @@ const Navbar = () => {
                     {/* <h2> LOGO</h2> */}
                     <img src={logo} alt="Umpire Tax" />
                 </Link>
-
                 {/* Desktop Menu */}
-
                 <nav className="desktop-menu">
-
                     <NavLink to="/">Home</NavLink>
-
                     <NavLink to="/services">Services</NavLink>
-
                     <NavLink to="/testimonials">Testimonials</NavLink>
-
                     <NavLink to="/careers">Careers</NavLink>
-
                     <NavLink to="/contact">Contact Us</NavLink>
-
                 </nav>
 
                 {/* Desktop Buttons */}
-
                 <div className="desktop-buttons">
-
                     <Link to="/login" className="btn btn-outline">
                         Login
                     </Link>
-
                     <Link to="/register" className="btn btn-primary">
                         Register
                     </Link>

@@ -1,23 +1,68 @@
-import React from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import "./home.css";
-
 import heroImage from "../../assets/image/page_track.png";
 import personImage from "../../assets/image/trust.png";
 import onePlatformImg1 from "../../assets/image/frame1.png";
 import weFileImg1 from "../../assets/image/frame2.png";
 import taxEstimateImg2 from "../../assets/image/frame3.png";
-
 import medicalExpensesImage from "../../assets/image/m1.png";
 import studentLoanImage from "../../assets/image/m2.png";
 import iraImage from "../../assets/image/m3.png";
+import personImage2 from "../../assets/image/Ellipse.png";
+import step1Image from "../../assets/image/mid_frame.png";
+import step2Image from "../../assets/image/mid_frame2.png";
+import step3Image from "../../assets/image/mid_frame3.png";
 
 
 const services = [
     { id: 1, image: onePlatformImg1, label: "Free Tax Estimate" },
-    { id: 2, image: onePlatformImg1, label: "One Platform. Every Tax Need." },
+    { id: 2, image: taxEstimateImg2, label: "One Platform. Every Tax Need." },
     { id: 3, image: weFileImg1, label: "We File. You Relax." },
-
 ];
+
+const testimonials = [
+    {
+        id: 1,
+        text: "My buying experience is so nice, and received me very politely. Riding experience is also very good. Very good performance. I never experienced such a kind of performance. Very good service.",
+        rating: 5,
+        name: "Karan",
+        time: "1 week ago",
+        avatarType: "person",
+    },
+    {
+        id: 2,
+        text: "I love my e-bike and the customer service is excellent. They respond in a timely manner with loads of information about e-bikes, accessories and maintenance information.",
+        rating: 5,
+        name: "Catherine",
+        time: "10 days ago",
+        avatarType: "brand",
+    },
+    {
+        id: 3,
+        text: "Visited to EO store. Product quality was particularly well, looked great, and the staff helped me test it in the parking lot area. We bought with customization after they went over all the options and I felt satisfied.",
+        rating: 5,
+        name: "Peter",
+        time: "2 weeks ago",
+        avatarType: "brand",
+    },
+    {
+        id: 4,
+        text: "The whole process was smooth from start to finish. The team explained every deduction clearly and made sure I understood exactly where my refund was coming from.",
+        rating: 5,
+        name: "Amira",
+        time: "3 weeks ago",
+        avatarType: "person",
+    },
+    {
+        id: 5,
+        text: "Excellent support throughout tax season. Quick responses, accurate filing, and a genuinely friendly team that made a stressful process feel simple.",
+        rating: 5,
+        name: "Liam",
+        time: "1 month ago",
+        avatarType: "person",
+    },
+];
+
 
 const IconArrow = ({ color = "#1B2E6B" }) => (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -47,9 +92,150 @@ const IconHouse = () => (
     </svg>
 );
 
+const steps = [
+    {
+        id: 1,
+        label: "Step 01",
+        title: "Sign up & Upload Documents",
+        description: "Create your account in seconds and upload your required documents securely.",
+        image: step1Image,
+        imageAlt: "Create your account and upload documents",
+    },
+];
+
+const steps2 = [
+    {
+        id: 1,
+        label: "Step 02",
+        title: "We Review & Analyze",
+        description: "Our tax experts review your documents,analyze your data and ensure maximum savings with 100% compliance.",
+        image: step2Image,
+        imageAlt: "Create your account and upload documents",
+    },
+];
+
+const steps3 = [
+    {
+        id: 1,
+        label: "Step 03",
+        title: "Get Tax Report on Email",
+        description: "Once completed, our analyst will send your Tax Report (PDF) directly to your email.",
+        image: step3Image,
+        imageAlt: "Create your account and upload documents",
+    },
+];
+
+const StarIcon = () => (
+
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="#F5B400" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2.5l2.9 6.3 6.9.7-5.2 4.6 1.6 6.8L12 17.6 5.8 20.9l1.6-6.8-5.2-4.6 6.9-.7L12 2.5z" />
+    </svg>
+);
+
+const PersonAvatar = () => (
+    <div className="tm-avatar tm-avatar--person">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="8" r="4" fill="#FFFFFF" />
+            <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="#FFFFFF" />
+        </svg>
+    </div>
+);
+
+const BrandAvatar = () => (
+    <div className="tm-avatar tm-avatar--brand">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="7" width="18" height="12" rx="1.5" stroke="#1B2E6B" strokeWidth="1.6" fill="none" />
+            <path d="M3 10h18" stroke="#1B2E6B" strokeWidth="1.6" />
+        </svg>
+    </div>
+);
+const faqs = [
+    {
+        id: 1,
+        question: "What is Umpire Tax Solution?",
+        answer:
+            "Umpire Tax Solution is a modern tax service platform offering accurate preparation, filing support, and practical tax guidance for individuals, freelancers, and growing businesses.",
+    },
+    {
+        id: 2,
+        question: "Who can use Umpire Tax Solution?",
+        answer:
+            "Individuals, freelancers, and growing businesses looking for accurate, reliable, and hassle-free tax preparation and filing support can use Umpire Tax Solution.",
+    },
+    {
+        id: 3,
+        question: "How easy is it to get started?",
+        answer:
+            "Getting started takes just a few minutes — create your account, upload your documents securely, and our team takes care of the rest.",
+    },
+    {
+        id: 4,
+        question: "Are there any hidden fees?",
+        answer:
+            "No. Our pricing is transparent and shown upfront before you file, with no hidden charges added later.",
+    },
+    {
+        id: 5,
+        question: "How does customer support work?",
+        answer:
+            "Our support team is available via phone and chat to answer questions and guide you through every step of the filing process.",
+    },
+];
+
+const ChevronIcon = ({ open }) => (
+    <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={`faq-chevron ${open ? "faq-chevron--open" : ""}`}>
+        <path d="M6 9l6 6 6-6" stroke="#1B2E6B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </svg>
+);
 
 
 const Home = () => {
+    const trackRef = useRef(null);
+    const [canScrollPrev, setCanScrollPrev] = useState(false);
+    const [canScrollNext, setCanScrollNext] = useState(true);
+    const updateScrollState = useCallback(() => {
+        const track = trackRef.current;
+        if (!track) return;
+        setCanScrollPrev(track.scrollLeft > 4);
+        setCanScrollNext(track.scrollLeft < track.scrollWidth - track.clientWidth - 4);
+    }, []);
+
+    useEffect(() => {
+        updateScrollState();
+        const track = trackRef.current;
+        if (!track) return;
+        track.addEventListener("scroll", updateScrollState, { passive: true });
+        window.addEventListener("resize", updateScrollState);
+        return () => {
+            track.removeEventListener("scroll", updateScrollState);
+            window.removeEventListener("resize", updateScrollState);
+        };
+    }, [updateScrollState]);
+
+    const slide = (direction) => {
+        const track = trackRef.current;
+        if (!track) return;
+        const firstCard = track.querySelector(".tm-card");
+        if (!firstCard) return;
+
+        const cardStyle = window.getComputedStyle(track);
+        const gap = parseFloat(cardStyle.columnGap || cardStyle.gap || "0");
+        const distance = firstCard.getBoundingClientRect().width + gap;
+
+        track.scrollBy({ left: direction * distance, behavior: "smooth" });
+    };
+    const [openId, setOpenId] = useState(1);
+    const toggle = (id) => {
+        setOpenId((prev) => (prev === id ? null : id));
+    };
+
+
     return (
         <>
             <section className="hero-wrapper">
@@ -382,6 +568,349 @@ const Home = () => {
                     </div>
                 </div>
             </section>
+
+            <section className="fs-wrapper">
+                <div className="fs-card">
+                    <div className="fs-bg-circle" aria-hidden="true"></div>
+
+                    <div className="fs-top">
+                        {/* Left content */}
+                        <div className="fs-content">
+                            <div className="fs-badge">Max Refund. Zero Stress.</div>
+
+                            <h2 className="fs-heading">
+                                <span className="fs-heading-dark">File Smart.</span>
+                                <br />
+                                <span className="fs-heading-accent">Get More Back.</span>
+                            </h2>
+
+                            <p className="fs-description">
+                                Accurate filling. Maximum refund.
+                                <br />
+                                100% hassle-free.
+                            </p>
+                        </div>
+
+                        {/* Right visual */}
+                        <div className="fs-visual">
+                            <div className="fs-image-wrap">
+                                <img src={personImage2} alt="Happy client giving a thumbs up" className="fs-image" />
+                            </div>
+
+                            <div className="fs-refund-card">
+                                <span className="fs-refund-label">Refund Up To</span>
+                                <span className="fs-refund-value">$2,750</span>
+                                <span className="fs-refund-tag">
+                                    <span className="fs-refund-tag-icon">
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M5 13l4 4L19 7" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                                        </svg>
+                                    </span>
+                                    <span className="fs-refund-tag-text">
+                                        More Refund. <span className="fs-refund-tag-accent">Better Future.</span>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Bottom feature bar */}
+                    <div className="fs-features">
+                        <div className="fs-feature">
+                            <span className="fs-feature-icon fs-feature-icon--purple">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="8" stroke="#6C63C7" strokeWidth="1.6" fill="none" />
+                                    <circle cx="12" cy="12" r="4.5" stroke="#6C63C7" strokeWidth="1.6" fill="none" />
+                                    <circle cx="12" cy="12" r="1.2" fill="#6C63C7" />
+                                </svg>
+                            </span>
+                            <div className="fs-feature-text">
+                                <span className="fs-feature-title">Accurate Filling</span>
+                                <span className="fs-feature-sub">Zero Error</span>
+                            </div>
+                        </div>
+
+                        <div className="fs-feature-divider" />
+
+                        <div className="fs-feature">
+                            <span className="fs-feature-icon fs-feature-icon--teal">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="9" r="5" stroke="#1E9E8C" strokeWidth="1.6" fill="none" />
+                                    <path d="M8.5 13.2L7 21l5-2.5 5 2.5-1.5-7.8" stroke="#1E9E8C" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                                </svg>
+                            </span>
+                            <div className="fs-feature-text">
+                                <span className="fs-feature-title">Maximum Refund</span>
+                                <span className="fs-feature-sub">Get What you Deserve</span>
+                            </div>
+                        </div>
+
+                        <div className="fs-feature-divider" />
+
+                        <div className="fs-feature">
+                            <span className="fs-feature-icon fs-feature-icon--green">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" stroke="#3FA84A" strokeWidth="1.6" strokeLinejoin="round" fill="none" />
+                                </svg>
+                            </span>
+                            <div className="fs-feature-text">
+                                <span className="fs-feature-title">Hassle-Free Process</span>
+                                <span className="fs-feature-sub">Simple, Smooth &amp; Stress-free</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section className="rs-wrapper">
+                <div className="rs-header">
+                    <div className="rs-badge">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="7" height="7" rx="1.2" stroke="#1B2E6B" strokeWidth="1.6" fill="none" />
+                            <rect x="14" y="3" width="7" height="7" rx="1.2" stroke="#1B2E6B" strokeWidth="1.6" fill="none" />
+                            <rect x="3" y="14" width="7" height="7" rx="1.2" stroke="#1B2E6B" strokeWidth="1.6" fill="none" />
+                            <rect x="14" y="14" width="7" height="7" rx="1.2" stroke="#1B2E6B" strokeWidth="1.6" fill="none" />
+                        </svg>
+                        <span>Step by step</span>
+                    </div>
+
+                    <h2 className="rs-heading">Your refund, in three steps</h2>
+                </div>
+
+                <div className="rs-steps">
+                    {steps.map((step) => (
+                        <div className="rs-card" key={step.id}>
+                            <div className="rs-card-content">
+                                <span className="rs-step-label">{step.label}</span>
+                                <h3 className="rs-step-title">{step.title}</h3>
+                                <p className="rs-step-description">{step.description}</p>
+                            </div>
+
+                            <div className="rs-card-visual">
+                                <div className="rs-visual-frame">
+                                    <img src={step.image} alt={step.imageAlt} className="rs-visual-image" />
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            <section className="rs-wrapper">
+
+                <div className="rs-steps">
+                    {steps2.map((step) => (
+                        <div className="rs-card" key={step.id}>
+                            <div className="rs-card-content">
+                                <span className="rs-step-label">{step.label}</span>
+                                <h3 className="rs-step-title">{step.title}</h3>
+                                <p className="rs-step-description">{step.description}</p>
+                            </div>
+
+                            <div className="rs-card-visual">
+                                <div className="rs-visual-frame">
+                                    <img src={step.image} alt={step.imageAlt} className="rs-visual-image" />
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            <section className="rs-wrapper">
+                <div className="rs-steps">
+                    {steps3.map((step) => (
+                        <div className="rs-card" key={step.id}>
+                            <div className="rs-card-content">
+                                <span className="rs-step-label">{step.label}</span>
+                                <h3 className="rs-step-title">{step.title}</h3>
+                                <p className="rs-step-description">{step.description}</p>
+                            </div>
+
+                            <div className="rs-card-visual">
+                                <div className="rs-visual-frame">
+                                    <img src={step.image} alt={step.imageAlt} className="rs-visual-image" />
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            <section className="tm-wrapper">
+                <div className="tm-inner">
+                    <div className="tm-header">
+                        <button className="tm-badge" type="button">
+                            Read reviews
+                        </button>
+
+                        <h2 className="tm-heading">Quoted with clarity. Tax solutions,</h2>
+
+                        <div className="tm-rating">
+                            <span>4.6/5</span>
+                            <StarIcon />
+                            <span>Based on 5210 reviews</span>
+                        </div>
+                    </div>
+
+                    <div className="tm-body">
+                        {/* Left static column */}
+                        <div className="tm-side">
+                            <svg className="tm-quote-icon" width="48" height="36" viewBox="0 0 48 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M0 36V21.6C0 9.6 7.2 1.2 18 0v7.2c-5.4 1.2-8.4 4.8-8.4 9.6H18V36H0zM27.6 36V21.6c0-12 7.2-20.4 18-21.6v7.2c-5.4 1.2-8.4 4.8-8.4 9.6h8.4V36H27.6z"
+                                    fill="rgba(255,255,255,0.25)"
+                                />
+                            </svg>
+
+                            <h3 className="tm-side-heading">
+                                What our
+                                <br />
+                                Clients
+                                <br />
+                                are saying
+                            </h3>
+
+                            <div className="tm-nav">
+                                <button
+                                    className="tm-nav-btn"
+                                    type="button"
+                                    onClick={() => slide(-1)}
+                                    disabled={!canScrollPrev}
+                                    aria-label="Previous testimonial"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M15 6l-6 6 6 6" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                                    </svg>
+                                </button>
+
+                                <span className="tm-nav-line" />
+
+                                <button
+                                    className="tm-nav-btn"
+                                    type="button"
+                                    onClick={() => slide(1)}
+                                    disabled={!canScrollNext}
+                                    aria-label="Next testimonial"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9 6l6 6-6 6" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Right sliding carousel */}
+                        <div className="tm-carousel">
+                            <div className="tm-track" ref={trackRef}>
+                                {testimonials.map((t) => (
+                                    <div className="tm-card" key={t.id}>
+                                        <p className="tm-card-text">{t.text}</p>
+
+                                        <div className="tm-card-stars">
+                                            {Array.from({ length: t.rating }).map((_, i) => (
+                                                <StarIcon key={i} />
+                                            ))}
+                                        </div>
+
+                                        <div className="tm-card-author">
+                                            {t.avatarType === "person" ? <PersonAvatar /> : <BrandAvatar />}
+                                            <div className="tm-card-author-text">
+                                                <span className="tm-card-name">{t.name}</span>
+                                                <span className="tm-card-time">{t.time}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section className="faq-wrapper">
+                <div className="faq-inner">
+                    <div className="faq-top">
+                        {/* Left content */}
+                        <div className="faq-content">
+                            <div className="faq-badge">FAQ</div>
+
+                            <h2 className="faq-heading">Frequently Asked Questions</h2>
+
+                            <p className="faq-description">
+                                Umpire Tax Solution helps individuals and businesses prepare accurate returns, stay compliant, and
+                                navigate tax season with confidence through reliable guidance and responsive support.
+                            </p>
+
+                            <button className="faq-check-more" type="button">
+                                Check More
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M7 17L17 7M17 7H9M17 7V15" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Right accordion */}
+                        <div className="faq-accordion">
+                            {faqs.map((faq) => {
+                                const isOpen = openId === faq.id;
+                                return (
+                                    <div className={`faq-item ${isOpen ? "faq-item--open" : ""}`} key={faq.id}>
+                                        <button
+                                            className="faq-item-header"
+                                            type="button"
+                                            onClick={() => toggle(faq.id)}
+                                            aria-expanded={isOpen}
+                                        >
+                                            <span className="faq-item-question">{faq.question}</span>
+                                            <ChevronIcon open={isOpen} />
+                                        </button>
+
+                                        <div
+                                            className="faq-item-body"
+                                            style={{
+                                                maxHeight: isOpen ? "240px" : "0px",
+                                            }}
+                                        >
+                                            <p className="faq-item-answer">{faq.answer}</p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Bottom contact bar */}
+                    <div className="faq-contact-bar">
+                        <div className="faq-contact-left">
+                            <span className="faq-contact-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M4 13a8 8 0 0116 0v5a2 2 0 01-2 2h-1a1 1 0 01-1-1v-5a1 1 0 011-1h2M4 13v5a1 1 0 001 1h1a1 1 0 001-1v-5a1 1 0 00-1-1H4"
+                                        stroke="#FFFFFF"
+                                        strokeWidth="1.6"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        fill="none"
+                                    />
+                                </svg>
+                            </span>
+                            <span className="faq-contact-text">Need help with your Financial &amp; Tax services?</span>
+                        </div>
+
+                        <a href="tel:+15156864275" className="faq-contact-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z"
+                                    fill="#1B2E6B"
+                                />
+                            </svg>
+                            +1 (515) 686-4275
+                        </a>
+                    </div>
+                </div>
+            </section>
+
         </>
     )
 }

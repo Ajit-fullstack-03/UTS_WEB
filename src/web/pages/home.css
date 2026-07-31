@@ -759,7 +759,7 @@
     background-color: #FFFFFF;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     overflow: hidden;
-    padding: 72px 24px 80px;
+    padding: 72px 24px 39px;
 }
 
 /* Decorative concentric circles, top-right background */
@@ -988,5 +988,1418 @@
         right: -220px;
         width: 420px;
         height: 420px;
+    }
+}
+
+/* ===== File Smart. Get More Back. Section — Tax Filing Landing Page ===== */
+
+.fs-wrapper {
+    width: 100%;
+    background-color: #FFFFFF;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding: 40px 24px;
+}
+
+.fs-card {
+    position: relative;
+    max-width: 1350px;
+    margin: 0 auto;
+    background: linear-gradient(100deg, #FFFFFF 0%, #F2F5FE 45%, #DCE6FB 100%);
+    border-radius: 28px;
+    overflow: hidden;
+    padding: 40px 40px 24px;
+}
+
+/* Decorative circle behind the person image */
+.fs-bg-circle {
+    position: absolute;
+    top: 50%;
+    right: 60px;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background-color: #C9D8F7;
+    transform: translateY(-58%);
+    z-index: 0;
+}
+
+.fs-top {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    flex-wrap: wrap;
+    padding-bottom: 32px;
+}
+
+/* ---------- Left content ---------- */
+.fs-content {
+    flex: 1 1 380px;
+    max-width: 460px;
+}
+
+.fs-badge {
+    display: inline-block;
+    padding: 9px 18px;
+    border-radius: 999px;
+    background-color: #4A4E8F;
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.fs-heading {
+    font-size: 40px;
+    line-height: 1.2;
+    font-weight: 800;
+    margin: 0 0 16px;
+    letter-spacing: -0.5px;
+}
+
+.fs-heading-dark {
+    color: #17181F;
+}
+
+.fs-heading-accent {
+    color: #2646C7;
+}
+
+.fs-description {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #666A78;
+    margin: 0;
+}
+
+/* ---------- Right visual ---------- */
+.fs-visual {
+    position: relative;
+    flex: 1 1 360px;
+    max-width: 460px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.fs-image-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 4 / 3.3;
+    border-radius: 24px;
+    overflow: hidden;
+}
+
+.fs-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+}
+
+/* Floating refund card */
+.fs-refund-card {
+    position: absolute;
+    top: 18px;
+    left: -110px;
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    box-shadow: 0 16px 40px rgba(20, 30, 70, 0.14);
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 190px;
+    z-index: 2;
+}
+
+.fs-refund-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #17181F;
+}
+
+.fs-refund-value {
+    font-size: 26px;
+    font-weight: 800;
+    color: #2646C7;
+    line-height: 1.2;
+}
+
+.fs-refund-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #E5F7EA;
+    border-radius: 999px;
+    padding: 5px 10px;
+    margin-top: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #17181F;
+    white-space: nowrap;
+}
+
+.fs-refund-tag-icon {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: #35B559;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.fs-refund-tag-accent {
+    color: #35B559;
+}
+
+/* ---------- Bottom feature bar ---------- */
+.fs-features {
+    position: relative;
+    z-index: 1;
+    background-color: #FFFFFF;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(20, 30, 70, 0.08);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.fs-feature {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1 1 200px;
+}
+
+.fs-feature-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.fs-feature-icon--purple {
+    background-color: #EEECFB;
+}
+
+.fs-feature-icon--teal {
+    background-color: #E4F6F3;
+}
+
+.fs-feature-icon--green {
+    background-color: #E9F8EB;
+}
+
+.fs-feature-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.35;
+}
+
+.fs-feature-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #17181F;
+}
+
+.fs-feature-sub {
+    font-size: 13px;
+    color: #8A8E9C;
+}
+
+.fs-feature-divider {
+    width: 1px;
+    height: 40px;
+    background-color: #E7E9F2;
+    flex-shrink: 0;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    .fs-card {
+        padding: 32px 28px 20px;
+    }
+
+    .fs-heading {
+        font-size: 32px;
+    }
+
+    .fs-top {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .fs-content {
+        max-width: 100%;
+    }
+
+    .fs-visual {
+        justify-content: center;
+        margin-top: 40px;
+    }
+
+    .fs-refund-card {
+        left: 50%;
+        top: -30px;
+        transform: translateX(-50%);
+    }
+
+    .fs-bg-circle {
+        right: 50%;
+        transform: translate(50%, -58%);
+    }
+
+    .fs-feature-divider {
+        display: none;
+    }
+
+    .fs-features {
+        justify-content: center;
+    }
+
+    .fs-feature {
+        justify-content: center;
+        flex: 1 1 100%;
+    }
+}
+
+@media (max-width: 560px) {
+    .fs-wrapper {
+        padding: 24px 16px;
+    }
+
+    .fs-card {
+        border-radius: 20px;
+        padding: 28px 20px 16px;
+    }
+
+    .fs-heading {
+        font-size: 26px;
+    }
+
+    .fs-badge {
+        font-size: 12px;
+        padding: 8px 14px;
+    }
+
+    .fs-refund-card {
+        width: 160px;
+        padding: 12px 16px;
+    }
+
+    .fs-refund-value {
+        font-size: 22px;
+    }
+
+    .fs-features {
+        padding: 18px 20px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .fs-feature {
+        justify-content: flex-start;
+    }
+}
+
+/* ===== Your Refund, In Three Steps Section — Tax Filing Landing Page ===== */
+
+.rs-wrapper {
+    width: 100%;
+    background-color: #FFFFFF;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding: 23px 20px 0px;
+}
+
+/* ---------- Header ---------- */
+.rs-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.rs-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid #D7DCEB;
+    border-radius: 999px;
+    background-color: #FFFFFF;
+    color: #1B2E6B;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.rs-heading {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: #14141A;
+    margin: 0;
+}
+
+/* ---------- Steps ---------- */
+.rs-steps {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.rs-card {
+    background-color: #EEF1F8;
+    border-radius: 24px;
+    padding: 48px;
+    display: flex;
+    align-items: center;
+    gap: 164px;
+    flex-wrap: wrap;
+    border: 2px solid #7F9BEC;
+}
+
+/* ---------- Left text content ---------- */
+.rs-card-content {
+    flex: 1 1 320px;
+    max-width: 420px;
+}
+
+.rs-step-label {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #5B7FE0;
+    margin-bottom: 16px;
+}
+
+.rs-step-title {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #1B2E6B;
+    margin: 0 0 16px;
+}
+
+.rs-step-description {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #6B6F7B;
+    margin: 0;
+}
+
+/* ---------- Right visual ---------- */
+.rs-card-visual {
+    flex: 1 1 340px;
+    display: flex;
+    justify-content: center;
+    max-width: 400px;
+}
+
+.rs-visual-frame {
+    width: 100%;
+    max-width: 430px;
+    border-radius: 18px;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.rs-visual-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    .rs-card {
+        padding: 36px 28px;
+        gap: 32px;
+    }
+
+    .rs-heading {
+        font-size: 26px;
+    }
+}
+
+@media (max-width: 700px) {
+    .rs-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 32px 24px;
+    }
+
+    .rs-card-content {
+        max-width: 100%;
+    }
+
+    .rs-step-description {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .rs-card-visual {
+        max-width: 320px;
+    }
+}
+
+@media (max-width: 480px) {
+    .rs-wrapper {
+        padding: 48px 16px 56px;
+    }
+
+    .rs-heading {
+        font-size: 22px;
+    }
+
+    .rs-step-title {
+        font-size: 22px;
+    }
+
+    .rs-card {
+        border-radius: 18px;
+        padding: 28px 18px;
+    }
+}
+
+/* ===== Your Refund, In Three Steps Section — Tax Filing Landing Page ===== */
+
+
+
+/* ---------- Header ---------- */
+.rs-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.rs-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid #D7DCEB;
+    border-radius: 999px;
+    background-color: #FFFFFF;
+    color: #1B2E6B;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.rs-heading {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: #14141A;
+    margin: 0;
+}
+
+/* ---------- Steps ---------- */
+.rs-steps {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.rs-card {
+    background-color: #EEF1F8;
+    border-radius: 24px;
+    padding: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 48px;
+    flex-wrap: wrap;
+}
+
+/* ---------- Left text content ---------- */
+.rs-card-content {
+    flex: 1 1 320px;
+    max-width: 420px;
+}
+
+.rs-step-label {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #5B7FE0;
+    margin-bottom: 16px;
+}
+
+.rs-step-title {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #1B2E6B;
+    margin: 0 0 16px;
+}
+
+.rs-step-description {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #6B6F7B;
+    margin: 0;
+}
+
+/* ---------- Right visual ---------- */
+.rs-card-visual {
+    flex: 1 1 340px;
+    display: flex;
+    justify-content: center;
+    max-width: 400px;
+}
+
+.rs-visual-frame {
+    width: 100%;
+    max-width: 340px;
+    border-radius: 18px;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.rs-visual-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    .rs-card {
+        padding: 36px 28px;
+        gap: 32px;
+    }
+
+    .rs-heading {
+        font-size: 26px;
+    }
+}
+
+@media (max-width: 700px) {
+    .rs-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 32px 24px;
+    }
+
+    .rs-card-content {
+        max-width: 100%;
+    }
+
+    .rs-step-description {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .rs-card-visual {
+        max-width: 320px;
+    }
+}
+
+@media (max-width: 480px) {
+    .rs-wrapper {
+        padding: 48px 16px 56px;
+    }
+
+    .rs-heading {
+        font-size: 22px;
+    }
+
+    .rs-step-title {
+        font-size: 22px;
+    }
+
+    .rs-card {
+        border-radius: 18px;
+        padding: 28px 18px;
+    }
+}
+
+/* ===== Testimonials / Reviews Section — Tax Filing Landing Page ===== */
+
+.tm-wrapper {
+    width: 100%;
+    background-color: #1B2E6B;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding: 56px 24px 72px;
+    margin-top: 50px;
+}
+
+.tm-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ---------- Header ---------- */
+.tm-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.tm-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 22px;
+    border-radius: 999px;
+    background-color: #FFFFFF;
+    color: #1B2E6B;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font-family: inherit;
+}
+
+.tm-heading {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 34px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0 0 14px;
+    max-width: 640px;
+}
+
+.tm-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* ---------- Body layout ---------- */
+.tm-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 40px;
+}
+
+/* ---------- Left static side ---------- */
+.tm-side {
+    flex: 0 0 220px;
+    display: flex;
+    flex-direction: column;
+    padding-top: 8px;
+}
+
+.tm-quote-icon {
+    margin-bottom: 16px;
+}
+
+.tm-side-heading {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 28px;
+    line-height: 1.3;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0 0 40px;
+}
+
+.tm-nav {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.tm-nav-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.tm-nav-btn:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.tm-nav-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.tm-nav-line {
+    width: 60px;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ---------- Carousel ---------- */
+.tm-carousel {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.tm-track {
+    display: flex;
+    gap: 24px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding: 4px 4px 8px;
+    margin: -4px -4px -8px;
+
+    /* hide scrollbar cross-browser */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.tm-track::-webkit-scrollbar {
+    display: none;
+}
+
+.tm-card {
+    scroll-snap-align: start;
+    flex: 0 0 calc((100% - 48px) / 3);
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.tm-card-text {
+    font-size: 14px;
+    line-height: 1.65;
+    color: #4A4E5C;
+    margin: 0 0 20px;
+    flex: 1 1 auto;
+}
+
+.tm-card-stars {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 16px;
+}
+
+.tm-card-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tm-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.tm-avatar--person {
+    background-color: #C7CBD6;
+}
+
+.tm-avatar--brand {
+    background-color: #E7EAF5;
+}
+
+.tm-card-author-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+}
+
+.tm-card-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1B2E6B;
+}
+
+.tm-card-time {
+    font-size: 12px;
+    color: #9295A3;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1000px) {
+    .tm-card {
+        flex: 0 0 calc((100% - 24px) / 2);
+    }
+}
+
+@media (max-width: 800px) {
+    .tm-heading {
+        font-size: 28px;
+    }
+
+    .tm-body {
+        flex-direction: column;
+        gap: 28px;
+    }
+
+    .tm-side {
+        flex: none;
+        align-items: center;
+        text-align: center;
+    }
+
+    .tm-side-heading {
+        margin-bottom: 24px;
+    }
+
+    .tm-card {
+        flex: 0 0 calc((100% - 24px) / 2);
+    }
+}
+
+@media (max-width: 560px) {
+    .tm-wrapper {
+        padding: 44px 16px 56px;
+    }
+
+    .tm-heading {
+        font-size: 22px;
+    }
+
+    .tm-card {
+        flex: 0 0 88%;
+    }
+}
+
+/* ===== FAQ Section — Tax Filing Landing Page ===== */
+
+.faq-wrapper {
+    width: 100%;
+    background-color: #FFFFFF;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding: 72px 24px 64px;
+}
+
+.faq-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.faq-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 48px;
+    flex-wrap: wrap;
+    padding-bottom: 72px;
+}
+
+/* ---------- Left content ---------- */
+.faq-content {
+    flex: 1 1 320px;
+    max-width: 400px;
+    padding-top: 4px;
+}
+
+.faq-badge {
+    display: inline-block;
+    padding: 8px 18px;
+    border: 1px solid #D7DCEB;
+    border-radius: 999px;
+    color: #1B2E6B;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+
+.faq-heading {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 36px;
+    line-height: 1.25;
+    font-weight: 700;
+    color: #14141A;
+    margin: 0 0 20px;
+}
+
+.faq-description {
+    font-size: 15px;
+    line-height: 1.65;
+    color: #6B6F7B;
+    margin: 0 0 28px;
+}
+
+.faq-check-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 8px;
+    background-color: #1B2E6B;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background-color 0.2s ease;
+}
+
+.faq-check-more:hover {
+    background-color: #16264F;
+}
+
+/* ---------- Right accordion ---------- */
+.faq-accordion {
+    flex: 1 1 420px;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.faq-item {
+    border: 1px solid #E6E8F0;
+    border-radius: 12px;
+    background-color: #FFFFFF;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.faq-item--open {
+    border-color: #DCE0EC;
+    box-shadow: 0 8px 24px rgba(20, 30, 70, 0.06);
+}
+
+.faq-item-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 22px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+}
+
+.faq-item-question {
+    font-size: 16px;
+    font-weight: 700;
+    color: #14141A;
+}
+
+.faq-chevron {
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+}
+
+.faq-chevron--open {
+    transform: rotate(180deg);
+}
+
+.faq-item-body {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.faq-item-answer {
+    margin: 0;
+    padding: 0 22px 20px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #6B6F7B;
+}
+
+/* ---------- Bottom contact bar ---------- */
+.faq-contact-bar {
+    background-color: #1B2E6B;
+    border-radius: 20px;
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.faq-contact-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.faq-contact-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.faq-contact-text {
+    color: #FFFFFF;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.faq-contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #FFFFFF;
+    color: #1B2E6B;
+    padding: 14px 24px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    .faq-heading {
+        font-size: 30px;
+    }
+
+    .faq-top {
+        padding-bottom: 60px;
+    }
+}
+
+@media (max-width: 760px) {
+    .faq-top {
+        flex-direction: column;
+    }
+
+    .faq-content {
+        max-width: 100%;
+    }
+
+    .faq-accordion {
+        max-width: 100%;
+    }
+
+    .faq-contact-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        border-radius: 18px;
+    }
+
+    .faq-contact-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .faq-wrapper {
+        padding: 56px 16px 0;
+    }
+
+    .faq-heading {
+        font-size: 26px;
+    }
+
+    .faq-item-question {
+        font-size: 14px;
+    }
+
+    .faq-item-header {
+        padding: 16px 18px;
+    }
+
+    .faq-item-answer {
+        padding: 0 18px 16px;
+    }
+
+    .faq-contact-text {
+        font-size: 15px;
+    }
+
+    .faq-contact-bar {
+        padding: 20px 22px;
+    }
+}
+
+/* ===== FAQ Section — Tax Filing Landing Page ===== */
+
+.faq-wrapper {
+    width: 100%;
+    background-color: #FFFFFF;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding: 72px 24px 64px;
+}
+
+.faq-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.faq-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 48px;
+    flex-wrap: wrap;
+    padding-bottom: 72px;
+}
+
+/* ---------- Left content ---------- */
+.faq-content {
+    flex: 1 1 320px;
+    max-width: 400px;
+    padding-top: 4px;
+}
+
+.faq-badge {
+    display: inline-block;
+    padding: 8px 18px;
+    border: 1px solid #D7DCEB;
+    border-radius: 999px;
+    color: #1B2E6B;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+
+.faq-heading {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 36px;
+    line-height: 1.25;
+    font-weight: 700;
+    color: #14141A;
+    margin: 0 0 20px;
+}
+
+.faq-description {
+    font-size: 15px;
+    line-height: 1.65;
+    color: #6B6F7B;
+    margin: 0 0 28px;
+}
+
+.faq-check-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: 8px;
+    background-color: #1B2E6B;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background-color 0.2s ease;
+}
+
+.faq-check-more:hover {
+    background-color: #16264F;
+}
+
+/* ---------- Right accordion ---------- */
+.faq-accordion {
+    flex: 1 1 420px;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.faq-item {
+    border: 1px solid #E6E8F0;
+    border-radius: 12px;
+    background-color: #FFFFFF;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.faq-item--open {
+    border-color: #DCE0EC;
+    box-shadow: 0 8px 24px rgba(20, 30, 70, 0.06);
+}
+
+.faq-item-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 22px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+}
+
+.faq-item-question {
+    font-size: 16px;
+    font-weight: 700;
+    color: #14141A;
+}
+
+.faq-chevron {
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+}
+
+.faq-chevron--open {
+    transform: rotate(180deg);
+}
+
+.faq-item-body {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.faq-item-answer {
+    margin: 0;
+    padding: 0 22px 20px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #6B6F7B;
+}
+
+/* ---------- Bottom contact bar ---------- */
+.faq-contact-bar {
+    background-color: #1B2E6B;
+    border-radius: 20px;
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.faq-contact-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.faq-contact-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.faq-contact-text {
+    color: #FFFFFF;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.faq-contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #FFFFFF;
+    color: #1B2E6B;
+    padding: 14px 24px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    .faq-heading {
+        font-size: 30px;
+    }
+
+    .faq-top {
+        padding-bottom: 60px;
+    }
+}
+
+@media (max-width: 760px) {
+    .faq-top {
+        flex-direction: column;
+    }
+
+    .faq-content {
+        max-width: 100%;
+    }
+
+    .faq-accordion {
+        max-width: 100%;
+    }
+
+    .faq-contact-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        border-radius: 18px;
+    }
+
+    .faq-contact-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .faq-wrapper {
+        padding: 56px 16px 0;
+    }
+
+    .faq-heading {
+        font-size: 26px;
+    }
+
+    .faq-item-question {
+        font-size: 14px;
+    }
+
+    .faq-item-header {
+        padding: 16px 18px;
+    }
+
+    .faq-item-answer {
+        padding: 0 18px 16px;
+    }
+
+    .faq-contact-text {
+        font-size: 15px;
+    }
+
+    .faq-contact-bar {
+        padding: 20px 22px;
     }
 }
