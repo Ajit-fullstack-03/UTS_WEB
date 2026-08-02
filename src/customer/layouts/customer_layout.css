@@ -1,0 +1,19 @@
+/* Customer Layout Styling */
+
+.customer-layout-wrapper {
+    background-color: #f4f6fa;
+    font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow-x: hidden;
+}
+
+.customer-main-area {
+    min-height: 100vh;
+    background-color: #f4f6fa;
+    display: flex;
+    flex-direction: column;
+}
+
+.customer-page-content {
+    background-color: #f4f6fa;
+    overflow-y: auto;
+}

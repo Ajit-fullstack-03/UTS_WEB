@@ -1,0 +1,77 @@
+/* Header styling for customer dashboard */
+
+.customer-header {
+    height: 75px;
+    border-bottom: 1px solid #eaedf3;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+    position: sticky;
+    top: 0;
+    z-index: 99;
+}
+
+/* Make Payment Button */
+.btn-make-payment {
+    background-color: #1b2e6b !important;
+    color: #ffffff !important;
+    border-radius: 10px !important;
+    padding: 10px 20px !important;
+    font-size: 0.9rem;
+    font-family: 'Outfit', sans-serif;
+    transition: all 0.2s ease;
+    border: none !important;
+    white-space: nowrap !important;
+    flex-shrink: 0;
+}
+
+.btn-make-payment:hover {
+    background-color: #13214e !important;
+    box-shadow: 0 4px 12px rgba(27, 46, 107, 0.15);
+}
+
+/* Refer & Earn Button */
+.btn-refer-earn {
+    background-color: #ffffff !important;
+    color: #1b2e6b !important;
+    border: 1.5px solid #1b2e6b !important;
+    border-radius: 10px !important;
+    padding: 9px 18px !important;
+    font-size: 0.9rem;
+    font-family: 'Outfit', sans-serif;
+    transition: all 0.2s ease;
+    white-space: nowrap !important;
+    flex-shrink: 0;
+}
+
+.btn-refer-earn:hover {
+    background-color: rgba(27, 46, 107, 0.05) !important;
+    color: #1b2e6b !important;
+    border-color: #1b2e6b !important;
+}
+
+/* Notification Bell */
+.btn-bell {
+    color: #475569 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50% !important;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-bell:hover {
+    background-color: #f1f5f9 !important;
+    color: #1b2e6b !important;
+}
+
+.notification-badge {
+    top: 5px !important;
+    right: 5px !important;
+    font-size: 0.7rem !important;
+    padding: 4px 6px !important;
+    border: 2px solid #ffffff;
+}
+
+.bell-icon {
+    stroke-width: 2px;
+}
