@@ -101,27 +101,21 @@ const steps = [
         image: step1Image,
         imageAlt: "Create your account and upload documents",
     },
-];
-
-const steps2 = [
     {
-        id: 1,
+        id: 2,
         label: "Step 02",
         title: "We Review & Analyze",
-        description: "Our tax experts review your documents,analyze your data and ensure maximum savings with 100% compliance.",
+        description: "Our tax experts review your documents, analyze your data and ensure maximum savings with 100% compliance.",
         image: step2Image,
-        imageAlt: "Create your account and upload documents",
+        imageAlt: "We review your documents and analyze data",
     },
-];
-
-const steps3 = [
     {
-        id: 1,
+        id: 3,
         label: "Step 03",
         title: "Get Tax Report on Email",
         description: "Once completed, our analyst will send your Tax Report (PDF) directly to your email.",
         image: step3Image,
-        imageAlt: "Create your account and upload documents",
+        imageAlt: "Receive your tax report on email",
     },
 ];
 
@@ -149,6 +143,51 @@ const BrandAvatar = () => (
         </svg>
     </div>
 );
+
+const AnimatedCounter = ({ target, suffix = "", prefix = "", duration = 2000 }) => {
+    const [count, setCount] = useState(0);
+    const counterRef = useRef(null);
+    const [hasAnimated, setHasAnimated] = useState(false);
+
+    useEffect(() => {
+        const el = counterRef.current;
+        if (!el) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting && !hasAnimated) {
+                    setHasAnimated(true);
+                    let startTime = null;
+
+                    const animate = (currentTime) => {
+                        if (!startTime) startTime = currentTime;
+                        const progress = Math.min((currentTime - startTime) / duration, 1);
+                        const easeProgress = 1 - Math.pow(1 - progress, 4);
+                        setCount(Math.floor(easeProgress * target));
+
+                        if (progress < 1) {
+                            requestAnimationFrame(animate);
+                        } else {
+                            setCount(target);
+                        }
+                    };
+
+                    requestAnimationFrame(animate);
+                }
+            },
+            { threshold: 0.1 }
+        );
+
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [target, duration, hasAnimated]);
+
+    return (
+        <span ref={counterRef}>
+            {prefix}{count}{suffix}
+        </span>
+    );
+};
 const faqs = [
     {
         id: 1,
@@ -342,17 +381,23 @@ const Home = () => {
                 <div className="hero-statsbar">
                     <div className="hero-statsbar-inner">
                         <div className="hero-stat">
-                            <span className="hero-stat-value">1000+</span>
+                            <span className="hero-stat-value">
+                                <AnimatedCounter target={1000} suffix="+" />
+                            </span>
                             <span className="hero-stat-label">Happy clients</span>
                         </div>
                         <div className="hero-stat-divider" />
                         <div className="hero-stat">
-                            <span className="hero-stat-value">10K+</span>
+                            <span className="hero-stat-value">
+                                <AnimatedCounter target={10} suffix="K+" />
+                            </span>
                             <span className="hero-stat-label">Returns filed</span>
                         </div>
                         <div className="hero-stat-divider" />
                         <div className="hero-stat">
-                            <span className="hero-stat-value">10 yrs</span>
+                            <span className="hero-stat-value">
+                                <AnimatedCounter target={10} suffix=" yrs" />
+                            </span>
                             <span className="hero-stat-label">Experience</span>
                         </div>
                     </div>
@@ -457,7 +502,6 @@ const Home = () => {
 
             <section className="tso-wrapper">
                 <div className="tso-bg-circles" aria-hidden="true"></div>
-
                 <div className="tso-inner">
                     <div className="tso-header">
                         <div className="tso-badge">
@@ -673,13 +717,19 @@ const Home = () => {
                         </svg>
                         <span>Step by step</span>
                     </div>
-
                     <h2 className="rs-heading">Your refund, in three steps</h2>
                 </div>
 
                 <div className="rs-steps">
-                    {steps.map((step) => (
-                        <div className="rs-card" key={step.id}>
+                    {steps.map((step, index) => (
+                        <div
+                            className="rs-card"
+                            key={step.id}
+                            style={{
+                                '--card-index': index + 1,
+                                zIndex: index + 1,
+                            }}
+                        >
                             <div className="rs-card-content">
                                 <span className="rs-step-label">{step.label}</span>
                                 <h3 className="rs-step-title">{step.title}</h3>
@@ -694,47 +744,8 @@ const Home = () => {
                         </div>
                     ))}
                 </div>
-            </section>
 
-            <section className="rs-wrapper">
 
-                <div className="rs-steps">
-                    {steps2.map((step) => (
-                        <div className="rs-card" key={step.id}>
-                            <div className="rs-card-content">
-                                <span className="rs-step-label">{step.label}</span>
-                                <h3 className="rs-step-title">{step.title}</h3>
-                                <p className="rs-step-description">{step.description}</p>
-                            </div>
-
-                            <div className="rs-card-visual">
-                                <div className="rs-visual-frame">
-                                    <img src={step.image} alt={step.imageAlt} className="rs-visual-image" />
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
-            <section className="rs-wrapper">
-                <div className="rs-steps">
-                    {steps3.map((step) => (
-                        <div className="rs-card" key={step.id}>
-                            <div className="rs-card-content">
-                                <span className="rs-step-label">{step.label}</span>
-                                <h3 className="rs-step-title">{step.title}</h3>
-                                <p className="rs-step-description">{step.description}</p>
-                            </div>
-
-                            <div className="rs-card-visual">
-                                <div className="rs-visual-frame">
-                                    <img src={step.image} alt={step.imageAlt} className="rs-visual-image" />
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
             </section>
 
             <section className="tm-wrapper">

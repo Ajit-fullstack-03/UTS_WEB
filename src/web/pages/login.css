@@ -1,275 +1,324 @@
-/* Login and Authentication Styling */
-
-.auth-page-container {
-    background-color: #ffffff;
-    font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-    min-height: 100vh;
+/* ===== Your Refund, In Three Steps Section — Tax Filing Landing Page ===== */
+.rs-wrapper {
     width: 100%;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-    display: flex;
-    align-items: center;
+    background-color: #FFFFFF;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    padding: 23px 20px 0px;
 }
 
-.auth-row {
-    min-height: 100vh;
-    margin: 0;
-    width: 100%;
-    display: flex;
-}
-
-/* Left Panel Style */
-.auth-left-panel {
-    background-color: #1b2e6b;
-    border-radius: 24px !important;
-    margin: 20px 0 20px 20px;
-    padding: 60px 40px 0 40px !important;
+/* ---------- Header ---------- */
+.rs-header {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: calc(100vh - 40px);
-    overflow: hidden; /* Prevent image overflow and crop corners at the bottom */
-    position: relative;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 40px;
 }
 
-.auth-left-text h2 {
-    font-size: 2.3rem;
+.rs-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid #D7DCEB;
+    border-radius: 999px;
+    background-color: #FFFFFF;
+    color: #1B2E6B;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.rs-heading {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: #14141A;
+    margin: 0;
+}
+
+/* ---------- Steps ---------- */
+.rs-steps {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.rs-card {
+    background-color: #EEF1F8;
+    border-radius: 24px;
+    padding: 48px;
+    display: flex;
+    align-items: center;
+    gap: 164px;
+    flex-wrap: wrap;
+    border: 2px solid #7F9BEC;
+}
+
+/* ---------- Left text content ---------- */
+.rs-card-content {
+    flex: 1 1 320px;
+    max-width: 420px;
+}
+
+.rs-step-label {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #5B7FE0;
+    margin-bottom: 16px;
+}
+
+.rs-step-title {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 26px;
     font-weight: 700;
     line-height: 1.3;
-    letter-spacing: -0.5px;
-    color: #ffffff;
-    font-family: 'Outfit', sans-serif;
-    margin-top: 10px;
+    color: #1B2E6B;
+    margin: 0 0 16px;
 }
 
-.auth-left-image-wrapper {
-    margin-top: auto;
-    width: 100%;
+.rs-step-description {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #6B6F7B;
+    margin: 0;
+}
+
+/* ---------- Right visual ---------- */
+.rs-card-visual {
+    flex: 1 1 340px;
     display: flex;
     justify-content: center;
-    align-items: flex-end;
+    max-width: 400px;
 }
 
-.auth-hero-image {
-    object-fit: cover;
-    border-radius: 16px 16px 0 0 !important; /* Rounded tops, flat bottom flush with edge */
-    max-height: 440px;
+.rs-visual-frame {
     width: 100%;
+    max-width: 430px;
+    border-radius: 18px;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.rs-visual-image {
+    width: 100%;
+    height: auto;
     display: block;
-    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.15);
 }
 
-/* Right Panel Style */
-.auth-right-panel {
-    background-color: #ffffff;
-    padding: 40px 20px !important;
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    .rs-card {
+        padding: 36px 28px;
+        gap: 32px;
+    }
+
+    .rs-heading {
+        font-size: 26px;
+    }
+}
+
+@media (max-width: 700px) {
+    .rs-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 32px 24px;
+    }
+
+    .rs-card-content {
+        max-width: 100%;
+    }
+
+    .rs-step-description {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .rs-card-visual {
+        max-width: 320px;
+    }
+}
+
+@media (max-width: 480px) {
+    .rs-wrapper {
+        padding: 48px 16px 56px;
+    }
+
+    .rs-heading {
+        font-size: 22px;
+    }
+
+    .rs-step-title {
+        font-size: 22px;
+    }
+
+    .rs-card {
+        border-radius: 18px;
+        padding: 28px 18px;
+    }
+}
+
+
+
+
+/* ===== Your Refund, In Three Steps Section — Tax Filing Landing Page ===== */
+
+
+
+/* ---------- Header ---------- */
+.rs-header {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: 100vh;
-    overflow-y: auto;
-    align-items: center; /* Center the form container horizontally */
-}
-
-/* Form Container Wrapper - Fixed width matching Figma */
-.auth-form-container {
-    width: 100%;
-    max-width: 420px;
-    margin: auto;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Header & Logo */
-.auth-logo-wrapper {
+    align-items: center;
     text-align: center;
-    width: 100%;
-    margin-bottom: 25px;
+    margin-bottom: 40px;
 }
 
-.auth-logo {
-    max-height: 48px;
-    object-fit: contain;
-    margin: 0 auto;
-}
-
-/* Tabs Navigation */
-.auth-tabs {
-    display: flex;
-    justify-content: center;
-    border-bottom: 1.5px solid #eaedf3 !important;
-    margin-bottom: 30px;
-    width: 100%;
-}
-
-.auth-tab {
-    font-size: 1.05rem;
-    padding: 0 24px 12px 24px;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    font-family: 'Outfit', sans-serif;
-    font-weight: 600;
-    border-bottom: 3px solid transparent;
-    margin-bottom: -1.5px;
-}
-
-.auth-tab.active {
-    color: #1b2e6b !important;
-    border-bottom-color: #1b2e6b !important;
-}
-
-.auth-tab.inactive {
-    color: #94a3b8 !important;
-}
-
-.auth-tab.inactive:hover {
-    color: #1b2e6b !important;
-}
-
-/* Form Headings */
-.auth-title-container {
-    text-align: center;
-    width: 100%;
-    margin-bottom: 25px;
-}
-
-.auth-title {
-    color: #1b2e6b;
-    font-size: 2.2rem;
-    font-weight: 700;
-    font-family: 'Outfit', sans-serif;
-    margin-bottom: 8px;
-}
-
-.auth-subtitle {
-    color: #64748b;
-    font-size: 0.95rem;
-    margin-bottom: 0;
-}
-
-/* Inputs & Form Controls */
-.auth-input-group {
+.rs-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid #D7DCEB;
+    border-radius: 999px;
+    background-color: #FFFFFF;
+    color: #1B2E6B;
+    font-size: 13px;
+    font-weight: 500;
     margin-bottom: 20px;
-    text-align: left; /* Keep form labels & inputs left-aligned */
 }
 
-.auth-input-label {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: #475569;
-    margin-bottom: 6px;
-    display: block;
-    font-family: 'Outfit', sans-serif;
+.rs-heading {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: #14141A;
+    margin: 0;
 }
 
-.auth-input {
-    background-color: #f8fafc;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 12px;
-    font-size: 0.95rem;
-    padding: 14px 18px;
-    transition: all 0.2s ease-in-out;
-    width: 100%;
+/* ---------- Steps ---------- */
+.rs-steps {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
 }
 
-.auth-input:focus {
-    background-color: #ffffff;
-    border-color: #1b2e6b;
-    box-shadow: 0 0 0 3px rgba(27, 46, 107, 0.12);
-    outline: none;
-}
-
-/* Password input positioning */
-.input-group-auth {
-    position: relative;
-}
-
-.password-toggle-btn {
-    height: 100%;
+.rs-card {
+    background-color: #EEF1F8;
+    border-radius: 24px;
+    padding: 48px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 48px;
+    flex-wrap: wrap;
+}
+
+/* ---------- Left text content ---------- */
+.rs-card-content {
+    flex: 1 1 320px;
+    max-width: 420px;
+}
+
+.rs-step-label {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #5B7FE0;
+    margin-bottom: 16px;
+}
+
+.rs-step-title {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #1B2E6B;
+    margin: 0 0 16px;
+}
+
+.rs-step-description {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #6B6F7B;
+    margin: 0;
+}
+
+/* ---------- Right visual ---------- */
+.rs-card-visual {
+    flex: 1 1 340px;
+    display: flex;
     justify-content: center;
-    padding: 0 18px;
-    z-index: 10;
-    background: none;
-    border: none;
-    color: #64748b;
+    max-width: 400px;
 }
 
-.password-toggle-btn:focus {
-    box-shadow: none !important;
-    outline: none;
-}
-
-/* Links & Buttons */
-.auth-link {
-    color: #1b2e6b;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: color 0.2s ease;
-}
-
-.auth-link:hover {
-    color: #13214e;
-    text-decoration: underline !important;
-}
-
-.auth-submit-btn {
-    background-color: #1b2e6b !important;
-    border-color: #1b2e6b !important;
-    font-weight: 600;
-    font-size: 1.05rem;
-    border-radius: 12px !important;
-    padding: 14px 20px !important;
-    transition: all 0.2s ease;
-    font-family: 'Outfit', sans-serif;
-}
-
-.auth-submit-btn:hover {
-    background-color: #13214e !important;
-    border-color: #13214e !important;
-}
-
-/* Checkbox Style */
-.auth-checkbox {
-    border-radius: 4px;
-    border: 1.5px solid #cbd5e1;
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-}
-
-.auth-checkbox:checked {
-    background-color: #1b2e6b;
-    border-color: #1b2e6b;
-}
-
-.auth-checkbox:focus {
-    box-shadow: 0 0 0 3px rgba(27, 46, 107, 0.12) !important;
-}
-
-/* Footer Copy */
-.auth-footer {
-    border-top: 1px solid #f1f3f7;
-    padding-top: 20px;
-    margin-top: 30px;
+.rs-visual-frame {
     width: 100%;
+    max-width: 340px;
+    border-radius: 18px;
+    overflow: hidden;
+    line-height: 0;
 }
 
-/* Responsive adjustments */
-@media (max-width: 991.98px) {
-    .auth-left-panel {
-        display: none !important;
+.rs-visual-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    .rs-card {
+        padding: 36px 28px;
+        gap: 32px;
     }
-    .auth-right-panel {
-        padding: 40px 20px !important;
-        height: 100vh;
+
+    .rs-heading {
+        font-size: 26px;
     }
-    .auth-form-container {
+}
+
+@media (max-width: 700px) {
+    .rs-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 32px 24px;
+    }
+
+    .rs-card-content {
         max-width: 100%;
-        padding: 0 10px;
+    }
+
+    .rs-step-description {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .rs-card-visual {
+        max-width: 320px;
+    }
+}
+
+@media (max-width: 480px) {
+    .rs-wrapper {
+        padding: 48px 16px 56px;
+    }
+
+    .rs-heading {
+        font-size: 22px;
+    }
+
+    .rs-step-title {
+        font-size: 22px;
+    }
+
+    .rs-card {
+        border-radius: 18px;
+        padding: 28px 18px;
     }
 }

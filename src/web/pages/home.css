@@ -10,8 +10,10 @@
 .hero-topbar {
     background-color: #1E3A8ACC;
     padding: 14px 24px;
-    max-width: 51%;
+    max-width: 79%;
     border-radius: 0px 0px 65px;
+    position: fixed;
+    z-index: 999999999;
 }
 
 .hero-topbar-inner {
@@ -168,20 +170,24 @@
     object-fit: cover;
 }
 
-/* Floating stats card - top left over image */
-.hero-float-card--stats {
-    position: absolute;
-    top: -28px;
-    left: -8px;
-    background-color: #FFFFFF;
-    border-radius: 14px;
-    box-shadow: 0 12px 32px rgba(20, 30, 70, 0.16);
-    padding: 16px 18px;
-    width: 210px;
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 10px 12px;
+/* ---------- Floating animation ---------- */
+/* Card gently rises, then eases back down, on a continuous loop */
+@keyframes heroFloatY {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-14px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
 }
+
+/* Floating stats card - top left over image */
+
 
 .hero-float-card-icon {
     width: 36px;
@@ -249,14 +255,56 @@
     right: 18px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    background-color: #FFFFFF;
-    border-radius: 999px;
-    box-shadow: 0 10px 28px rgba(20, 30, 70, 0.16);
+    gap: 10px;
     padding: 12px 20px 12px 12px;
     font-size: 14px;
     font-weight: 600;
-    color: #1A1A1A;
+    color: #2c2b2b;
+    border-radius: 10px;
+    overflow: hidden;
+    isolation: isolate;
+    /* Premium Glass */
+    background: linear-gradient(135deg,
+            rgba(253, 251, 251, 0.24),
+            rgba(255, 255, 255, 0.08));
+    backdrop-filter: blur(45px) saturate(220%) brightness(1.15);
+    -webkit-backdrop-filter: blur(45px) saturate(220%) brightness(1.15);
+    border: 1px solid rgba(255, 255, 255, .35);
+    box-shadow:
+        0 15px 45px rgba(31, 38, 135, .16),
+        inset 0 1px 1px rgba(255, 255, 255, .75),
+        inset 0 -1px 2px rgba(255, 255, 255, .12);
+    animation: heroFloatY 3.2s ease-in-out infinite;
+    animation-delay: .6s;
+    will-change: transform;
+}
+
+.hero-float-card--stats {
+    position: absolute;
+    top: -15px;
+    left: -8px;
+    width: 210px;
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px 12px;
+    position: absolute;
+    overflow: hidden;
+    isolation: isolate;
+    /* Premium Glass */
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, .22),
+            rgba(255, 255, 255, .08));
+    backdrop-filter: blur(15px) saturate(120%) brightness(1.15);
+    -webkit-backdrop-filter: blur(45px) saturate(220%) brightness(1.15);
+    border: 1px solid rgba(255, 255, 255, .35);
+    border-radius: 20px;
+    box-shadow:
+        0 15px 45px rgba(31, 38, 135, .18),
+        inset 0 1px 1px rgba(255, 255, 255, .75),
+        inset 0 -1px 2px rgba(255, 255, 255, .12);
+    animation: heroFloatY 3.6s ease-in-out infinite;
+    will-change: transform;
 }
 
 .hero-float-card-refund-icon {
@@ -268,6 +316,15 @@
     align-items: center;
     justify-content: center;
     font-size: 15px;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+    .hero-float-card--stats,
+    .hero-float-card--refund {
+        animation: none;
+    }
 }
 
 /* ---------- Bottom stats bar ---------- */
@@ -388,6 +445,265 @@
     }
 }
 
+/* ===== Tax-Saving Opportunities Section — Tax Filing Landing Page ===== */
+
+.tso-wrapper {
+    position: relative;
+    width: 100%;
+    background-color: #FFFFFF;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+    padding: 72px 24px 39px;
+}
+
+/* Decorative concentric circles, top-right background */
+.tso-bg-circles {
+    position: absolute;
+    top: -220px;
+    right: -160px;
+    width: 560px;
+    height: 560px;
+    border-radius: 50%;
+    background:
+        repeating-radial-gradient(circle,
+            #EEF0F6 0px,
+            #EEF0F6 1px,
+            transparent 1px,
+            transparent 30px);
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.tso-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 90%;
+    margin: 0 auto;
+}
+
+/* ---------- Header ---------- */
+.tso-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.tso-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid #D7DCEB;
+    border-radius: 999px;
+    background-color: #FFFFFF;
+    color: #1B2E6B;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.tso-heading {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 34px;
+    line-height: 1.3;
+    font-weight: 700;
+    color: #14141A;
+    max-width: 760px;
+    margin: 0 0 12px;
+}
+
+.tso-subheading {
+    font-size: 16px;
+    color: #6B6F7B;
+    margin: 0;
+    max-width: 520px;
+}
+
+/* ---------- Grid (3 columns, each a vertical stack) ---------- */
+.tso-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.tso-col {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ---------- Card base ---------- */
+.tso-card {
+    border-radius: 18px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* clips the full-bleed image (and its hover zoom) to the card's own rounded corners */
+}
+
+.tso-card--light {
+    background-color: #EAECFB;
+}
+
+.tso-card--dark {
+    background-color: #333C6B;
+}
+
+.tso-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+/* Icon square (text-only cards) */
+.tso-card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.tso-card-icon--light {
+    background-color: #1B2E6B;
+}
+
+.tso-card-icon--dark {
+    background-color: rgba(255, 255, 255, 0.14);
+}
+
+/* Arrow button */
+.tso-card-arrow {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.tso-card-arrow--light {
+    background-color: #D3D8F5;
+}
+
+.tso-card-arrow--dark {
+    background-color: #FFFFFF;
+}
+
+/* Title / description */
+.tso-card-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #14141A;
+    margin: 0 0 8px;
+    line-height: 1.3;
+}
+
+.tso-card-title--onDark {
+    color: #FFFFFF;
+}
+
+.tso-card-desc {
+    font-size: 14px;
+    line-height: 1.55;
+    color: #62667A;
+    margin: 0;
+}
+
+.tso-card-desc--onDark {
+    color: #C4C8E4;
+}
+
+/* When title is in the top row (image cards), remove default title bottom margin conflicts */
+.tso-card--with-image .tso-card-top .tso-card-title {
+    margin: 0;
+    flex: 1;
+}
+
+/* ---------- Image ---------- */
+/* FIX: full-bleed — negative margins cancel out the card's own 20px padding
+   so the image touches all edges with zero gap. The card's overflow:hidden +
+   border-radius (above) automatically rounds the image's bottom corners to match. */
+.tso-card-image-wrap {
+    position: relative;
+    margin: 16px -20px -20px -20px;
+    width: calc(100% + 40px);
+    overflow: hidden;
+    aspect-ratio: 16 / 11;
+}
+
+.tso-card-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transform: scale(1);
+    transition: transform 0.45s ease;
+    /* smooth hover zoom */
+    will-change: transform;
+}
+
+/* Hover in: image zooms in smoothly. Hover out: eases back to normal, same transition. */
+.tso-card-image-wrap:hover .tso-card-image {
+    transform: scale(1.1);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+    .tso-heading {
+        font-size: 28px;
+    }
+
+    .tso-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .tso-wrapper {
+        padding: 56px 20px 64px;
+    }
+
+    .tso-heading {
+        font-size: 24px;
+    }
+
+    .tso-subheading {
+        font-size: 14px;
+    }
+
+    /* Mobile: everything stacks one by one in a single column */
+    .tso-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .tso-col {
+        gap: 20px;
+    }
+
+    .tso-bg-circles {
+        top: -180px;
+        right: -220px;
+        width: 420px;
+        height: 420px;
+    }
+}
+
+
+
+
+
 /* ===== Why Choose Us Section — Tax Filing Landing Page ===== */
 
 .wcu-wrapper {
@@ -458,6 +774,45 @@
     object-fit: cover;
     object-position: center top;
     display: block;
+    animation: wcuFloatYFast 2.4s ease-in-out infinite;
+    will-change: transform;
+}
+
+/* ---------- Floating animation ---------- */
+/* Shared keyframes: gentle rise-and-settle loop, reused by the image card and each chip */
+@keyframes wcuFloatY {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-16px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* The whole photo + chips block floats together, slow and subtle */
+.wcu-image-card {
+    animation: wcuFloatY 4.5s ease-in-out infinite;
+    will-change: transform;
+}
+
+/* Faster, smaller float just for the image, layered on top of the card's own float */
+@keyframes wcuFloatYFast {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-18px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
 }
 
 /* Floating chips */
@@ -472,6 +827,8 @@
     font-weight: 600;
     white-space: nowrap;
     box-shadow: 0 8px 20px rgba(20, 30, 70, 0.14);
+    animation: wcuFloatY 3.4s ease-in-out infinite;
+    will-change: transform;
 }
 
 .wcu-chip-icon {
@@ -506,6 +863,9 @@
         inset 0 1px 1px rgba(255, 255, 255, 0.8),
         inset 0 -1px 1px rgba(255, 255, 255, 0.15);
     overflow: hidden;
+    /* stagger: slightly different speed + delay so it doesn't move in sync with the others */
+    animation-duration: 3.1s;
+    animation-delay: 0.2s;
 }
 
 .wcu-chip--turnaround {
@@ -519,6 +879,9 @@
     box-shadow: 0 8px 30px rgba(138, 109, 31, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.8), inset 0 -1px 1px rgba(255, 255, 255, 0.15);
     overflow: hidden;
     isolation: isolate;
+    /* stagger */
+    animation-duration: 3.8s;
+    animation-delay: 0.6s;
 }
 
 .wcu-chip--turnaround::before {
@@ -547,6 +910,19 @@
     box-shadow: 0 8px 30px rgba(138, 109, 31, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.8), inset 0 -1px 1px rgba(255, 255, 255, 0.15);
     overflow: hidden;
     isolation: isolate;
+    /* stagger */
+    animation-duration: 3.6s;
+    animation-delay: 1s;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+    .wcu-image-card,
+    .wcu-image,
+    .wcu-chip {
+        animation: none;
+    }
 }
 
 /* ---------- Right content ---------- */
@@ -702,6 +1078,17 @@
     display: flex;
     flex-direction: column;
 }
+
+.os-card:hover {
+    background-color: white;
+
+}
+
+.os-card:hover .os-card-label {
+    color: black;
+
+}
+
 
 .os-card-image-wrap {
     width: 100%;
@@ -939,7 +1326,6 @@
     margin-top: 16px;
     border-radius: 12px;
     overflow: hidden;
-    width: 100%;
 }
 
 .tso-card-image {
@@ -1315,13 +1701,13 @@
     }
 }
 
-/* ===== Your Refund, In Three Steps Section — Tax Filing Landing Page ===== */
-
+/* ===== Your Refund, In Three Steps Section — Sticky Stacking Scroll ===== */
 .rs-wrapper {
     width: 100%;
     background-color: #FFFFFF;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    padding: 23px 20px 0px;
+    padding: 60px 20px 100px;
+    position: relative;
 }
 
 /* ---------- Header ---------- */
@@ -1330,7 +1716,7 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 50px;
 }
 
 .rs-badge {
@@ -1349,30 +1735,52 @@
 
 .rs-heading {
     font-family: Georgia, 'Times New Roman', Times, serif;
-    font-size: 30px;
+    font-size: 32px;
     font-weight: 700;
     color: #14141A;
     margin: 0;
 }
 
-/* ---------- Steps ---------- */
+/* ---------- Steps Container & Sticky Stacking Cards ---------- */
 .rs-steps {
     max-width: 1200px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 60px;
+    position: relative;
+    padding-bottom: 60px;
 }
 
 .rs-card {
+    position: sticky;
+    top: calc(140px + (var(--card-index, 1) - 1) * 25px);
+    z-index: var(--card-index, 1);
     background-color: #EEF1F8;
-    border-radius: 24px;
+    border-radius: 28px;
     padding: 48px;
     display: flex;
     align-items: center;
     gap: 164px;
     flex-wrap: wrap;
     border: 2px solid #7F9BEC;
+    box-shadow: 0 -12px 36px rgba(27, 46, 107, 0.08), 0 20px 40px rgba(0, 0, 0, 0.07);
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+    will-change: transform;
+}
+
+.rs-card:nth-child(1) {
+    background-color: #F3F6FD;
+}
+
+.rs-card:nth-child(2) {
+    background-color: #EEF2FD;
+    border-color: #6C8DE8;
+}
+
+.rs-card:nth-child(3) {
+    background-color: #E6EDFC;
+    border-color: #557CE5;
 }
 
 /* ---------- Left text content ---------- */
@@ -1478,6 +1886,9 @@
         padding: 28px 18px;
     }
 }
+
+
+
 
 /* ===== Your Refund, In Three Steps Section — Tax Filing Landing Page ===== */
 
