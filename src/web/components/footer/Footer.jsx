@@ -1,9 +1,13 @@
 import React from "react";
 import "./Footer.css";
 import logoImage from "../../../assets/image/umpire_tax_logo.png";
+import heroBg from "../../../assets/image/BACKGROUD.jpeg";
+
 const Footer = () => {
     return (
-        <footer className="ftr-wrapper">
+        <footer className="ftr-wrapper"
+            style={{ backgroundImage: `url(${heroBg})` }}
+        >
             <div className="ftr-inner">
                 <div className="ftr-top">
                     {/* Brand column */}

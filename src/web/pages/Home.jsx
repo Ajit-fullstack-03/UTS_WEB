@@ -628,7 +628,7 @@ const Home = () => {
 
                             <h2 className="fs-heading">
                                 <span className="fs-heading-dark">File Smart.</span>
-                                <br />
+
                                 <span className="fs-heading-accent">Get More Back.</span>
                             </h2>
 
