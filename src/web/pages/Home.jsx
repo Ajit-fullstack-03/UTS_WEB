@@ -21,6 +21,9 @@ const services = [
     { id: 1, image: onePlatformImg1, label: "Free Tax Estimate" },
     { id: 2, image: taxEstimateImg2, label: "One Platform. Every Tax Need." },
     { id: 3, image: weFileImg1, label: "We File. You Relax." },
+    { id: 4, image: onePlatformImg1, label: "Free Tax Estimate" },
+    { id: 5, image: taxEstimateImg2, label: "One Platform. Every Tax Need." },
+    { id: 6, image: weFileImg1, label: "We File. You Relax." },
 ];
 
 const testimonials = [

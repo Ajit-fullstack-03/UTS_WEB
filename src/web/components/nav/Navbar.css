@@ -7,7 +7,7 @@
     box-sizing: border-box;
 }
 
-.navbar {
+.custom-navbar {
     width: 100%;
     background: #fff;
     border-bottom: 1px solid #ececec;
@@ -64,7 +64,7 @@
     gap: 14px;
 }
 
-.btn {
+.nav-btn {
     width: 96px;
     height: 40px;
 
@@ -80,23 +80,23 @@
     transition: .3s;
 }
 
-.btn-outline {
+.nav-btn-outline {
     border: 1px solid #2446A6;
     color: #2446A6;
     background: #fff;
 }
 
-.btn-outline:hover {
+.nav-btn-outline:hover {
     background: #2446A6;
     color: #fff;
 }
 
-.btn-primary {
+.nav-btn-primary {
     background: #2446A6;
     color: #fff;
 }
 
-.btn-primary:hover {
+.nav-btn-primary:hover {
     background: #17388d;
 }
 

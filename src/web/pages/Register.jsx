@@ -83,7 +83,7 @@ const Register = () => {
                             {/* Form */}
                             <form onSubmit={handleRegister}>
                                 <div className="row">
-                                    <div className="col-md-12 mb-3 text-start">
+                                    <div className="col-md-6 mb-3 text-start">
                                         <label className="auth-input-label">
                                             First Name
                                         </label>
@@ -96,7 +96,7 @@ const Register = () => {
                                             required
                                         />
                                     </div>
-                                    <div className="col-md-12 mb-3 text-start">
+                                    <div className="col-md-6 mb-3 text-start">
                                         <label className="auth-input-label">
                                             Last Name
                                         </label>

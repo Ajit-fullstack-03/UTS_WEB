@@ -9,7 +9,7 @@ const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const closeMenu = () => setMenuOpen(false);
     return (
-        <header className="navbar">
+        <header className="custom-navbar">
             <div className="navbar-container">
                 {/* Logo */}
                 <Link to="/" className="logo">
@@ -27,10 +27,10 @@ const Navbar = () => {
 
                 {/* Desktop Buttons */}
                 <div className="desktop-buttons">
-                    <Link to="/login" className="btn btn-outline">
+                    <Link to="/login" className="nav-btn nav-btn-outline">
                         Login
                     </Link>
-                    <Link to="/register" className="btn btn-primary">
+                    <Link to="/register" className="nav-btn nav-btn-primary">
                         Register
                     </Link>
                 </div>
