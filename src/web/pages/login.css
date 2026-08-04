@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Ancizar+Serif:ital,wght@0,300..900;1,300..900&display=swap');
+
 /* ===== Your Refund, In Three Steps Section — Tax Filing Landing Page ===== */
 .rs-wrapper {
     width: 100%;
@@ -192,8 +194,8 @@
 }
 
 .rs-heading {
-    font-family: Georgia, 'Times New Roman', Times, serif;
-    font-size: 30px;
+    font-family: Ancizar serif;
+    font-size: 36px;
     font-weight: 700;
     color: #14141A;
     margin: 0;
@@ -227,19 +229,19 @@
 
 .rs-step-label {
     display: block;
-    font-size: 15px;
-    font-weight: 700;
-    color: #5B7FE0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #7F9BEC;
     margin-bottom: 16px;
 }
 
 .rs-step-title {
-    font-family: Georgia, 'Times New Roman', Times, serif;
-    font-size: 26px;
-    font-weight: 700;
+    font-size: 28px;
+    font-weight: 600;
     line-height: 1.3;
-    color: #1B2E6B;
+    color: #1E3A8A;
     margin: 0 0 16px;
+    font-family: Ancizar serif;
 }
 
 .rs-step-description {

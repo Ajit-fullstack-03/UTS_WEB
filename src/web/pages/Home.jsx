@@ -8,10 +8,13 @@ import taxEstimateImg2 from "../../assets/image/frame3.png";
 import medicalExpensesImage from "../../assets/image/m1.png";
 import studentLoanImage from "../../assets/image/m2.png";
 import iraImage from "../../assets/image/m3.png";
-import personImage2 from "../../assets/image/Ellipse.png";
+import personImage2 from "../../assets/image/grouptag.png";
 import step1Image from "../../assets/image/mid_frame.png";
 import step2Image from "../../assets/image/mid_frame2.png";
 import step3Image from "../../assets/image/mid_frame3.png";
+import heroBg from "../../assets/image/BACKGROUD.jpeg";
+import gist from "../../assets/image/gift.gif";
+import { ArrowLeft, ArrowRight } from "iconsax-reactjs";
 
 
 const services = [
@@ -277,7 +280,9 @@ const Home = () => {
 
     return (
         <>
-            <section className="hero-wrapper">
+            <section className="hero-wrapper"
+                style={{ backgroundImage: `url(${heroBg})` }}
+            >
                 {/* Top contact bar */}
                 <div className="hero-topbar">
                     <div className="hero-topbar-inner">
@@ -333,7 +338,7 @@ const Home = () => {
                         <div className="hero-cta-group">
                             <button className="hero-btn hero-btn-primary">Get Started</button>
                             <button className="hero-btn hero-btn-secondary">
-                                <span className="hero-btn-icon" role="img" aria-label="gift">🎁</span>
+                                <img src={gist} alt="" className="image-icon" />
                                 Refer &amp; Earn
                             </button>
                         </div>
@@ -615,7 +620,6 @@ const Home = () => {
 
             <section className="fs-wrapper">
                 <div className="fs-card">
-                    <div className="fs-bg-circle" aria-hidden="true"></div>
 
                     <div className="fs-top">
                         {/* Left content */}
@@ -639,21 +643,6 @@ const Home = () => {
                         <div className="fs-visual">
                             <div className="fs-image-wrap">
                                 <img src={personImage2} alt="Happy client giving a thumbs up" className="fs-image" />
-                            </div>
-
-                            <div className="fs-refund-card">
-                                <span className="fs-refund-label">Refund Up To</span>
-                                <span className="fs-refund-value">$2,750</span>
-                                <span className="fs-refund-tag">
-                                    <span className="fs-refund-tag-icon">
-                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M5 13l4 4L19 7" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                                        </svg>
-                                    </span>
-                                    <span className="fs-refund-tag-text">
-                                        More Refund. <span className="fs-refund-tag-accent">Better Future.</span>
-                                    </span>
-                                </span>
                             </div>
                         </div>
                     </div>
@@ -790,9 +779,10 @@ const Home = () => {
                                     disabled={!canScrollPrev}
                                     aria-label="Previous testimonial"
                                 >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M15 6l-6 6 6 6" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                                    </svg>
+                                    <ArrowLeft
+                                        size="22"
+                                        color="#ffffffff"
+                                    />
                                 </button>
 
                                 <span className="tm-nav-line" />
@@ -804,9 +794,10 @@ const Home = () => {
                                     disabled={!canScrollNext}
                                     aria-label="Next testimonial"
                                 >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M9 6l6 6-6 6" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                                    </svg>
+                                    <ArrowRight
+                                        size="22"
+                                        color="#ffffffff"
+                                    />
                                 </button>
                             </div>
                         </div>
