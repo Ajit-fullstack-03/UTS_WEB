@@ -2854,3 +2854,62 @@ body {
         padding: 20px 22px;
     }
 }
+
+/* ========== Country Flag in Topbar ========== */
+.hero-topbar-flag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 3px;
+    overflow: hidden;
+    line-height: 0;
+}
+
+/* ========== Scroll To Top Button ========== */
+.scroll-to-top-btn {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1B2E6B 0%, #2a4aad 100%);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 20px rgba(27, 46, 107, 0.45);
+    opacity: 0;
+    transform: translateY(20px) scale(0.85);
+    pointer-events: none;
+    transition: opacity 0.35s ease, transform 0.35s ease, box-shadow 0.25s ease, background 0.25s ease;
+    z-index: 9999;
+}
+
+.scroll-to-top-btn--visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.scroll-to-top-btn:hover {
+    background: linear-gradient(135deg, #2a4aad 0%, #3b5fcf 100%);
+    box-shadow: 0 8px 28px rgba(27, 46, 107, 0.65);
+    transform: translateY(-3px) scale(1.06);
+}
+
+.scroll-to-top-btn:active {
+    transform: translateY(0) scale(0.97);
+    box-shadow: 0 4px 14px rgba(27, 46, 107, 0.4);
+}
+
+@media (max-width: 575px) {
+    .scroll-to-top-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 42px;
+        height: 42px;
+    }
+}

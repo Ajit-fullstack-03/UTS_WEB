@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import logoImg from "../../assets/image/umpire_tax_logo.png";
-import loginCollabImg from "../../assets/image/login_collab.png";
+import loginCollabImg from "../../assets/image/frame1l.png";
+import ellipseImg from "../../assets/image/Object.png";
 import "./login.css";
 
 const Login = () => {
@@ -19,37 +20,39 @@ const Login = () => {
     };
 
     return (
-        <div className="auth-page-container container-fluid p-0">
+        <div className="auth-page-container">
+            {/* Top Right Circle Pattern Graphic */}
+            <img
+                src={ellipseImg}
+                alt="Background decorative pattern"
+                className="auth-ellipse-bg"
+            />
+
             <div className="auth-row row g-0">
-                {/* Left Panel - Hero Graphic */}
-                <div className="col-lg-6 p-0 d-none d-lg-block">
+                {/* Left Panel - Hero Graphic (50% Width) */}
+                <div className="col-lg-6 p-0 d-none d-lg-block h-100">
                     <div className="auth-left-panel">
-                        <div className="auth-left-text">
-                            <h2>
-                                Secure Tax Filing.
-                                <br />
-                                Expert Guidance.
-                                <br />
-                                Better Outcomes.
-                            </h2>
-                        </div>
-                        <div className="auth-left-image-wrapper">
+                        <div className="auth-image-wrapper">
                             <img
                                 src={loginCollabImg}
                                 alt="Tax Professionals Collaborating"
-                                className="img-fluid auth-hero-image"
+                                className="auth-hero-image"
                             />
+                            <h2 className="auth-left-heading">
+                                <span>  Secure Tax Filing. Expert</span> <br />
+                                <span> Guidance. Better Outcomes. </span>
+                            </h2>
                         </div>
                     </div>
                 </div>
 
-                {/* Right Panel - Form */}
-                <div className="col-lg-6 p-0">
+                {/* Right Panel - Form (50% Width) */}
+                <div className="col-lg-6 p-0 h-100">
                     <div className="auth-right-panel">
                         <div className="auth-form-container">
-                            {/* Header Logo */}
+                            {/* Header Logo Card */}
                             <div className="auth-logo-wrapper">
-                                <Link to="/">
+                                <Link to="/" className="auth-logo-card">
                                     <img
                                         src={logoImg}
                                         alt="Umpire Tax Solutions Logo"
@@ -110,7 +113,7 @@ const Login = () => {
                                         />
                                         <button
                                             type="button"
-                                            className="password-toggle-btn btn position-absolute end-0 top-50 translate-middle-y"
+                                            className="password-toggle-btn position-absolute end-0 top-50 translate-middle-y"
                                             onClick={() => setShowPassword(!showPassword)}
                                         >
                                             {showPassword ? (
@@ -123,17 +126,17 @@ const Login = () => {
                                 </div>
 
                                 {/* Remember Me and Forgot Password */}
-                                <div className="d-flex justify-content-between align-items-center mb-4">
-                                    <div className="form-check d-flex align-items-center gap-2">
+                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                    <div className="form-check d-flex align-items-center gap-2 ps-0">
                                         <input
                                             type="checkbox"
-                                            className="form-check-input auth-checkbox m-0"
+                                            className="form-check-input auth-checkbox m-0 ms-0"
                                             id="rememberMe"
                                             checked={rememberMe}
                                             onChange={(e) => setRememberMe(e.target.checked)}
                                         />
                                         <label
-                                            className="form-check-label text-muted small fw-semibold cursor-pointer"
+                                            className="form-check-label auth-link mb-0 cursor-pointer"
                                             htmlFor="rememberMe"
                                         >
                                             Remember Me
@@ -150,18 +153,18 @@ const Login = () => {
                                 {/* Submit Button */}
                                 <button
                                     type="submit"
-                                    className="btn btn-primary w-100 auth-submit-btn mb-4"
+                                    className="btn auth-submit-btn w-100 mb-3"
                                 >
                                     Log In
                                 </button>
 
                                 {/* Redirect Option */}
                                 <div className="text-center">
-                                    <p className="text-muted small mb-0">
+                                    <p className="auth-subtitle mb-0">
                                         Don't Have An Account?{" "}
                                         <Link
                                             to="/register"
-                                            className="auth-link text-decoration-none"
+                                            className="auth-link fw-bold text-decoration-none"
                                         >
                                             Register Now.
                                         </Link>
@@ -172,8 +175,8 @@ const Login = () => {
 
                         {/* Footer Copy */}
                         <div className="auth-footer text-center">
-                            <p className="text-muted small mb-0">
-                                Copyright, All rights reserved by Umpire Tax Solutions
+                            <p className="auth-footer-text">
+                                2026 Copyright, All rights reserved by Umpire Tax Solutions
                             </p>
                         </div>
                     </div>

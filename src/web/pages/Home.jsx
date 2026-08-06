@@ -280,6 +280,14 @@ const Home = () => {
         setOpenId((prev) => (prev === id ? null : id));
     };
 
+    // Scroll to top
+    const [showScrollTop, setShowScrollTop] = useState(false);
+    useEffect(() => {
+        const onScroll = () => setShowScrollTop(window.scrollY > 300);
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => window.removeEventListener("scroll", onScroll);
+    }, []);
+    const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
     return (
         <>
@@ -295,6 +303,19 @@ const Home = () => {
                                     <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z" fill="currentColor" />
                                 </svg>
                             </span>
+                            {/* USA Flag SVG */}
+                            <span className="hero-topbar-flag">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" width="22" height="12" style={{borderRadius: "2px", display: "block"}}>
+                                    <rect width="7410" height="3900" fill="#B22234"/>
+                                    <rect y="300" width="7410" height="300" fill="white"/>
+                                    <rect y="900" width="7410" height="300" fill="white"/>
+                                    <rect y="1500" width="7410" height="300" fill="white"/>
+                                    <rect y="2100" width="7410" height="300" fill="white"/>
+                                    <rect y="2700" width="7410" height="300" fill="white"/>
+                                    <rect y="3300" width="7410" height="300" fill="white"/>
+                                    <rect width="2964" height="2100" fill="#3C3B6E"/>
+                                </svg>
+                            </span>
                             <span>+1 (515)686-4275</span>
                         </div>
 
@@ -302,6 +323,16 @@ const Home = () => {
                             <span className="hero-topbar-icon">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z" fill="currentColor" />
+                                </svg>
+                            </span>
+                            {/* India Flag SVG */}
+                            <span className="hero-topbar-flag">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="22" height="12" style={{borderRadius: "2px", display: "block"}}>
+                                    <rect width="900" height="200" fill="#FF9933"/>
+                                    <rect y="200" width="900" height="200" fill="#FFFFFF"/>
+                                    <rect y="400" width="900" height="200" fill="#138808"/>
+                                    <circle cx="450" cy="300" r="60" fill="none" stroke="#000080" strokeWidth="6"/>
+                                    <circle cx="450" cy="300" r="8" fill="#000080"/>
                                 </svg>
                             </span>
                             <span>+91 81860-51040</span>
@@ -916,8 +947,19 @@ const Home = () => {
                 </div>
             </section>
 
+            {/* Scroll to Top Button */}
+            <button
+                className={`scroll-to-top-btn ${showScrollTop ? "scroll-to-top-btn--visible" : ""}`}
+                onClick={scrollToTop}
+                aria-label="Scroll to top"
+                title="Back to top"
+            >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 19V5M5 12l7-7 7 7" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+            </button>
         </>
     )
 }
 
-export default Home; 
+export default Home;
