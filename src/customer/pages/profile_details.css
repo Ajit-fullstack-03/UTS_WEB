@@ -1,0 +1,157 @@
+/* Profile Details Styling */
+
+.profile-details-wrapper {
+    font-family: 'Outfit', 'Inter', sans-serif;
+    color: #1b2e6b;
+}
+
+.profile-page-title {
+    font-size: 2.2rem;
+    letter-spacing: -0.5px;
+}
+
+.bg-light-gray {
+    background-color: #f1f5f9;
+}
+
+/* Tabs Navigation Styling */
+.tab-btn {
+    border: none !important;
+    background: transparent !important;
+    color: #64748b !important;
+    font-size: 0.95rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.tab-btn:hover {
+    color: #1b2e6b !important;
+    background-color: rgba(27, 46, 107, 0.05) !important;
+}
+
+.active-tab {
+    background-color: #1b2e6b !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 10px rgba(27, 46, 107, 0.15) !important;
+}
+
+/* Form Section Input Styling */
+.section-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.35rem;
+    position: relative;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #eaedf3;
+}
+
+.form-input-label {
+    font-size: 0.88rem;
+    letter-spacing: 0.1px;
+}
+
+.form-input {
+    border: 1.5px solid #cbd5e1;
+    background-color: #ffffff;
+    color: #1b2e6b;
+    font-size: 0.95rem;
+    transition: all 0.2s ease-in-out;
+    font-weight: 500;
+}
+
+.form-input:focus {
+    border-color: #1b2e6b;
+    box-shadow: 0 0 0 4px rgba(27, 46, 107, 0.08);
+    outline: none;
+}
+
+.form-input::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+/* Custom Select Styling */
+.form-select.form-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%231b2e6b' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+}
+
+/* Custom date input padding */
+input[type="date"].form-input {
+    padding-right: 0.75rem;
+}
+
+/* Action Buttons Styling */
+.btn-save-profile {
+    background-color: #1b2e6b !important;
+    border: none !important;
+    transition: all 0.2s ease-in-out;
+    font-size: 0.95rem;
+    padding: 10px 24px !important;
+}
+
+.btn-save-profile:hover {
+    background-color: #13214e !important;
+    box-shadow: 0 4px 12px rgba(27, 46, 107, 0.25);
+    transform: translateY(-1px);
+}
+
+.btn-add-dep {
+    background-color: #ffffff !important;
+    color: #1b2e6b !important;
+    border: 1.5px solid #1b2e6b !important;
+    transition: all 0.2s ease;
+    font-size: 0.88rem;
+}
+
+.btn-add-dep:hover {
+    background-color: rgba(27, 46, 107, 0.05) !important;
+    box-shadow: 0 2px 8px rgba(27, 46, 107, 0.1);
+}
+
+/* Dependent Card Styling */
+.bg-light-gray-subtle {
+    background-color: #f8fafc;
+}
+
+.dependent-card {
+    border: 1.5px solid #e2e8f0 !important;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.dependent-card:hover {
+    border-color: #cbd5e1 !important;
+}
+
+.bg-navy {
+    background-color: #1b2e6b !important;
+}
+
+.hover-trash:hover {
+    color: #dc3545 !important;
+    opacity: 0.9;
+}
+
+/* Success Alert Styling */
+.alert-success {
+    background-color: #f0fdf4 !important;
+    border: 1px solid #bbf7d0 !important;
+}
+
+.alert-success .text-success {
+    color: #15803d !important;
+}
+
+/* Responsive adjust */
+@media (max-width: 576px) {
+    .profile-page-title {
+        font-size: 1.8rem;
+    }
+    
+    .tab-btn {
+        font-size: 0.85rem;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+}

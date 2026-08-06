@@ -5,7 +5,13 @@ import "./header.css";
 
 const Header = () => {
     return (
-        <header className="customer-header py-3 px-4 d-flex align-items-center justify-content-end bg-white">
+        <header className="customer-header py-3 px-4 d-flex align-items-center justify-content-between bg-white">
+            {/* File Status Badge */}
+            <div className="header-status-badge d-flex align-items-center gap-2 px-3 py-2 rounded-pill">
+                <span className="status-dot"></span>
+                <span className="status-text fw-semibold small">File status: basic info pending</span>
+            </div>
+
             <div className="header-actions d-flex align-items-center gap-3">
                 {/* Make Payment button */}
                 <button className="btn btn-make-payment fw-semibold">
