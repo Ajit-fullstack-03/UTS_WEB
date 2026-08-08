@@ -5,6 +5,7 @@ import logoImg from "../../assets/image/umpire_tax_logo.png";
 import loginCollabImg from "../../assets/image/frame1l.png";
 import ellipseImg from "../../assets/image/Object.png";
 import "./login.css";
+import { webservices } from "../services/webServices";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -13,15 +14,31 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [rememberMe, setRememberMe] = useState(false);
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        alert(`Logged in with: ${email}`);
-        navigate("/");
+        const payload = {
+            email: email,
+            password: password
+        }
+        try {
+            const response = await webservices.login(payload);
+            if (response.data.http_code === 200) {
+                localStorage.setItem("currentUser", JSON.stringify(response.data.uinfo.user_id));
+                // Store the full user info for future use if needed
+                localStorage.setItem("userInfo", JSON.stringify(response.data.uinfo));
+                alert(response.data.status_smessage);
+                navigate("/customer");
+            } else {
+                alert(response.data.status_smessage || "Login failed");
+            }
+        } catch (error) {
+            console.log(error);
+            alert("An error occurred during login. Please try again.");
+        }
     };
 
     return (
         <div className="auth-page-container">
-            {/* Top Right Circle Pattern Graphic */}
             <img
                 src={ellipseImg}
                 alt="Background decorative pattern"

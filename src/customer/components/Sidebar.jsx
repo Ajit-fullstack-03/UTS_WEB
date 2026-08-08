@@ -78,6 +78,10 @@ const Sidebar = () => {
                     <li className="mt-4 border-top border-secondary pt-3">
                         <NavLink
                             to="/login"
+                            onClick={() => {
+                                localStorage.removeItem("currentUser");
+                                localStorage.removeItem("userInfo");
+                            }}
                             className="sidebar-menu-item d-flex align-items-center gap-3 text-decoration-none text-danger-hover"
                         >
                             <FiLogOut className="menu-icon text-muted" />

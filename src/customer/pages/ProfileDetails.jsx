@@ -1,23 +1,25 @@
-﻿import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiUser, FiUsers, FiPlus, FiTrash2, FiSave, FiCheckCircle, FiChevronUp, FiChevronDown } from "react-icons/fi";
+import { webservices } from "../servics/CustomerServices";
 import "./profile_details.css";
 
 const ProfileDetails = () => {
     const [activeTab, setActiveTab] = useState("taxpayer");
     const [showSuccessToast, setShowSuccessToast] = useState(false);
     const [sectionOpen, setSectionOpen] = useState(true);
+    const [isEditable, setIsEditable] = useState(false);
 
     const [taxpayer, setTaxpayer] = useState({
-        firstName: "Somya",
-        lastName: "Sahoo",
-        ssnItin: "XXX-XX-1234",
-        occupation: "Software Engineer",
-        dob: "1995-08-15",
-        email: "somya.sahoo@example.com",
-        mobileCode: "+91",
-        mobilePhone: "(912)-458-3320",
-        workPhone: "(912)-458-9988",
-        referralName: "Rajesh Kumar"
+        firstName: "",
+        lastName: "",
+        ssnItin: "",
+        occupation: "",
+        dob: "",
+        email: "",
+        mobileCode: "",
+        mobilePhone: "",
+        workPhone: "",
+        referralName: ""
     });
 
     const [spouse, setSpouse] = useState({
@@ -32,8 +34,79 @@ const ProfileDetails = () => {
     });
 
     const [dependents, setDependents] = useState([
-        { id: 1, name: "Aryan Sahoo", relationship: "Son", ssnItin: "XXX-XX-9876", dob: "2018-05-12" }
+        { id: 1, firstName: "", lastName: "", relationship: "", ssnItin: "", dob: "", visaType: "" }
     ]);
+
+    useEffect(() => {
+        const fetchProfileData = async () => {
+            const userInfoStr = localStorage.getItem("userInfo");
+            if (!userInfoStr) return;
+
+            try {
+                const userInfo = JSON.parse(userInfoStr);
+                const client_id = userInfo.client_id;
+                const user_id = userInfo.user_id;
+
+                // 1. Fetch Taxpayer Info
+                const resTaxpayer = await webservices.taxpayerinfo({ client_id, user_id });
+                if (resTaxpayer.data && resTaxpayer.data.http_code === 200 && resTaxpayer.data.tinfo) {
+                    const t = resTaxpayer.data.tinfo;
+                    setTaxpayer({
+                        firstName: t.first_name || "",
+                        lastName: t.last_name || "",
+                        ssnItin: t.ssnitin || t.itin || "",
+                        occupation: t.occupation || "",
+                        dob: t.dob ? t.dob.split("T")[0] : "",
+                        email: t.email || "",
+                        mobileCode: t.phoneext || "+91",
+                        mobilePhone: t.phone || "",
+                        workPhone: t.alterphone || "",
+                        referralName: t.referral_name || ""
+                    });
+                }
+
+                // 2. Fetch Spouse Info
+                const resSpouse = await webservices.spouseinfo({ client_id, user_id });
+                if (resSpouse.data && resSpouse.data.http_code === 200) {
+                    const s = resSpouse.data.tinfo || resSpouse.data.sinfo || resSpouse.data.spouseinfo;
+                    if (s) {
+                        setSpouse({
+                            firstName: s.first_name || "",
+                            lastName: s.last_name || "",
+                            ssnItin: s.ssnitin || s.itin || "",
+                            occupation: s.occupation || "",
+                            dob: s.dob ? s.dob.split("T")[0] : "",
+                            email: s.email || "",
+                            mobileCode: s.phoneext || "+1",
+                            mobilePhone: s.phone || ""
+                        });
+                    }
+                }
+
+                // 3. Fetch Dependents Info
+                const resDeps = await webservices.dependentinfo({ client_id, user_id });
+                if (resDeps.data && resDeps.data.http_code === 200) {
+                    const dList = resDeps.data.tinfo || resDeps.data.dinfo || resDeps.data.dependents;
+                    if (Array.isArray(dList)) {
+                        setDependents(dList.map((d, index) => ({
+                            id: d.user_details_id || index + 1,
+                            firstName: d.first_name || "",
+                            lastName: d.last_name || "",
+                            relationship: d.relation_ship || "Son",
+                            ssnItin: d.ssnitin || d.itin || "",
+                            dob: d.dob ? d.dob.split("T")[0] : "",
+                            visaType: d.visa_type || ""
+                        })));
+                    }
+                }
+
+            } catch (error) {
+                console.error("Error fetching profile details:", error);
+            }
+        };
+
+        fetchProfileData();
+    }, []);
 
     const handleTaxpayerChange = (e) => {
         const { name, value } = e.target;
@@ -55,7 +128,7 @@ const ProfileDetails = () => {
         const newId = dependents.length > 0 ? Math.max(...dependents.map(d => d.id)) + 1 : 1;
         setDependents(prev => [
             ...prev,
-            { id: newId, name: "", relationship: "Son", ssnItin: "", dob: "" }
+            { id: newId, firstName: "", lastName: "", relationship: "Son", ssnItin: "", dob: "", visaType: "" }
         ]);
     };
 
@@ -63,11 +136,77 @@ const ProfileDetails = () => {
         setDependents(prev => prev.filter(dep => dep.id !== id));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setShowSuccessToast(true);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setTimeout(() => setShowSuccessToast(false), 5000);
+        const userInfoStr = localStorage.getItem("userInfo");
+        if (!userInfoStr) return;
+
+        try {
+            const userInfo = JSON.parse(userInfoStr);
+            const client_id = userInfo.client_id;
+            const user_id = userInfo.user_id;
+
+            let response;
+            if (activeTab === "taxpayer") {
+                const payload = {
+                    client_id,
+                    user_id,
+                    first_name: taxpayer.firstName,
+                    last_name: taxpayer.lastName,
+                    ssnitin: taxpayer.ssnItin,
+                    occupation: taxpayer.occupation,
+                    dob: taxpayer.dob,
+                    email: taxpayer.email,
+                    phoneext: taxpayer.mobileCode,
+                    phone: taxpayer.mobilePhone,
+                    alterphone: taxpayer.workPhone,
+                    referral_name: taxpayer.referralName
+                };
+                response = await webservices.saveTaxpayerInfo(payload);
+            } else if (activeTab === "spouse") {
+                const payload = {
+                    client_id,
+                    user_id,
+                    first_name: spouse.firstName,
+                    last_name: spouse.lastName,
+                    dob: spouse.dob,
+                    occupation: spouse.occupation,
+                    ssn: spouse.ssnItin,
+                    visa_type: spouse.visaType || ""
+                };
+                response = await webservices.saveSpouseInfo(payload);
+            } else if (activeTab === "dependents") {
+                const dependentsList = dependents.map(dep => ({
+                    d_user_id: client_id,
+                    first_name: dep.firstName,
+                    last_name: dep.lastName,
+                    dob: dep.dob,
+                    occupation: dep.occupation || "",
+                    ssn: dep.ssnItin,
+                    itin: dep.ssnItin,
+                    visa_type: dep.visaType || "",
+                    relation_ship: dep.relationship
+                }));
+                const payload = {
+                    client_id,
+                    user_id,
+                    dependentinfo: dependentsList
+                };
+                response = await webservices.saveDependentsInfo(payload);
+            }
+
+            if (response && response.data && response.data.http_code === 200) {
+                setIsEditable(false);
+                setShowSuccessToast(true);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+                setTimeout(() => setShowSuccessToast(false), 5000);
+            } else {
+                alert(response?.data?.status_smessage || "Failed to save details");
+            }
+        } catch (error) {
+            console.error("Error saving profile details:", error);
+            alert("An error occurred while saving profile details. Please try again.");
+        }
     };
 
     const countryCodes = ["+1", "+91", "+44", "+61", "+971"];
@@ -92,28 +231,38 @@ const ProfileDetails = () => {
                 </div>
             )}
 
-            {/* Tab Navigation */}
-            <div className="profile-tab-bar">
+            {/* Tab Navigation and Edit Action */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "12px" }}>
+                <div className="profile-tab-bar" style={{ margin: 0, borderBottom: "none" }}>
+                    <button
+                        type="button"
+                        className={`profile-tab-btn ${activeTab === "taxpayer" ? "active" : ""}`}
+                        onClick={() => setActiveTab("taxpayer")}
+                    >
+                        Tax Payer Info
+                    </button>
+                    <button
+                        type="button"
+                        className={`profile-tab-btn ${activeTab === "spouse" ? "active" : ""}`}
+                        onClick={() => setActiveTab("spouse")}
+                    >
+                        Spouse Info
+                    </button>
+                    <button
+                        type="button"
+                        className={`profile-tab-btn ${activeTab === "dependents" ? "active" : ""}`}
+                        onClick={() => setActiveTab("dependents")}
+                    >
+                        Dependents (If any)
+                    </button>
+                </div>
+
                 <button
                     type="button"
-                    className={`profile-tab-btn ${activeTab === "taxpayer" ? "active" : ""}`}
-                    onClick={() => setActiveTab("taxpayer")}
+                    className={`btn-edit-toggle ${isEditable ? "editing" : ""}`}
+                    onClick={() => setIsEditable(prev => !prev)}
                 >
-                    Tax Payer Info
-                </button>
-                <button
-                    type="button"
-                    className={`profile-tab-btn ${activeTab === "spouse" ? "active" : ""}`}
-                    onClick={() => setActiveTab("spouse")}
-                >
-                    Spouse Info
-                </button>
-                <button
-                    type="button"
-                    className={`profile-tab-btn ${activeTab === "dependents" ? "active" : ""}`}
-                    onClick={() => setActiveTab("dependents")}
-                >
-                    Dependents (If any)
+                    {isEditable ? "Cancel Edit" : "Edit Profile"}
                 </button>
             </div>
 
@@ -142,9 +291,9 @@ const ProfileDetails = () => {
                     {sectionOpen && (
                         <div className="profile-form-body">
 
-                            {/* â”€â”€ Taxpayer Tab â”€â”€ */}
+                            {/* ─── Taxpayer Tab ─── */}
                             {activeTab === "taxpayer" && (
-                                <>
+                                <fieldset disabled={!isEditable} style={{ border: "none", padding: 0, margin: 0, width: "100%" }}>
                                     <div className="profile-form-row">
                                         <div className="profile-field">
                                             <label className="profile-label">First Name <span className="req">*</span></label>
@@ -273,12 +422,12 @@ const ProfileDetails = () => {
                                             />
                                         </div>
                                     </div>
-                                </>
+                                </fieldset>
                             )}
 
-                            {/* â”€â”€ Spouse Tab â”€â”€ */}
+                            {/* ─── Spouse Tab ─── */}
                             {activeTab === "spouse" && (
-                                <>
+                                <fieldset disabled={!isEditable} style={{ border: "none", padding: 0, margin: 0, width: "100%" }}>
                                     <div className="profile-form-row">
                                         <div className="profile-field">
                                             <label className="profile-label">First Name</label>
@@ -320,18 +469,20 @@ const ProfileDetails = () => {
                                             </div>
                                         </div>
                                     </div>
-                                </>
+                                </fieldset>
                             )}
 
-                            {/* â”€â”€ Dependents Tab â”€â”€ */}
+                            {/* ─── Dependents Tab ─── */}
                             {activeTab === "dependents" && (
-                                <>
+                                <fieldset disabled={!isEditable} style={{ border: "none", padding: 0, margin: 0, width: "100%" }}>
                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
                                         <span style={{ fontWeight: 600, color: "#111827", fontSize: "0.95rem" }}>Dependents List</span>
-                                        <button type="button" onClick={handleAddDependent} className="btn-add-dep">
-                                            <FiPlus size={15} />
-                                            <span>Add Dependent</span>
-                                        </button>
+                                        {isEditable && (
+                                            <button type="button" onClick={handleAddDependent} className="btn-add-dep">
+                                                <FiPlus size={15} />
+                                                <span>Add Dependent</span>
+                                            </button>
+                                        )}
                                     </div>
 
                                     {dependents.length === 0 ? (
@@ -344,15 +495,21 @@ const ProfileDetails = () => {
                                                 <div key={dep.id} className="dependent-card">
                                                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
                                                         <span className="dep-badge">Dependent #{index + 1}</span>
-                                                        <button type="button" className="btn-remove-dep" onClick={() => handleRemoveDependent(dep.id)}>
-                                                            <FiTrash2 size={14} />
-                                                            <span>Remove</span>
-                                                        </button>
+                                                        {isEditable && (
+                                                            <button type="button" className="btn-remove-dep" onClick={() => handleRemoveDependent(dep.id)}>
+                                                                <FiTrash2 size={14} />
+                                                                <span>Remove</span>
+                                                            </button>
+                                                        )}
                                                     </div>
                                                     <div className="profile-form-row" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
                                                         <div className="profile-field">
-                                                            <label className="profile-label">Name</label>
-                                                            <input type="text" value={dep.name} onChange={(e) => handleDependentChange(dep.id, "name", e.target.value)} className="profile-input" placeholder="Enter Dependent Name" required />
+                                                            <label className="profile-label">First Name <span className="req">*</span></label>
+                                                            <input type="text" value={dep.firstName || ""} onChange={(e) => handleDependentChange(dep.id, "firstName", e.target.value)} className="profile-input" placeholder="Enter First Name" required />
+                                                        </div>
+                                                        <div className="profile-field">
+                                                            <label className="profile-label">Last Name <span className="req">*</span></label>
+                                                            <input type="text" value={dep.lastName || ""} onChange={(e) => handleDependentChange(dep.id, "lastName", e.target.value)} className="profile-input" placeholder="Enter Last Name" required />
                                                         </div>
                                                         <div className="profile-field">
                                                             <label className="profile-label">Relationship</label>
@@ -364,32 +521,40 @@ const ProfileDetails = () => {
                                                                 <option value="Other">Other</option>
                                                             </select>
                                                         </div>
+                                                    </div>
+                                                    <div className="profile-form-row" style={{ gridTemplateColumns: "1fr 1fr 1fr", marginTop: "16px" }}>
                                                         <div className="profile-field">
                                                             <label className="profile-label">SSN/ITIN</label>
-                                                            <input type="text" value={dep.ssnItin} onChange={(e) => handleDependentChange(dep.id, "ssnItin", e.target.value)} className="profile-input" placeholder="Enter SSN/ITIN" />
+                                                            <input type="text" value={dep.ssnItin || ""} onChange={(e) => handleDependentChange(dep.id, "ssnItin", e.target.value)} className="profile-input" placeholder="Enter SSN/ITIN" />
                                                         </div>
                                                         <div className="profile-field">
                                                             <label className="profile-label">Date Of Birth</label>
-                                                            <input type="date" value={dep.dob} onChange={(e) => handleDependentChange(dep.id, "dob", e.target.value)} className="profile-input" />
+                                                            <input type="date" value={dep.dob || ""} onChange={(e) => handleDependentChange(dep.id, "dob", e.target.value)} className="profile-input" />
+                                                        </div>
+                                                        <div className="profile-field">
+                                                            <label className="profile-label">Visa Type</label>
+                                                            <input type="text" value={dep.visaType || ""} onChange={(e) => handleDependentChange(dep.id, "visaType", e.target.value)} className="profile-input" placeholder="Enter Visa Type" />
                                                         </div>
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
                                     )}
-                                </>
+                                </fieldset>
                             )}
 
                         </div>
                     )}
 
                     {/* Action Bar */}
-                    <div className="profile-action-bar">
-                        <button type="submit" className="btn-save-profile">
-                            <FiSave size={16} />
-                            <span>Save Changes</span>
-                        </button>
-                    </div>
+                    {isEditable && (
+                        <div className="profile-action-bar">
+                            <button type="submit" className="btn-save-profile">
+                                <FiSave size={16} />
+                                <span>Save Changes</span>
+                            </button>
+                        </div>
+                    )}
 
                 </div>
             </form>

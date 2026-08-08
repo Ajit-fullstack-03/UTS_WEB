@@ -1,0 +1,240 @@
+/* ===========================================
+   Referrals Screen CSS - Exact Figma Design Match
+   =========================================== */
+
+.ref-page-container {
+    padding: 10px 0;
+}
+
+/* ════════════════════════════════════════
+   KPI STAT CARDS
+   ════════════════════════════════════════ */
+.ref-metric-card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1.5px solid #e5e7eb !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.ref-metric-icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ref-metric-icon-box.green {
+    background-color: #e6f4ea;
+    color: #137333;
+}
+
+.ref-metric-icon-box.orange {
+    background-color: #fdf2e9;
+    color: #c85a17;
+}
+
+.ref-metric-val {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.1;
+}
+
+.ref-metric-label {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-top: 2px;
+    font-weight: 500;
+}
+
+/* ════════════════════════════════════════
+   ADD REFERRAL BUTTON
+   ════════════════════════════════════════ */
+.btn-add-ref {
+    background-color: #2d3a8c;
+    border-color: #2d3a8c;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    padding: 8px 18px;
+    transition: all 0.2s ease;
+}
+
+.btn-add-ref:hover {
+    background-color: #1e2865;
+    border-color: #1e2865;
+    box-shadow: 0 4px 10px rgba(45, 58, 140, 0.15);
+}
+
+/* ════════════════════════════════════════
+   EMPTY STATE IN CARD
+   ════════════════════════════════════════ */
+.ref-empty-body {
+    padding: 64px 20px !important;
+}
+
+.ref-empty-user-box {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #e6f4ea;
+    color: #137333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ref-empty-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.ref-empty-subtitle {
+    font-size: 0.88rem;
+    color: #6b7280;
+}
+
+.btn-invite-first {
+    background-color: #2d3a8c;
+    border-color: #2d3a8c;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    padding: 10px 24px;
+    transition: all 0.2s ease;
+}
+
+.btn-invite-first:hover {
+    background-color: #1e2865;
+    border-color: #1e2865;
+    box-shadow: 0 4px 12px rgba(45, 58, 140, 0.15);
+}
+
+/* ════════════════════════════════════════
+   TABLE HISTORY LIST
+   ════════════════════════════════════════ */
+.ref-history-table {
+    width: 100%;
+}
+
+.ref-history-table thead th {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #6b7280;
+    letter-spacing: 0.8px;
+    padding: 14px 16px;
+    border-bottom: 2px solid #e5e7eb;
+    background-color: #f9fafb;
+}
+
+.ref-history-table tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.9rem;
+}
+
+.ref-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.ref-badge.completed {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.ref-badge.pending {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+/* ════════════════════════════════════════
+   PAGINATION FOOTER
+   ════════════════════════════════════════ */
+.ref-pagination-footer {
+    border-color: #e5e7eb !important;
+}
+
+.select-rows-dropdown {
+    width: auto;
+    font-size: 0.8rem;
+    padding: 2px 24px 2px 8px;
+    border-color: #cbd5e1;
+    background-position: right 8px center;
+}
+
+.select-rows-dropdown:focus {
+    box-shadow: none;
+    border-color: #2d3a8c;
+}
+
+.btn-page-number {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #4b5563;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.btn-page-number:hover {
+    background-color: #f3f4f6;
+    color: #111827;
+}
+
+.btn-page-number.active {
+    background-color: #2d3a8c;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.btn-link-arrow:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* ════════════════════════════════════════
+   REFER A FRIEND FORM VIEW
+   ════════════════════════════════════════ */
+.ref-form-subtitle {
+    font-size: 0.88rem;
+    line-height: 1.45;
+    margin-top: 6px;
+}
+
+.ref-info-banner {
+    background-color: #e6f4ea;
+    border: 1px solid #ceead6;
+    color: #137333;
+}
+
+.ref-info-banner .info-icon {
+    color: #137333;
+}
+
+.ref-info-banner .info-text {
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+.btn-cancel {
+    border-color: #d1d5db !important;
+    transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+    background-color: #f3f4f6 !important;
+    border-color: #9ca3af !important;
+}

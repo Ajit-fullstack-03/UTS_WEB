@@ -3,14 +3,21 @@ import { Routes, Route } from "react-router-dom";
 import CustomerLayout from "../layouts/CustomerLayout";
 import CustomerDashboard from "../pages/CustomerDashboard";
 import ProfileDetails from "../pages/ProfileDetails";
+import Documents from "../pages/Documents";
+import Referrals from "../pages/Referrals";
+import AuthGuard from "../guards/AuthGuard";
 
 const CustomerRoutes = () => {
     return (
         <Routes>
-            <Route element={<CustomerLayout />}>
-                <Route index element={<CustomerDashboard />} />
-                <Route path="profile" element={<ProfileDetails />} />
-                {/* Future routes like documents etc can go here */}
+            {/* Wrap all customer routes with AuthGuard to secure them */}
+            <Route element={<AuthGuard />}>
+                <Route element={<CustomerLayout />}>
+                    <Route index element={<CustomerDashboard />} />
+                    <Route path="profile" element={<ProfileDetails />} />
+                    <Route path="documents" element={<Documents />} />
+                    <Route path="referrals" element={<Referrals />} />
+                </Route>
             </Route>
         </Routes>
     );
