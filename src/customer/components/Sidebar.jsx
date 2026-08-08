@@ -1,13 +1,14 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { 
-    FiLayout, 
-    FiUser, 
-    FiFileText, 
-    FiGift, 
-    FiLogOut 
+import {
+    FiLayout,
+    FiUser,
+    FiFileText,
+    FiGift,
+    FiLogOut
 } from "react-icons/fi";
 import logoImg from "../../assets/image/umpire_tax_logo.png";
+
 import "./sidebar.css";
 
 const Sidebar = () => {
@@ -26,12 +27,11 @@ const Sidebar = () => {
             <nav className="sidebar-nav flex-grow-1">
                 <ul className="list-unstyled sidebar-menu-list">
                     <li>
-                        <NavLink 
-                            to="/customer" 
+                        <NavLink
+                            to="/customer"
                             end
-                            className={({ isActive }) => 
-                                `sidebar-menu-item d-flex align-items-center gap-3 text-decoration-none ${
-                                    isActive ? "active" : ""
+                            className={({ isActive }) =>
+                                `sidebar-menu-item d-flex align-items-center gap-3 text-decoration-none ${isActive ? "active" : ""
                                 }`
                             }
                         >
@@ -40,11 +40,10 @@ const Sidebar = () => {
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink 
-                            to="/customer/profile" 
-                            className={({ isActive }) => 
-                                `sidebar-menu-item d-flex align-items-center gap-3 text-decoration-none ${
-                                    isActive ? "active" : ""
+                        <NavLink
+                            to="/customer/profile"
+                            className={({ isActive }) =>
+                                `sidebar-menu-item d-flex align-items-center gap-3 text-decoration-none ${isActive ? "active" : ""
                                 }`
                             }
                         >
@@ -53,11 +52,10 @@ const Sidebar = () => {
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink 
-                            to="/customer/documents" 
-                            className={({ isActive }) => 
-                                `sidebar-menu-item d-flex align-items-center gap-3 text-decoration-none ${
-                                    isActive ? "active" : ""
+                        <NavLink
+                            to="/customer/documents"
+                            className={({ isActive }) =>
+                                `sidebar-menu-item d-flex align-items-center gap-3 text-decoration-none ${isActive ? "active" : ""
                                 }`
                             }
                         >
@@ -66,11 +64,10 @@ const Sidebar = () => {
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink 
-                            to="/customer/referrals" 
-                            className={({ isActive }) => 
-                                `sidebar-menu-item d-flex align-items-center gap-3 text-decoration-none ${
-                                    isActive ? "active" : ""
+                        <NavLink
+                            to="/customer/referrals"
+                            className={({ isActive }) =>
+                                `sidebar-menu-item d-flex align-items-center gap-3 text-decoration-none ${isActive ? "active" : ""
                                 }`
                             }
                         >
@@ -79,8 +76,8 @@ const Sidebar = () => {
                         </NavLink>
                     </li>
                     <li className="mt-4 border-top border-secondary pt-3">
-                        <NavLink 
-                            to="/login" 
+                        <NavLink
+                            to="/login"
                             className="sidebar-menu-item d-flex align-items-center gap-3 text-decoration-none text-danger-hover"
                         >
                             <FiLogOut className="menu-icon text-muted" />

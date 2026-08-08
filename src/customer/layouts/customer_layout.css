@@ -6,14 +6,24 @@
     overflow-x: hidden;
 }
 
+/* Offset for fixed sidebar (260px wide) */
 .customer-main-area {
     min-height: 100vh;
     background-color: #f4f6fa;
     display: flex;
     flex-direction: column;
+    margin-left: 260px;
 }
 
 .customer-page-content {
     background-color: #f4f6fa;
     overflow-y: auto;
+    flex: 1;
+}
+
+/* Responsive: when sidebar collapses to 80px icon-only */
+@media (max-width: 767.98px) {
+    .customer-main-area {
+        margin-left: 80px;
+    }
 }
