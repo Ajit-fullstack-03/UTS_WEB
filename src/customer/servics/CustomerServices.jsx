@@ -12,6 +12,14 @@ const getAuthHeaders = () => {
     };
 };
 
+const getUploadFileAuthHeaders = () => {
+    const token = localStorage.getItem("currentUser")?.replace(/"/g, "");
+    return {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+    };
+};
+
 // GET with auth
 const getUrl = (uri) => {
     return axios.get(uri, { headers: getAuthHeaders() });
@@ -20,6 +28,10 @@ const getUrl = (uri) => {
 // POST with auth
 const postUrl = (uri, data) => {
     return axios.post(uri, data, { headers: getAuthHeaders() });
+};
+
+const postUrlFile = (uri, data) => {
+    return axios.post(uri, data, { headers: getUploadFileAuthHeaders() });
 };
 
 // POST without auth
@@ -36,6 +48,11 @@ const dependentinfo = (data) => postUrl(`${API_URL}member/dependentinfo`, data);
 const saveTaxpayerInfo = (data) => postUrl(`${API_URL}member/saveTaxpayerInfo`, data);
 const saveSpouseInfo = (data) => postUrl(`${API_URL}member/saveSpouseInfo`, data);
 const saveDependentsInfo = (data) => postUrl(`${API_URL}member/saveDependentsInfo`, data);
+const uploaddocs = (data) => postUrlFile(`${API_URL}upload/uploaddocs`, data);
+const getuploaddocs = (data) => postUrl(`${API_URL}upload/getuploaddocs`, data);
+const deleteuploaddoc = (data) => postUrl(`${API_URL}upload/deleteuploaddoc`, data);
+const saveReferralContact = (data) => postUrl(`${API_URL}saveReferralContact`, data);
+const refferalslist = (data) => postUrl(`${API_URL}member/refferalslist`, data);
 
 export const webservices = {
     taxpayerinfo,
@@ -43,5 +60,10 @@ export const webservices = {
     dependentinfo,
     saveTaxpayerInfo,
     saveSpouseInfo,
-    saveDependentsInfo
+    saveDependentsInfo,
+    uploaddocs,
+    getuploaddocs,
+    deleteuploaddoc,
+    saveReferralContact,
+    refferalslist
 };

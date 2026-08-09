@@ -8,11 +8,13 @@ import {
     FiChevronRight
 } from "react-icons/fi";
 import "./referrals.css";
+import { webservices } from "../servics/CustomerServices";
 
 const Referrals = () => {
     const [view, setView] = useState("list"); // 'list' or 'form'
     const [referralHistory, setReferralHistory] = useState([]);
-    
+    const [loading, setLoading] = useState(false);
+
     // User details for prefilling
     const [userProfile, setUserProfile] = useState({
         name: "Somya Sahoo",
@@ -26,14 +28,68 @@ const Referrals = () => {
     const [emailError, setEmailError] = useState("");
     const [nameError, setNameError] = useState("");
 
-    // Load history and user profile from localStorage
+    const fetchReferrals = async () => {
+        const userInfoStr = localStorage.getItem("userInfo");
+        if (!userInfoStr) return;
+
+        try {
+            setLoading(true);
+            const userInfo = JSON.parse(userInfoStr);
+            const client_id = userInfo.client_id;
+            const taxYear = "2026";
+
+            const payload = {
+                taxYear,
+                client_id: String(client_id)
+            };
+
+            const response = await webservices.refferalslist(payload);
+            let rawList = [];
+            if (response.data) {
+                rawList = Array.isArray(response.data)
+                    ? response.data
+                    : (Array.isArray(response.data.data) ? response.data.data : []);
+            }
+
+            const formattedHistory = rawList.map(ref => {
+                let dateStr = "N/A";
+                const createdDate = ref.created_at || ref.rf_created_at;
+                if (createdDate) {
+                    const d = new Date(createdDate);
+                    dateStr = d.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric"
+                    });
+                }
+
+                let status = ref.status || ref.rf_status || "Pending";
+                if (status === 1 || status === "1" || status === "Completed") status = "Completed";
+                else status = "Pending";
+
+                return {
+                    id: ref.rf_id || ref.id || Math.random(),
+                    name: ref.rf_name || "Unknown Friend",
+                    email: ref.rf_email || "N/A",
+                    phone: ref.rf_phone || "",
+                    date: dateStr,
+                    status: status,
+                    earnings: status === "Completed" ? 100 : 0
+                };
+            });
+
+            setReferralHistory(formattedHistory);
+        } catch (error) {
+            console.error("Error fetching referrals:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Load history and user profile from localStorage/API
     useEffect(() => {
-        const storedHistory = localStorage.getItem("referral_history_v2");
-        if (storedHistory) {
-            setReferralHistory(JSON.parse(storedHistory));
-        } else {
-            // Keep it empty initially to show Figma's exact "No referrals yet" empty state
-            setReferralHistory([]);
+        if (view === "list") {
+            fetchReferrals();
         }
 
         const userInfoStr = localStorage.getItem("userInfo");
@@ -48,6 +104,7 @@ const Referrals = () => {
                 console.error(e);
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [view]);
 
     // Calculate stats
@@ -57,7 +114,7 @@ const Referrals = () => {
         .reduce((sum, r) => sum + r.earnings, 0);
 
     // Form submit handler
-    const handleSubmitInvite = (e) => {
+    const handleSubmitInvite = async (e) => {
         e.preventDefault();
         setEmailError("");
         setNameError("");
@@ -87,33 +144,46 @@ const Referrals = () => {
             return;
         }
 
-        const dateStr = new Date().toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric"
-        });
+        const userInfoStr = localStorage.getItem("userInfo");
+        if (!userInfoStr) {
+            alert("Session expired. Please log in again.");
+            return;
+        }
 
-        const newReferral = {
-            id: Date.now(),
-            name: friendName,
-            email: friendEmail,
-            phone: friendPhone,
-            date: dateStr,
-            status: "Pending", // default
-            earnings: 100 // up to $100
-        };
+        try {
+            setLoading(true);
+            const userInfo = JSON.parse(userInfoStr);
 
-        const updatedHistory = [newReferral, ...referralHistory];
-        setReferralHistory(updatedHistory);
-        localStorage.setItem("referral_history_v2", JSON.stringify(updatedHistory));
-        
-        // Reset form
-        setFriendName("");
-        setFriendEmail("");
-        setFriendPhone("");
-        
-        alert("Referral invitation successfully sent!");
-        setView("list");
+            const payload = {
+                rf_on_name: userInfo.user_name || userProfile.name,
+                rf_on_email: userInfo.email || userProfile.email,
+                rf_on_phone: userInfo.phone || userInfo.phone_number || "",
+                rf_on_phone_ext: userInfo.mobileCountry || "INDIA",
+                rf_name: friendName,
+                rf_email: friendEmail,
+                rf_phone: friendPhone || "",
+                rf_phone_ext: "INDIA",
+                rf_comment: "Referral invitation",
+                rf_user_id: userInfo.user_id,
+                user_id: userInfo.user_id
+            };
+
+            const response = await webservices.saveReferralContact(payload);
+            if (response.data && (response.status === 200 || response.data.http_code === 200)) {
+                alert("Referral invitation successfully sent!");
+                setFriendName("");
+                setFriendEmail("");
+                setFriendPhone("");
+                setView("list");
+            } else {
+                alert(response.data.status_smessage || "Failed to send referral invitation. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error saving referral:", error);
+            alert("An error occurred during referral submission. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -161,7 +231,7 @@ const Referrals = () => {
                         {/* Section Header */}
                         <div className="profile-section-header">
                             <h2 className="profile-section-title">Your Referral</h2>
-                            <button 
+                            <button
                                 className="btn btn-primary btn-add-ref px-4 py-2 small fw-semibold"
                                 onClick={() => setView("form")}
                             >
@@ -170,7 +240,14 @@ const Referrals = () => {
                         </div>
 
                         {/* Card Body */}
-                        {referralHistory.length === 0 ? (
+                        {loading && referralHistory.length === 0 ? (
+                            <div className="ref-empty-body text-center d-flex flex-column align-items-center justify-content-center py-5 px-3" style={{ minHeight: "300px" }}>
+                                <div className="spinner-border text-primary" role="status" style={{ width: "3rem", height: "3rem" }}>
+                                    <span className="visually-hidden">Loading...</span>
+                                </div>
+                                <p className="text-muted mt-3 fw-semibold">Loading referrals...</p>
+                            </div>
+                        ) : referralHistory.length === 0 ? (
                             /* Empty State Match to Figma */
                             <div className="ref-empty-body text-center d-flex flex-column align-items-center justify-content-center py-5 px-3">
                                 <div className="ref-empty-user-box mb-3 d-flex align-items-center justify-content-center">
@@ -178,7 +255,7 @@ const Referrals = () => {
                                 </div>
                                 <h3 className="ref-empty-title mb-2">No referrals yet</h3>
                                 <p className="ref-empty-subtitle text-muted mb-4">Invite a friend and you get upto $100 on filing.</p>
-                                <button 
+                                <button
                                     className="btn btn-primary btn-invite-first px-4 py-2.5 fw-semibold"
                                     onClick={() => setView("form")}
                                 >
@@ -279,18 +356,18 @@ const Referrals = () => {
                             <div className="profile-form-row">
                                 <div className="profile-field">
                                     <label className="profile-label">Your Name <span className="req">*</span></label>
-                                    <input 
-                                        type="text" 
-                                        className="profile-input" 
+                                    <input
+                                        type="text"
+                                        className="profile-input"
                                         value={userProfile.name}
                                         disabled
                                     />
                                 </div>
                                 <div className="profile-field">
                                     <label className="profile-label">Your Email <span className="req">*</span></label>
-                                    <input 
-                                        type="email" 
-                                        className="profile-input" 
+                                    <input
+                                        type="email"
+                                        className="profile-input"
                                         value={userProfile.email}
                                         disabled
                                     />
@@ -306,9 +383,9 @@ const Referrals = () => {
                             <div className="profile-form-row">
                                 <div className="profile-field">
                                     <label className="profile-label">Full Name <span className="req">*</span></label>
-                                    <input 
-                                        type="text" 
-                                        className={`profile-input ${nameError ? "is-invalid border-danger" : ""}`} 
+                                    <input
+                                        type="text"
+                                        className={`profile-input ${nameError ? "is-invalid border-danger" : ""}`}
                                         placeholder="Enter First Name"
                                         value={friendName}
                                         onChange={(e) => setFriendName(e.target.value)}
@@ -318,9 +395,9 @@ const Referrals = () => {
                                 </div>
                                 <div className="profile-field">
                                     <label className="profile-label">Email <span className="req">*</span></label>
-                                    <input 
-                                        type="email" 
-                                        className={`profile-input ${emailError ? "is-invalid border-danger" : ""}`} 
+                                    <input
+                                        type="email"
+                                        className={`profile-input ${emailError ? "is-invalid border-danger" : ""}`}
                                         placeholder="Enter Email Address"
                                         value={friendEmail}
                                         onChange={(e) => setFriendEmail(e.target.value)}
@@ -332,9 +409,9 @@ const Referrals = () => {
                             <div className="profile-form-row mt-4">
                                 <div className="profile-field">
                                     <label className="profile-label">Phone Number</label>
-                                    <input 
-                                        type="tel" 
-                                        className="profile-input" 
+                                    <input
+                                        type="tel"
+                                        className="profile-input"
                                         placeholder="Enter Phone Number"
                                         value={friendPhone}
                                         onChange={(e) => setFriendPhone(e.target.value)}
@@ -348,19 +425,29 @@ const Referrals = () => {
 
                         {/* Form Action Buttons Bar */}
                         <div className="profile-action-bar">
-                            <button 
+                            <button
                                 className="btn btn-outline-secondary btn-cancel px-4 py-2 border rounded fw-semibold text-muted bg-transparent me-2"
                                 type="button"
                                 onClick={() => setView("list")}
                             >
                                 Cancel
                             </button>
-                            <button 
-                                className="btn btn-primary btn-save-profile px-4 py-2 fw-semibold"
+                            <button
+                                className="btn btn-primary btn-save-profile px-4 py-2 fw-semibold d-flex align-items-center justify-content-center gap-2"
                                 type="submit"
                                 onClick={handleSubmitInvite}
+                                disabled={loading}
                             >
-                                Send Invitation
+                                {loading ? (
+                                    <>
+                                        <div className="spinner-border spinner-border-sm text-white" role="status">
+                                            <span className="visually-hidden">Sending...</span>
+                                        </div>
+                                        <span>Sending...</span>
+                                    </>
+                                ) : (
+                                    "Send Invitation"
+                                )}
                             </button>
                         </div>
                     </div>

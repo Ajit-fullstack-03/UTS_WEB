@@ -5,6 +5,7 @@ import logoImg from "../../assets/image/umpire_tax_logo.png";
 import registerCallImg from "../../assets/image/frame1l2.png";
 import ellipseImg from "../../assets/image/Object.png";
 import "./login.css";
+import { webservices } from "../services/webServices";
 
 const Register = () => {
     const navigate = useNavigate();
@@ -15,11 +16,46 @@ const Register = () => {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleRegister = (e) => {
+    const getMobileCountry = (code) => {
+        const clean = code.replace("+", "").trim();
+        if (clean === "91") return "INDIA";
+        if (clean === "1") return "USA";
+        if (clean === "44") return "UNITED KINGDOM";
+        return "INDIA"; // Default fallback
+    };
+
+    const handleRegister = async (e) => {
         e.preventDefault();
-        alert(`Registered: ${firstName} ${lastName} (${email})`);
-        navigate("/login");
+        setLoading(true);
+
+        const payload = {
+            first_name: firstName,
+            last_name: lastName,
+            phone: phoneNumber,
+            email: email,
+            password: password,
+            confirmpassword: password,
+            confirmemail: email,
+            mobileCountry: getMobileCountry(phoneCode),
+            user_id: null
+        };
+
+        try {
+            const response = await webservices.register(payload);
+            if (response.data.http_code === 200) {
+                alert(response.data.status_smessage || "Registration successful!");
+                navigate("/login");
+            } else {
+                alert(response.data.status_smessage || "Registration failed");
+            }
+        } catch (error) {
+            console.error("Register Error:", error);
+            alert("An error occurred during registration. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -193,8 +229,9 @@ const Register = () => {
                                 <button
                                     type="submit"
                                     className="btn auth-submit-btn w-100 mb-3"
+                                    disabled={loading}
                                 >
-                                    Register
+                                    {loading ? "Registering..." : "Register"}
                                 </button>
 
                                 {/* Redirect Option */}

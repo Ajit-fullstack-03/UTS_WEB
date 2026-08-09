@@ -13,6 +13,7 @@ import {
 } from "react-icons/fi";
 import noDataImg from "../../assets/image/no_data.png";
 import "./documents.css";
+import { webservices } from "../servics/CustomerServices";
 
 const Documents = () => {
     // Categories tabs definition
@@ -30,59 +31,125 @@ const Documents = () => {
     const [selectedCountry, setSelectedCountry] = useState("IN"); // 'US' or 'IN'
     const [pendingFiles, setPendingFiles] = useState([]);
     const [uploadedDocs, setUploadedDocs] = useState([]);
+    const [loading, setLoading] = useState(false);
     const fileInputRef = useRef(null);
 
-    // Load initial documents from localStorage or set defaults
-    useEffect(() => {
-        const storedDocs = localStorage.getItem("uploaded_tax_documents");
-        if (storedDocs) {
-            setUploadedDocs(JSON.parse(storedDocs));
-        } else {
-            // Add some mock documents to match state D (Document List View) initially
-            const mockDocs = [
-                {
-                    id: 1,
-                    name: "image (11).png",
-                    type: "Other documents",
-                    categoryKey: "other",
-                    country: "INDIA",
-                    year: "2026",
-                    uploadedDate: "Jul 24, 2026"
-                },
-                {
-                    id: 2,
-                    name: "Form 16 - Company.pdf",
-                    type: "W2",
-                    categoryKey: "w2",
-                    country: "INDIA",
-                    year: "2026",
-                    uploadedDate: "Jul 24, 2026"
-                },
-                {
-                    id: 3,
-                    name: "Annual Information Statement.pdf",
-                    type: "1099-NEC/B/G/DIV/INT/MISC",
-                    categoryKey: "1099",
-                    country: "INDIA",
-                    year: "2026",
-                    uploadedDate: "Jul 24, 2026"
-                }
-            ];
-            setUploadedDocs(mockDocs);
-            localStorage.setItem("uploaded_tax_documents", JSON.stringify(mockDocs));
-        }
-    }, []);
+    const getOriginalNameAndCountry = (fileName) => {
+        let name = "Unknown Document";
+        let country = "INDIA";
+        if (!fileName) return { name, country };
 
-    // Save to localStorage whenever uploadedDocs changes
-    const saveDocs = (docs) => {
-        setUploadedDocs(docs);
-        localStorage.setItem("uploaded_tax_documents", JSON.stringify(docs));
+        // Remove query parameters if present (e.g. from S3 presigned URL)
+        let cleanName = fileName.split("?")[0];
+        // Extract the filename portion if it contains folder paths or URL segments
+        cleanName = cleanName.substring(cleanName.lastIndexOf("/") + 1);
+
+        const parts = cleanName.split("_utshash_");
+        if (parts.length > 1) {
+            const rawName = parts[1];
+            if (rawName.startsWith("US_")) {
+                country = "UNITED STATES";
+                name = rawName.substring(3);
+            } else if (rawName.startsWith("IN_")) {
+                country = "INDIA";
+                name = rawName.substring(3);
+            } else {
+                name = rawName;
+            }
+        } else {
+            name = cleanName;
+        }
+        return { name, country };
     };
+
+    const fetchAllDocs = async () => {
+        const userInfoStr = localStorage.getItem("userInfo");
+        if (!userInfoStr) return;
+
+        try {
+            setLoading(true);
+            const userInfo = JSON.parse(userInfoStr);
+            const client_id = userInfo.client_id;
+            const user_id = userInfo.user_id;
+
+            const docTypes = [
+                { key: "w2", apiType: "W2", label: "W2" },
+                { key: "1099", apiType: "P1099B", label: "1099-NEC/B/G/DIV/INT/MISC" },
+                { key: "5498", apiType: "HSA", label: "5498/HSA 1099R/IRA" },
+                { key: "1098", apiType: "IRA", label: "1098/1098-T" },
+                { key: "other", apiType: "other", label: "Other documents" }
+            ];
+
+            const promises = docTypes.map(async (docType) => {
+                const payload = {
+                    folderPath: `${client_id}/${docType.apiType}/`,
+                    doctype: docType.apiType,
+                    user_id: user_id
+                };
+                const response = await webservices.getuploaddocs(payload);
+                let files = [];
+                if (response.data) {
+                    if (Array.isArray(response.data)) {
+                        files = response.data;
+                    } else if (response.data.data) {
+                        if (Array.isArray(response.data.data.Contents)) {
+                            files = response.data.data.Contents;
+                        } else if (Array.isArray(response.data.data)) {
+                            files = response.data.data;
+                        }
+                    } else if (Array.isArray(response.data.Contents)) {
+                        files = response.data.Contents;
+                    }
+                }
+
+                return files.map(file => {
+                    let formattedDate = "N/A";
+                    if (file.created_at) {
+                        const d = new Date(file.created_at);
+                        formattedDate = d.toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric"
+                        });
+                    }
+
+                    const fileNameSource = file.upload_file_name || (file.upload_file ? file.upload_file.split("?")[0].split("/").pop() : "");
+                    const parsed = getOriginalNameAndCountry(fileNameSource);
+
+                    return {
+                        id: file.up_id || fileNameSource || Math.random().toString(),
+                        up_id: file.up_id,
+                        name: parsed.name,
+                        url: file.upload_file,
+                        rawFileName: fileNameSource,
+                        type: docType.label,
+                        categoryKey: docType.key,
+                        country: parsed.country,
+                        year: file.current_year || "2026",
+                        uploadedDate: formattedDate
+                    };
+                });
+            });
+
+            const results = await Promise.all(promises);
+            const flatDocs = results.flat();
+            setUploadedDocs(flatDocs);
+        } catch (error) {
+            console.error("Error fetching docs:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchAllDocs();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Filter documents based on active tab
     const filteredDocs = uploadedDocs.filter(doc => {
         if (activeTab === "all") return true;
-        
+
         // Map activeTab to category names
         if (activeTab === "w2") return doc.type === "W2";
         if (activeTab === "1099") return doc.type === "1099-NEC/B/G/DIV/INT/MISC";
@@ -107,8 +174,8 @@ const Documents = () => {
         const newPending = files.map((file, index) => {
             // format size to human-readable
             const sizeInKb = Math.round(file.size / 1024);
-            const sizeStr = sizeInKb > 1000 
-                ? `${(sizeInKb / 1024).toFixed(1)} MB` 
+            const sizeStr = sizeInKb > 1000
+                ? `${(sizeInKb / 1024).toFixed(1)} MB`
                 : `${sizeInKb} KB`;
 
             return {
@@ -145,45 +212,107 @@ const Documents = () => {
     };
 
     // Submit pending files and add to uploaded list
-    const handleUploadSubmit = () => {
+    const handleUploadSubmit = async () => {
         if (pendingFiles.length === 0) return;
 
-        const dateStr = new Date().toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric"
-        });
+        const userInfoStr = localStorage.getItem("userInfo");
+        if (!userInfoStr) {
+            alert("User session not found. Please log in again.");
+            return;
+        }
 
-        const newDocs = pendingFiles.map(pf => {
-            // Find key from selected type label
-            let key = "other";
-            if (pf.selectedType === "W2") key = "w2";
-            else if (pf.selectedType.startsWith("1099")) key = "1099";
-            else if (pf.selectedType.startsWith("5498")) key = "5498";
-            else if (pf.selectedType.startsWith("1098")) key = "1098";
+        try {
+            setLoading(true);
+            const userInfo = JSON.parse(userInfoStr);
+            const client_id = userInfo.client_id;
+            const upt_id = userInfo.upt_id || null;
 
-            return {
-                id: Date.now() + Math.random(),
-                name: pf.name,
-                type: pf.selectedType,
-                categoryKey: key,
-                country: selectedCountry === "US" ? "UNITED STATES" : "INDIA",
-                year: pf.selectedYear,
-                uploadedDate: dateStr
-            };
-        });
+            const formData = new FormData();
+            const metadata = [];
 
-        const updated = [...newDocs, ...uploadedDocs];
-        saveDocs(updated);
-        setPendingFiles([]);
-        setShowModal(false);
+            pendingFiles.forEach((fileObj, index) => {
+                let apiType = "other";
+                if (fileObj.selectedType === "W2") apiType = "W2";
+                else if (fileObj.selectedType.startsWith("1099")) apiType = "P1099B";
+                else if (fileObj.selectedType.startsWith("5498")) apiType = "HSA";
+                else if (fileObj.selectedType.startsWith("1098")) apiType = "IRA";
+
+                const fileExtension = fileObj.rawFile.name.substring(fileObj.rawFile.name.lastIndexOf("."));
+                const filePrefix = selectedCountry === "US" ? "US_" : "IN_";
+                // const renamedFileName = `${filePrefix}file${index + 1}${fileExtension}`;
+                const timestamp = Date.now();
+                const renamedFileName = `${filePrefix}file${timestamp}${fileExtension}`;
+
+                const renamedFile = new File([fileObj.rawFile], renamedFileName, {
+                    type: fileObj.rawFile.type
+                });
+
+                formData.append("uploadedImages" + index, renamedFile);
+                formData.append("doctype", apiType);
+
+                metadata.push({
+                    name: renamedFileName,
+                    doctype: apiType
+                });
+            });
+
+            formData.append("client_id", client_id);
+            formData.append("fileMetadata", JSON.stringify(metadata));
+            // Add a default folderPath for backend fallback compatibility
+            formData.append("folderPath", `${client_id}/`);
+            if (upt_id !== null) {
+                formData.append("upt_id", upt_id);
+            }
+            const response = await webservices.uploaddocs(formData);
+            if (response.data && (response.status === 200 || response.data.message)) {
+                alert(`${pendingFiles.length} file(s) uploaded successfully!`);
+            } else {
+                alert("Failed to upload files.");
+            }
+        } catch (error) {
+            console.error("General error during upload process:", error);
+            alert("An error occurred during file upload.");
+        } finally {
+            setLoading(false);
+            setPendingFiles([]);
+            setShowModal(false);
+            fetchAllDocs();
+        }
     };
 
     // Delete an uploaded document
-    const handleDeleteDoc = (id) => {
-        if (window.confirm("Are you sure you want to delete this document?")) {
-            const updated = uploadedDocs.filter(doc => doc.id !== id);
-            saveDocs(updated);
+    const handleDeleteDoc = async (doc) => {
+        if (!window.confirm(`Are you sure you want to delete "${doc.name}"?`)) return;
+
+        const userInfoStr = localStorage.getItem("userInfo");
+        if (!userInfoStr) {
+            alert("User session not found.");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const userInfo = JSON.parse(userInfoStr);
+            const client_id = userInfo.client_id;
+
+            const payload = {
+                filename: doc.rawFileName || doc.id,
+                uid: client_id,
+                up_id: doc.up_id
+            };
+
+            const response = await webservices.deleteuploaddoc(payload);
+            if (response.data && (response.status === 200 || response.data.http_code === 200)) {
+                alert(response.data.msg || "File deleted successfully.");
+            } else {
+                alert(response.data.status_smessage || "Failed to delete file.");
+            }
+        } catch (error) {
+            console.error("Error deleting file:", error);
+            alert("An error occurred during file deletion.");
+        } finally {
+            setLoading(false);
+            fetchAllDocs();
         }
     };
 
@@ -192,7 +321,7 @@ const Documents = () => {
             {/* Header Area */}
             <div className="docs-header-wrapper d-flex align-items-center justify-content-between mb-4">
                 <h1 className="docs-title">Upload Tax Documents</h1>
-                <button 
+                <button
                     className="btn btn-primary btn-upload-top d-flex align-items-center gap-2 px-4 py-2"
                     onClick={() => {
                         setPendingFiles([]);
@@ -221,18 +350,25 @@ const Documents = () => {
             </div>
 
             {/* Main Area: Empty State OR Table View */}
-            {filteredDocs.length === 0 ? (
+            {loading && filteredDocs.length === 0 ? (
+                <div className="docs-empty-state-box text-center d-flex flex-column align-items-center justify-content-center py-5 rounded bg-white border" style={{ minHeight: "350px" }}>
+                    <div className="spinner-border text-primary" role="status" style={{ width: "3rem", height: "3rem" }}>
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                    <p className="text-muted mt-3 fw-semibold">Loading your documents...</p>
+                </div>
+            ) : filteredDocs.length === 0 ? (
                 /* State A: Empty State View */
                 <div className="docs-empty-state-box text-center d-flex flex-column align-items-center justify-content-center py-5 rounded bg-white border">
-                    <img 
-                        src={noDataImg} 
-                        alt="No Documents Uploaded" 
+                    <img
+                        src={noDataImg}
+                        alt="No Documents Uploaded"
                         className="empty-state-img img-fluid mb-4"
                         style={{ maxWidth: "280px" }}
                     />
                     <h3 className="empty-state-title mb-2">No data found</h3>
                     <p className="empty-state-subtitle text-muted mb-4">Upload your Tax Documents</p>
-                    <button 
+                    <button
                         className="btn btn-primary btn-upload-empty px-4 py-2 fw-semibold"
                         onClick={() => {
                             setPendingFiles([]);
@@ -276,24 +412,24 @@ const Documents = () => {
                                         <td className="doc-date-cell text-muted">{doc.uploadedDate}</td>
                                         <td className="doc-action-cell text-end">
                                             <div className="d-flex justify-content-end align-items-center gap-2">
-                                                <button 
-                                                    className="btn btn-icon text-muted" 
+                                                <button
+                                                    className="btn btn-icon text-muted"
                                                     title="View Document"
-                                                    onClick={() => alert(`Viewing file: ${doc.name}`)}
+                                                    onClick={() => doc.url ? window.open(doc.url, "_blank") : alert(`Viewing file: ${doc.name}`)}
                                                 >
                                                     <FiEye size={18} />
                                                 </button>
-                                                <button 
-                                                    className="btn btn-icon text-muted" 
+                                                {/* <button
+                                                    className="btn btn-icon text-muted"
                                                     title="Edit Details"
                                                     onClick={() => alert(`Edit feature for: ${doc.name}`)}
                                                 >
                                                     <FiEdit3 size={17} />
-                                                </button>
-                                                <button 
-                                                    className="btn btn-icon text-danger" 
+                                                </button> */}
+                                                <button
+                                                    className="btn btn-icon text-danger"
                                                     title="Delete Document"
-                                                    onClick={() => handleDeleteDoc(doc.id)}
+                                                    onClick={() => handleDeleteDoc(doc)}
                                                 >
                                                     <FiTrash2 size={17} />
                                                 </button>
@@ -320,7 +456,7 @@ const Documents = () => {
                     <div className="modal-backdrop-blur" onClick={() => setShowModal(false)}></div>
                     <div className="upload-modal-container bg-white rounded border shadow-lg position-relative">
                         {/* Close button */}
-                        <button 
+                        <button
                             className="btn btn-close-modal p-2 border-0 bg-transparent text-muted position-absolute"
                             onClick={() => setShowModal(false)}
                         >
@@ -335,14 +471,14 @@ const Documents = () => {
                             <div className="modal-field-group mb-4">
                                 <label className="modal-field-label d-block text-uppercase small text-muted fw-bold mb-2">Country</label>
                                 <div className="d-flex align-items-center gap-2">
-                                    <button 
+                                    <button
                                         className={`btn btn-country-pill d-flex align-items-center gap-2 ${selectedCountry === "US" ? "active" : ""}`}
                                         onClick={() => setSelectedCountry("US")}
                                     >
                                         <span className="flag-icon">🇺🇸</span>
                                         <span>United States</span>
                                     </button>
-                                    <button 
+                                    <button
                                         className={`btn btn-country-pill d-flex align-items-center gap-2 ${selectedCountry === "IN" ? "active" : ""}`}
                                         onClick={() => setSelectedCountry("IN")}
                                     >
@@ -354,15 +490,15 @@ const Documents = () => {
 
                             {/* Drag & Drop Zone */}
                             <div className="modal-field-group mb-4">
-                                <div 
+                                <div
                                     className="upload-drag-zone d-flex flex-column align-items-center justify-content-center p-4 border-dashed rounded text-center"
                                     onClick={handleDragZoneClick}
                                 >
-                                    <input 
-                                        type="file" 
-                                        ref={fileInputRef} 
-                                        className="d-none" 
-                                        multiple 
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        className="d-none"
+                                        multiple
                                         onChange={handleFileChange}
                                     />
                                     <div className="upload-cloud-icon-container mb-3">
@@ -393,7 +529,7 @@ const Documents = () => {
                                                         <p className="file-size text-muted small mb-0">{file.size}</p>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="pending-file-selectors d-flex align-items-center gap-2 ms-3">
                                                     {/* Category Select Dropdown */}
                                                     <div className="custom-dropdown-container position-relative">
@@ -427,7 +563,7 @@ const Documents = () => {
                                                     </div>
 
                                                     {/* Remove Button */}
-                                                    <button 
+                                                    <button
                                                         className="btn btn-icon text-danger p-2 border-0 bg-transparent"
                                                         onClick={() => handleRemovePending(file.id)}
                                                     >
@@ -441,13 +577,24 @@ const Documents = () => {
                             )}
 
                             {/* Action Upload button */}
-                            <button 
+                            <button
                                 className="btn btn-primary btn-submit-upload w-100 py-3 fw-semibold d-flex align-items-center justify-content-center gap-2 mb-4"
-                                disabled={pendingFiles.length === 0}
+                                disabled={pendingFiles.length === 0 || loading}
                                 onClick={handleUploadSubmit}
                             >
-                                <FiUploadCloud size={20} />
-                                <span>Upload documents</span>
+                                {loading ? (
+                                    <>
+                                        <div className="spinner-border spinner-border-sm text-white" role="status">
+                                            <span className="visually-hidden">Uploading...</span>
+                                        </div>
+                                        <span>Uploading documents...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <FiUploadCloud size={20} />
+                                        <span>Upload documents</span>
+                                    </>
+                                )}
                             </button>
 
                             {/* Warning Footer in Modal */}
