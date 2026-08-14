@@ -42,6 +42,25 @@ const ProfileDetails = () => {
             const userInfoStr = localStorage.getItem("userInfo");
             if (!userInfoStr) return;
 
+            // Auto-enable editing if current file status is <= 3 (setup stage)
+            try {
+                const storedStatus = localStorage.getItem("currentFileStatus");
+                if (storedStatus) {
+                    const parsed = JSON.parse(storedStatus);
+                    const statusId = Number(parsed.presentfilestatus);
+                    if (statusId <= 3) {
+                        setIsEditable(true);
+                    } else {
+                        setIsEditable(false);
+                    }
+                } else {
+                    // Default to editable if status isn't loaded yet to avoid lockouts
+                    setIsEditable(true);
+                }
+            } catch (e) {
+                console.error("Error checking file status:", e);
+            }
+
             try {
                 const userInfo = JSON.parse(userInfoStr);
                 const client_id = userInfo.client_id;

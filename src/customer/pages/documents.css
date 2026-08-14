@@ -443,8 +443,42 @@
     color: #94a3b8;
     cursor: not-allowed;
 }
-
 .modal-warning-footer {
     background-color: #fffbeb !important;
     border-color: #fef3c7 !important;
+}
+
+/* Done Document Upload Checkbox Card */
+.docs-done-checkbox-card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.22s ease-in-out;
+    box-shadow: 0 4px 12px rgba(27, 46, 107, 0.04);
+}
+
+.docs-done-checkbox-card:hover:not(:has(.done-uploads-checkbox:disabled)) {
+    box-shadow: 0 6px 18px rgba(27, 46, 107, 0.08);
+    border-color: #cbd5e1;
+}
+
+.done-uploads-checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    border: 2px solid #cbd5e1;
+    cursor: pointer;
+    accent-color: #1b3178;
+}
+
+.done-uploads-checkbox:disabled {
+    cursor: not-allowed;
+}
+
+.done-uploads-label {
+    font-size: 0.98rem;
+    font-family: 'Outfit', sans-serif;
+    color: #1b2e6b;
+    cursor: pointer;
+    user-select: none;
 }

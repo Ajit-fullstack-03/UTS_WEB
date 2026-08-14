@@ -1,5 +1,6 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import {
     FiLayout,
     FiUser,
@@ -12,6 +13,7 @@ import logoImg from "../../assets/image/umpire_tax_logo.png";
 import "./sidebar.css";
 
 const Sidebar = () => {
+    const navigate = useNavigate();
     return (
         <aside className="customer-sidebar d-flex flex-column text-white">
             {/* Logo Header */}
@@ -76,17 +78,38 @@ const Sidebar = () => {
                         </NavLink>
                     </li>
                     <li className="mt-4 border-top border-secondary pt-3">
-                        <NavLink
-                            to="/login"
-                            onClick={() => {
-                                localStorage.removeItem("currentUser");
-                                localStorage.removeItem("userInfo");
+                        <div
+                            onClick={(e) => {
+                                e.preventDefault();
+                                Swal.fire({
+                                    title: "Logout?",
+                                    text: "Are you sure you want to log out of your session?",
+                                    icon: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#dc3545",
+                                    cancelButtonColor: "#cbd5e1",
+                                    confirmButtonText: "Yes, logout",
+                                    cancelButtonText: "No, stay",
+                                    customClass: {
+                                        confirmButton: "btn btn-danger px-4 py-2",
+                                        cancelButton: "btn btn-light px-4 py-2 ms-2"
+                                    },
+                                    buttonsStyling: false
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        localStorage.removeItem("currentUser");
+                                        localStorage.removeItem("userInfo");
+                                        localStorage.removeItem("currentFileStatus");
+                                        navigate("/login");
+                                    }
+                                });
                             }}
+                            style={{ cursor: "pointer" }}
                             className="sidebar-menu-item d-flex align-items-center gap-3 text-decoration-none text-danger-hover"
                         >
                             <FiLogOut className="menu-icon text-muted" />
                             <span>Logout</span>
-                        </NavLink>
+                        </div>
                     </li>
                 </ul>
             </nav>

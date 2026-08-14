@@ -6,6 +6,7 @@ import loginCollabImg from "../../assets/image/frame1l.png";
 import ellipseImg from "../../assets/image/Object.png";
 import "./login.css";
 import { webservices } from "../services/webServices";
+import Swal from "sweetalert2";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -26,14 +27,24 @@ const Login = () => {
                 localStorage.setItem("currentUser", JSON.stringify(response.data.uinfo.user_id));
                 // Store the full user info for future use if needed
                 localStorage.setItem("userInfo", JSON.stringify(response.data.uinfo));
-                alert(response.data.status_smessage);
+                // alert(response.data.status_smessage);
                 navigate("/customer");
             } else {
-                alert(response.data.status_smessage || "Login failed");
+                Swal.fire({
+                    title: "Login Failed",
+                    text: response.data.status_smessage || "Incorrect email or password.",
+                    icon: "error",
+                    confirmButtonColor: "#1b3178"
+                });
             }
         } catch (error) {
             console.log(error);
-            alert("An error occurred during login. Please try again.");
+            Swal.fire({
+                title: "Error!",
+                text: "An error occurred during login. Please try again.",
+                icon: "error",
+                confirmButtonColor: "#1b3178"
+            });
         }
     };
 

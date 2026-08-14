@@ -6,6 +6,7 @@ import registerCallImg from "../../assets/image/frame1l2.png";
 import ellipseImg from "../../assets/image/Object.png";
 import "./login.css";
 import { webservices } from "../services/webServices";
+import Swal from "sweetalert2";
 
 const Register = () => {
     const navigate = useNavigate();
@@ -45,14 +46,30 @@ const Register = () => {
         try {
             const response = await webservices.register(payload);
             if (response.data.http_code === 200) {
-                alert(response.data.status_smessage || "Registration successful!");
-                navigate("/login");
+                Swal.fire({
+                    title: "Success!",
+                    text: response.data.status_smessage || "Registration successful!",
+                    icon: "success",
+                    confirmButtonColor: "#1b3178"
+                }).then(() => {
+                    navigate("/login");
+                });
             } else {
-                alert(response.data.status_smessage || "Registration failed");
+                Swal.fire({
+                    title: "Registration Failed",
+                    text: response.data.status_smessage || "Failed to register. Please try again.",
+                    icon: "error",
+                    confirmButtonColor: "#1b3178"
+                });
             }
         } catch (error) {
             console.error("Register Error:", error);
-            alert("An error occurred during registration. Please try again.");
+            Swal.fire({
+                title: "Error!",
+                text: "An error occurred during registration. Please try again.",
+                icon: "error",
+                confirmButtonColor: "#1b3178"
+            });
         } finally {
             setLoading(false);
         }

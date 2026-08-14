@@ -189,7 +189,7 @@
 }
 
 .db-step.active-pending .db-bar {
-    background: linear-gradient(to right, #7b8fe0, rgba(255, 255, 255, 0.35));
+    background: linear-gradient(to right, #6b7fd4, rgba(255, 255, 255, 0.25));
 }
 
 .db-step span {
@@ -589,7 +589,14 @@
 .text-navy {
     color: #1b2e6b !important;
 }
-
 .dashboard-content-wrapper {
     font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+/* Disabled tasks styling */
+.db-task-item.disabled-task {
+    cursor: default;
+}
+.db-task-item.disabled-task input[type="checkbox"] {
+    cursor: default;
 }

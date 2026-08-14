@@ -9,11 +9,13 @@ import {
     FiChevronDown,
     FiFileText,
     FiPlus,
-    FiCheckCircle
+    FiCheckCircle,
+    FiDownload
 } from "react-icons/fi";
 import noDataImg from "../../assets/image/no_data.png";
 import "./documents.css";
 import { webservices } from "../servics/CustomerServices";
+import Swal from "sweetalert2";
 
 const Documents = () => {
     // Categories tabs definition
@@ -33,6 +35,116 @@ const Documents = () => {
     const [uploadedDocs, setUploadedDocs] = useState([]);
     const [loading, setLoading] = useState(false);
     const fileInputRef = useRef(null);
+    const [isDoneUploaded, setIsDoneUploaded] = useState(false);
+
+    useEffect(() => {
+        const checkUploadStatus = () => {
+            try {
+                const storedStatus = localStorage.getItem("currentFileStatus");
+                if (storedStatus) {
+                    const parsed = JSON.parse(storedStatus);
+                    const statusId = Number(parsed.presentfilestatus);
+                    if (statusId >= 6 && statusId !== 15) {
+                        setIsDoneUploaded(true);
+                    } else {
+                        setIsDoneUploaded(false);
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        checkUploadStatus();
+        window.addEventListener("fileStatusUpdated", checkUploadStatus);
+        return () => {
+            window.removeEventListener("fileStatusUpdated", checkUploadStatus);
+        };
+    }, []);
+
+    const handleDoneUploadsChange = async (e) => {
+        const checked = e.target.checked;
+        if (checked) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Confirm that you have completed uploading all required tax documents.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#1b3178",
+                cancelButtonColor: "#cbd5e1",
+                confirmButtonText: "Yes, I'm done!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn btn-primary px-4 py-2",
+                    cancelButton: "btn btn-light px-4 py-2 ms-2"
+                },
+                buttonsStyling: false
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const userInfoStr = localStorage.getItem("userInfo");
+                    if (!userInfoStr) {
+                        Swal.fire({
+                            title: "Error!",
+                            text: "User session not found.",
+                            icon: "error",
+                            confirmButtonColor: "#1b3178"
+                        });
+                        return;
+                    }
+                    try {
+                        setLoading(true);
+                        const userInfo = JSON.parse(userInfoStr);
+                        const client_id = userInfo.client_id;
+                        const payload = {
+                            user_id: Number(client_id)
+                        };
+                        const response = await webservices.confirmdocupload(payload);
+                        if (response.data && (response.status === 200 || response.data.http_code === 200)) {
+                            Swal.fire({
+                                title: "Success!",
+                                text: response.data.status_smessage || "Document upload confirmation sent successfully.",
+                                icon: "success",
+                                confirmButtonColor: "#1b3178"
+                            });
+                            setIsDoneUploaded(true);
+                            
+                            // Update cached status to 6 (Preparation Pending)
+                            try {
+                                const storedStatus = localStorage.getItem("currentFileStatus");
+                                let updatedStatus = { presentfilestatus: 6, pfilename: "Preparation Pending" };
+                                if (storedStatus) {
+                                    const parsed = JSON.parse(storedStatus);
+                                    updatedStatus = { ...parsed, presentfilestatus: 6, pfilename: "Preparation Pending" };
+                                }
+                                localStorage.setItem("currentFileStatus", JSON.stringify(updatedStatus));
+                            } catch (e) {
+                                console.error(e);
+                            }
+                            
+                            window.dispatchEvent(new Event("fileStatusUpdated"));
+                        } else {
+                            Swal.fire({
+                                title: "Failed!",
+                                text: response.data.status_smessage || "Failed to confirm upload. Please try again.",
+                                icon: "error",
+                                confirmButtonColor: "#1b3178"
+                            });
+                        }
+                    } catch (error) {
+                        console.error("Error confirming uploads:", error);
+                        Swal.fire({
+                            title: "Error!",
+                            text: "An error occurred while confirming document upload.",
+                            icon: "error",
+                            confirmButtonColor: "#1b3178"
+                        });
+                    } finally {
+                        setLoading(false);
+                    }
+                }
+            });
+        }
+    };
 
     const getOriginalNameAndCountry = (fileName) => {
         let name = "Unknown Document";
@@ -280,6 +392,73 @@ const Documents = () => {
         }
     };
 
+    // View document in a new tab by fetching as blob to bypass attachment headers
+    const handleViewDoc = async (doc) => {
+        if (!doc.url) {
+            alert("Document URL not found.");
+            return;
+        }
+        try {
+            setLoading(true);
+            const response = await fetch(doc.url);
+            const blob = await response.blob();
+            
+            // Get correct file type from extension if S3 returned generic octet-stream
+            const extension = doc.name ? doc.name.split(".").pop().toLowerCase() : "";
+            let fileType = blob.type;
+            if (!fileType || fileType === "application/octet-stream" || fileType === "binary/octet-stream") {
+                if (extension === "pdf") fileType = "application/pdf";
+                else if (extension === "png") fileType = "image/png";
+                else if (extension === "jpg" || extension === "jpeg") fileType = "image/jpeg";
+                else if (extension === "gif") fileType = "image/gif";
+                else if (extension === "txt") fileType = "text/plain";
+            }
+            
+            const viewBlob = new Blob([blob], { type: fileType });
+            const blobUrl = window.URL.createObjectURL(viewBlob);
+            window.open(blobUrl, "_blank");
+        } catch (error) {
+            console.error("Failed to view file, fallback to direct open:", error);
+            window.open(doc.url, "_blank");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Download document by fetching as blob and triggering download
+    const handleDownloadDoc = async (doc) => {
+        if (!doc.url) {
+            alert("Document URL not found.");
+            return;
+        }
+        try {
+            setLoading(true);
+            const response = await fetch(doc.url);
+            const blob = await response.blob();
+            
+            // Force content-type to application/octet-stream to trigger direct browser download
+            const downloadBlob = new Blob([blob], { type: "application/octet-stream" });
+            const blobUrl = window.URL.createObjectURL(downloadBlob);
+            const link = document.createElement("a");
+            link.href = blobUrl;
+            link.setAttribute("download", doc.name || "document");
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+        } catch (error) {
+            console.error("Failed to download file, fallback to direct download:", error);
+            const link = document.createElement("a");
+            link.href = doc.url;
+            link.setAttribute("download", doc.name || "document");
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // Delete an uploaded document
     const handleDeleteDoc = async (doc) => {
         if (!window.confirm(`Are you sure you want to delete "${doc.name}"?`)) return;
@@ -349,6 +528,25 @@ const Documents = () => {
                 </ul>
             </div>
 
+            {/* Confirmation Box (Only on All tab) */}
+            {activeTab === "all" && (
+                <div className="docs-done-checkbox-card p-3 mb-4 bg-white rounded border d-flex align-items-center gap-3">
+                    <input
+                        type="checkbox"
+                        id="doneWithUploads"
+                        className="done-uploads-checkbox"
+                        checked={isDoneUploaded}
+                        disabled={isDoneUploaded}
+                        onChange={handleDoneUploadsChange}
+                    />
+                    <label htmlFor="doneWithUploads" className="done-uploads-label fw-semibold mb-0 cursor-pointer">
+                        {isDoneUploaded 
+                            ? "You have confirmed that your document upload is complete."
+                            : "Are you done with your document upload?"}
+                    </label>
+                </div>
+            )}
+
             {/* Main Area: Empty State OR Table View */}
             {loading && filteredDocs.length === 0 ? (
                 <div className="docs-empty-state-box text-center d-flex flex-column align-items-center justify-content-center py-5 rounded bg-white border" style={{ minHeight: "350px" }}>
@@ -415,17 +613,17 @@ const Documents = () => {
                                                 <button
                                                     className="btn btn-icon text-muted"
                                                     title="View Document"
-                                                    onClick={() => doc.url ? window.open(doc.url, "_blank") : alert(`Viewing file: ${doc.name}`)}
+                                                    onClick={() => handleViewDoc(doc)}
                                                 >
                                                     <FiEye size={18} />
                                                 </button>
-                                                {/* <button
+                                                <button
                                                     className="btn btn-icon text-muted"
-                                                    title="Edit Details"
-                                                    onClick={() => alert(`Edit feature for: ${doc.name}`)}
+                                                    title="Download Document"
+                                                    onClick={() => handleDownloadDoc(doc)}
                                                 >
-                                                    <FiEdit3 size={17} />
-                                                </button> */}
+                                                    <FiDownload size={18} />
+                                                </button>
                                                 <button
                                                     className="btn btn-icon text-danger"
                                                     title="Delete Document"
@@ -544,7 +742,7 @@ const Documents = () => {
                                                             <option value="1098/1098-T">1098/1098-T</option>
                                                             <option value="Other documents">Other documents</option>
                                                         </select>
-                                                        <FiChevronDown className="select-arrow-icon position-absolute text-muted" size={14} />
+                                                        {/* <FiChevronDown className="select-arrow-icon position-absolute text-muted" size={14} /> */}
                                                     </div>
 
                                                     {/* Year Select Dropdown */}
@@ -559,7 +757,7 @@ const Documents = () => {
                                                             <option value="2024">2024</option>
                                                             <option value="2023">2023</option>
                                                         </select>
-                                                        <FiChevronDown className="select-arrow-icon position-absolute text-muted" size={14} />
+                                                        {/* <FiChevronDown className="select-arrow-icon position-absolute text-muted" size={14} /> */}
                                                     </div>
 
                                                     {/* Remove Button */}

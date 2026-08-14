@@ -42,6 +42,7 @@ const postNoAuthUrl = (uri, data) => {
 
 
 // ================= API methods =================
+const currentfileststus = (data) => postUrl(`${API_URL}member/currentfileststus`, data);
 const taxpayerinfo = (data) => postUrl(`${API_URL}member/taxpayerinfo`, data);
 const spouseinfo = (data) => postUrl(`${API_URL}member/spouseinfo`, data);
 const dependentinfo = (data) => postUrl(`${API_URL}member/dependentinfo`, data);
@@ -53,8 +54,10 @@ const getuploaddocs = (data) => postUrl(`${API_URL}upload/getuploaddocs`, data);
 const deleteuploaddoc = (data) => postUrl(`${API_URL}upload/deleteuploaddoc`, data);
 const saveReferralContact = (data) => postUrl(`${API_URL}saveReferralContact`, data);
 const refferalslist = (data) => postUrl(`${API_URL}member/refferalslist`, data);
+const confirmdocupload = (data) => postUrl(`${API_URL}upload/confirmdocupload`, data);
 
 export const webservices = {
+    currentfileststus,
     taxpayerinfo,
     spouseinfo,
     dependentinfo,
@@ -65,5 +68,6 @@ export const webservices = {
     getuploaddocs,
     deleteuploaddoc,
     saveReferralContact,
-    refferalslist
+    refferalslist,
+    confirmdocupload
 };
