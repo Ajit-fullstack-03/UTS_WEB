@@ -1,0 +1,110 @@
+/* Admin Header Styles */
+
+.admin-header {
+    height: 75px;
+    border-bottom: 1px solid #eaedf3;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+    position: sticky;
+    top: 0;
+    z-index: 99;
+    background-color: #ffffff;
+    font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+/* Logo Section */
+.header-logo-container {
+    user-select: none;
+}
+
+.header-logo {
+    max-height: 40px;
+    object-fit: contain;
+}
+
+.header-logo-text {
+    font-family: 'Outfit', sans-serif;
+}
+
+.logo-text-top {
+    font-size: 0.95rem;
+    color: #1b2e6b;
+    letter-spacing: 0.5px;
+}
+
+.logo-text-bottom {
+    font-size: 0.75rem;
+    color: #d97706 !important; /* Gold/yellow text */
+    letter-spacing: 1px;
+}
+
+/* Navigation Pills */
+.header-nav-pills {
+    max-width: 60%;
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+}
+
+.header-nav-pills::-webkit-scrollbar {
+    display: none; /* Hide scrollbar Chrome/Safari */
+}
+
+.btn-nav-pill {
+    background-color: #ffffff !important;
+    color: #475569 !important;
+    border: 1px solid #e2e8f0 !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    padding: 6px 16px !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.btn-nav-pill:hover {
+    background-color: #f8fafc !important;
+    color: #1b2e6b !important;
+    border-color: #cbd5e1 !important;
+}
+
+.btn-nav-pill.active {
+    background-color: #1b2e6b !important;
+    color: #ffffff !important;
+    border-color: #1b2e6b !important;
+    box-shadow: 0 2px 8px rgba(27, 46, 107, 0.15);
+}
+
+/* Bell Notification */
+.btn-bell {
+    color: #475569 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50% !important;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-bell:hover {
+    background-color: #f1f5f9 !important;
+    color: #1b2e6b !important;
+}
+
+.bell-icon {
+    stroke-width: 2px;
+}
+
+.notification-badge {
+    top: 5px !important;
+    right: 5px !important;
+    font-size: 0.7rem !important;
+    padding: 4px 6px !important;
+    background-color: #0ea5e9 !important; /* Teal/cyan color */
+    color: #ffffff !important;
+    border: 2px solid #ffffff;
+}
+
+@media (max-width: 991.98px) {
+    .header-logo-text {
+        display: none !important;
+    }
+    .header-nav-pills {
+        max-width: 80%;
+    }
+}

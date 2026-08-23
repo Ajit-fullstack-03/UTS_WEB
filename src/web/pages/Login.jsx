@@ -28,7 +28,14 @@ const Login = () => {
                 // Store the full user info for future use if needed
                 localStorage.setItem("userInfo", JSON.stringify(response.data.uinfo));
                 // alert(response.data.status_smessage);
-                navigate("/customer");
+                if (response.data.uinfo.user_type_id == 1) {
+                    navigate("/admin");
+                } else if (response.data.uinfo.user_type_id == 2) {
+                    navigate("/customer");
+                } else if (response.data.uinfo.user_type_id == 3) {
+                    // navigate("/customer");
+                    alert("Analysist Not design.")
+                }
             } else {
                 Swal.fire({
                     title: "Login Failed",

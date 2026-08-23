@@ -1,0 +1,507 @@
+/* Admin Dashboard Stylesheet */
+
+.admin-dashboard-container {
+    font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+.dashboard-main-title {
+    font-weight: 700;
+    color: #1e293b;
+    letter-spacing: -0.5px;
+}
+
+/* Button & Action Styles */
+.btn-filter-adjust {
+    background-color: #ffffff !important;
+    color: #475569 !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    font-size: 0.9rem !important;
+    padding: 8px 16px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-filter-adjust:hover {
+    background-color: #f8fafc !important;
+    border-color: #94a3b8 !important;
+    color: #1e293b !important;
+}
+
+.search-bar-wrapper {
+    min-width: 280px;
+}
+
+.search-bar-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+.search-input {
+    padding-left: 36px !important;
+    border-radius: 8px !important;
+    border: 1px solid #cbd5e1 !important;
+    font-size: 0.9rem !important;
+    height: 40px !important;
+}
+
+.search-input:focus {
+    box-shadow: 0 0 0 3px rgba(27, 46, 107, 0.15) !important;
+    border-color: #1b2e6b !important;
+}
+
+/* Records Table */
+.admin-records-table {
+    margin-bottom: 0 !important;
+}
+
+.admin-records-table th {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #475569;
+    font-weight: 600;
+    background-color: #f8fafc !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+    padding: 12px 16px !important;
+}
+
+.admin-records-table td {
+    padding: 14px 16px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    font-size: 0.9rem;
+}
+
+.admin-records-table tbody tr:hover {
+    background-color: #f8fafc !important;
+}
+
+.client-name-link {
+    font-family: 'Outfit', sans-serif;
+    color: #3b82f6 !important;
+    font-weight: 600 !important;
+    border: none !important;
+    background: transparent !important;
+    outline: none !important;
+    transition: color 0.15s ease;
+}
+
+.client-name-link:hover {
+    color: #1d4ed8 !important;
+}
+
+.referral-link {
+    font-size: 0.9rem !important;
+    color: #3b82f6 !important;
+    transition: color 0.15s ease;
+}
+
+.referral-link:hover {
+    color: #1d4ed8 !important;
+}
+
+/* Status Badges */
+.status-pill-badge {
+    padding: 6px 12px !important;
+    border-radius: 20px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.2px;
+    text-transform: capitalize;
+}
+
+/* Specific status styles matching client types */
+.status-pill-badge.all {
+    background-color: #f1f5f9;
+    color: #334155;
+}
+
+.status-pill-badge.to_be_assigned {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+.status-pill-badge.basic_info_pending {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.status-pill-badge.interview_pending {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-pill-badge.docs_upload_pending {
+    background-color: #ffedd5;
+    color: #9a3412;
+}
+
+.status-pill-badge.other_docs_pending {
+    background-color: #f3e8ff;
+    color: #6b21a8;
+}
+
+.status-pill-badge.prep_pending {
+    background-color: #e0f2fe;
+    color: #075985;
+}
+
+.status-pill-badge.pre_synopsys_pending {
+    background-color: #ccfbf1;
+    color: #115e59;
+}
+
+.status-pill-badge.synopsys_pending {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-pill-badge.payment_pending {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.status-pill-badge.review_upload_pending {
+    background-color: #e2e8f0;
+    color: #1e293b;
+}
+
+.status-pill-badge.cancel_filing {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+/* Assigned indicator dot */
+.assigned-status-dot-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.assigned-status-dot-label .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.assigned-status-dot-label.assigned {
+    color: #166534;
+}
+
+.assigned-status-dot-label.assigned .dot {
+    background-color: #22c55e;
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.4);
+}
+
+.assigned-status-dot-label.unassigned {
+    color: #64748b;
+}
+
+.assigned-status-dot-label.unassigned .dot {
+    background-color: #94a3b8;
+}
+
+/* Pagination Buttons */
+.pagination-navigation .page-link {
+    color: #475569 !important;
+    background-color: transparent !important;
+    font-size: 0.9rem;
+    padding: 8px 12px !important;
+    margin: 0 2px;
+}
+
+.pagination-navigation .page-item.active .page-link {
+    background-color: #1b2e6b !important;
+    color: #ffffff !important;
+    border-color: #1b2e6b !important;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(27, 46, 107, 0.15);
+}
+
+.pagination-navigation .page-link:hover:not(.disabled) {
+    background-color: #e2e8f0 !important;
+    color: #1b2e6b !important;
+}
+
+.select-rows {
+    font-size: 0.85rem !important;
+    height: 38px !important;
+    border-radius: 8px !important;
+    border-color: #cbd5e1 !important;
+}
+
+/* Assigned File Number View Config Cards */
+.card-config {
+    border: 1px solid #e2e8f0 !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-config:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04) !important;
+}
+
+.config-select {
+    border-radius: 8px !important;
+}
+
+.btn-config-update {
+    background-color: #1b2e6b !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    border: none !important;
+    transition: all 0.2s ease;
+}
+
+.btn-config-update:hover {
+    background-color: #13214e !important;
+    box-shadow: 0 4px 12px rgba(27, 46, 107, 0.2);
+}
+
+/* Client Details Workspace */
+.btn-back-dashboard {
+    background-color: #ffffff !important;
+    color: #475569 !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    font-size: 0.9rem !important;
+    padding: 8px 16px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease;
+}
+
+.btn-back-dashboard:hover {
+    background-color: #f8fafc !important;
+    color: #1b2e6b !important;
+}
+
+.status-indicator-badge {
+    background-color: #fef2f2;
+    border: 1px solid #fee2e2;
+    color: #991b1b;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Sub tabs Menu */
+.inner-tabs-nav .nav-link {
+    background-color: transparent !important;
+    color: #475569 !important;
+    border: 1px solid transparent !important;
+    font-size: 0.85rem;
+    padding: 6px 16px !important;
+    transition: all 0.15s ease-in-out;
+}
+
+.inner-tabs-nav .nav-link:hover {
+    color: #1b2e6b !important;
+    background-color: #f1f5f9 !important;
+}
+
+.inner-tabs-nav .nav-link.active {
+    background-color: #ffffff !important;
+    color: #1b2e6b !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05) !important;
+}
+
+.btn-action-top-right {
+    background-color: #1b2e6b !important;
+    color: #ffffff !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    border-radius: 8px !important;
+    border: none !important;
+    padding: 6px 14px !important;
+    transition: all 0.2s ease;
+}
+
+.btn-action-top-right:hover {
+    background-color: #13214e !important;
+    box-shadow: 0 3px 8px rgba(27, 46, 107, 0.15);
+}
+
+.btn-save-details {
+    background-color: #1b2e6b !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    border: none !important;
+    transition: all 0.2s ease;
+}
+
+.btn-save-details:hover {
+    background-color: #13214e !important;
+}
+
+/* Category pills in Download Documents */
+.btn-category-pill {
+    background-color: #f1f5f9 !important;
+    color: #475569 !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    border: none !important;
+    padding: 5px 14px !important;
+    transition: all 0.15s ease;
+}
+
+.btn-category-pill:hover {
+    background-color: #e2e8f0 !important;
+    color: #1b2e6b !important;
+}
+
+.btn-category-pill.active {
+    background-color: #1b2e6b !important;
+    color: #ffffff !important;
+}
+
+.doc-files-table th {
+    font-size: 0.75rem !important;
+    color: #64748b !important;
+    font-weight: 600 !important;
+    background-color: transparent !important;
+    border-bottom: 1.5px solid #e2e8f0 !important;
+    padding: 10px 12px !important;
+}
+
+.doc-files-table td {
+    padding: 12px 12px !important;
+    font-size: 0.85rem;
+}
+
+.btn-icon-action {
+    border: none !important;
+    background: transparent !important;
+    color: #64748b !important;
+    padding: 6px !important;
+    border-radius: 6px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.btn-icon-action:hover {
+    background-color: #f1f5f9 !important;
+    color: #1b2e6b !important;
+}
+
+.btn-icon-action[title="Delete"]:hover {
+    color: #dc3545 !important;
+    background-color: #fee2e2 !important;
+}
+
+/* Upload Documents tab */
+.upload-empty-illustration {
+    width: 96px;
+    height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-upload-trigger {
+    background-color: #1b2e6b !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    border: none !important;
+    transition: all 0.2s ease;
+}
+
+.btn-upload-trigger:hover {
+    background-color: #13214e !important;
+    box-shadow: 0 4px 12px rgba(27, 46, 107, 0.2);
+}
+
+/* Modal Overlay styling */
+.custom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 23, 42, 0.6);
+    z-index: 1050;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.25s ease-out;
+}
+
+.custom-modal-card {
+    width: 100%;
+    max-width: 480px;
+    background-color: #ffffff;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    animation: slideUp 0.3s ease-out;
+}
+
+.modal-close-btn {
+    top: 16px;
+    right: 16px;
+    color: #64748b !important;
+    transition: color 0.15s ease;
+}
+
+.modal-close-btn:hover {
+    color: #1e293b !important;
+}
+
+.modal-country-pill {
+    background-color: #f1f5f9 !important;
+    color: #475569 !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    border: 1px solid #cbd5e1 !important;
+    transition: all 0.2s ease;
+}
+
+.modal-country-pill.active {
+    background-color: #1b2e6b !important;
+    color: #ffffff !important;
+    border-color: #1b2e6b !important;
+}
+
+.dropzone-box {
+    border: 2px dashed #cbd5e1 !important;
+    border-radius: 10px !important;
+    background-color: #f8fafc;
+    padding: 30px 20px !important;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.dropzone-box:hover {
+    border-color: #1b2e6b !important;
+    background-color: #f1f5f9;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.btn-modal-upload {
+    background-color: #1b2e6b !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    border: none !important;
+    transition: all 0.2s ease;
+}
+
+.btn-modal-upload:hover {
+    background-color: #13214e !important;
+    box-shadow: 0 4px 12px rgba(27, 46, 107, 0.2);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}

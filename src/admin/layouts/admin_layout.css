@@ -1,0 +1,29 @@
+/* Admin Layout Styling */
+
+.admin-layout-wrapper {
+    background-color: #f8f9fa;
+    font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow-x: hidden;
+}
+
+/* Offset for fixed sidebar (260px wide) */
+.admin-main-area {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    margin-left: 260px;
+}
+
+.admin-page-content {
+    background-color: #f8f9fa;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Responsive: when sidebar collapses to 80px icon-only */
+@media (max-width: 767.98px) {
+    .admin-main-area {
+        margin-left: 80px;
+    }
+}
