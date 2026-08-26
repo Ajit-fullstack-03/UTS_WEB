@@ -9,6 +9,7 @@ import Career from "../pages/Career";
 import Contact from "../pages/Contact";
 import Testimonials from "../pages/Testimonials";
 import Services from "../pages/Services";
+import AccountVerifyUser from "../pages/AccountVerifyUser";
 // ...
 
 const WebsiteRoutes = () => {
@@ -20,6 +21,7 @@ const WebsiteRoutes = () => {
                 <Route path="contact" element={<Contact />} />
                 <Route path="testimonials" element={<Testimonials />} />
                 <Route path="services" element={<Services />} />
+                <Route path="accountverifyuser" element={<AccountVerifyUser />} />
             </Route>
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
@@ -28,4 +30,4 @@ const WebsiteRoutes = () => {
 };
 
 export default WebsiteRoutes;
-
+

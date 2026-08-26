@@ -32,8 +32,10 @@ const postNoAuthUrl = (uri, data) => {
 // ================= API methods =================
 const login = (data) => postNoAuthUrl(`${API_URL}login/check`, data);
 const register = (data) => postNoAuthUrl(`${API_URL}login/register`, data);
+const verifyregister = (data) => postNoAuthUrl(`${API_URL}login/cregisterverify`, data);
 
 export const webservices = {
     login,
-    register
+    register,
+    verifyregister
 };

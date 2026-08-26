@@ -17,6 +17,7 @@ import {
     FiChevronRight,
     FiFileText
 } from "react-icons/fi";
+import AssignedFileNumber from "./AssignedFileNumber";
 import "./admin_dashboard.css";
 
 const AdminDashboard = () => {
@@ -863,7 +864,7 @@ const AdminDashboard = () => {
 
         switch (activeFilter) {
             case "assigned_file_number":
-                return renderAssignedFileNumberView();
+                return <AssignedFileNumber />;
             default:
                 return renderTableRecordsView();
         }

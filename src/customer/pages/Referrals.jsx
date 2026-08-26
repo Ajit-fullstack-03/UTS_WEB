@@ -36,10 +36,10 @@ const Referrals = () => {
             setLoading(true);
             const userInfo = JSON.parse(userInfoStr);
             const client_id = userInfo.client_id;
-            const taxYear = "2026";
+            const taxYear = userInfo.taxyear || userInfo.taxYear || userInfo.current_year || String(new Date().getFullYear());
 
             const payload = {
-                taxYear,
+                taxYear: String(taxYear),
                 client_id: String(client_id)
             };
 

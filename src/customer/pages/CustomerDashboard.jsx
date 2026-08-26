@@ -80,7 +80,7 @@ const CustomerDashboard = () => {
             try {
                 const userInfo = JSON.parse(userInfoStr);
                 const client_id = userInfo.client_id;
-                const taxYear = userInfo.taxyear || userInfo.taxYear || "2025";
+                const taxYear = userInfo.taxyear || userInfo.taxYear || userInfo.current_year || String(new Date().getFullYear());
                 const payload = {
                     client_id: String(client_id),
                     taxyear: String(taxYear)

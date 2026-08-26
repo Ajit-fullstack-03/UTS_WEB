@@ -6,17 +6,17 @@ import "./admin_layout.css";
 
 const AdminLayout = () => {
     return (
-        <div className="admin-layout-wrapper d-flex min-vh-100">
-            {/* Sidebar Component */}
-            <Sidebar />
+        <div className="admin-layout-wrapper min-vh-100 d-flex flex-column">
+            {/* Header Navbar spanning full width */}
+            <Header />
 
-            {/* Main Content Area */}
-            <div className="admin-main-area d-flex flex-column flex-grow-1">
-                {/* Header Navbar */}
-                <Header />
+            {/* Main Body Area: Sidebar & Page Content */}
+            <div className="admin-body-area d-flex flex-grow-1 p-4 gap-4 overflow-hidden">
+                {/* Sidebar Component */}
+                <Sidebar />
 
                 {/* Main page render content */}
-                <main className="admin-page-content p-4 flex-grow-1">
+                <main className="admin-page-content flex-grow-1 overflow-auto">
                     <div className="container-fluid p-0">
                         <Outlet />
                     </div>

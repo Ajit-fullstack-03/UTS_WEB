@@ -16,7 +16,7 @@ const Header = () => {
             try {
                 const userInfo = JSON.parse(userInfoStr);
                 const client_id = userInfo.client_id;
-                const taxYear = userInfo.taxyear || userInfo.taxYear || "2025";
+                const taxYear = userInfo.taxyear || userInfo.taxYear || userInfo.current_year || String(new Date().getFullYear());
                 const payload = {
                     client_id: String(client_id),
                     taxyear: String(taxYear)
@@ -25,7 +25,7 @@ const Header = () => {
                 const res = await webservices.currentfileststus(payload);
                 if (res.data && res.data.http_code === 200) {
                     const statusId = res.data.presentfilestatus;
-                    
+
                     const statusNames = {
                         0: "To Be Assigned",
                         1: "Basic Info Pending",
@@ -102,7 +102,13 @@ const Header = () => {
             <div className="header-status-badge d-flex align-items-center gap-2 px-3 py-2 rounded-pill">
                 <span className="status-dot"></span>
                 <span className="status-text fw-semibold small">
-                    File status: {statusName.toLowerCase()} {fileNumber ? `(${fileNumber})` : ""}
+                    File status: {statusName.toLowerCase()}
+                </span>
+            </div>
+            <div className="header-status-badge d-flex align-items-center gap-2 px-3 py-2 rounded-pill">
+                <span className="status-dot"></span>
+                <span className="status-text fw-semibold small">
+                    File Number: {fileNumber ? `(${fileNumber})` : ""}
                 </span>
             </div>
 

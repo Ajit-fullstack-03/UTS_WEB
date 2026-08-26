@@ -30,7 +30,7 @@ const Documents = () => {
 
     const [activeTab, setActiveTab] = useState("all");
     const [showModal, setShowModal] = useState(false);
-    const [selectedCountry, setSelectedCountry] = useState("IN"); // 'US' or 'IN'
+    const [selectedCountry, setSelectedCountry] = useState("US"); // 'US'
     const [pendingFiles, setPendingFiles] = useState([]);
     const [uploadedDocs, setUploadedDocs] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -107,7 +107,7 @@ const Documents = () => {
                                 confirmButtonColor: "#1b3178"
                             });
                             setIsDoneUploaded(true);
-                            
+
                             // Update cached status to 6 (Preparation Pending)
                             try {
                                 const storedStatus = localStorage.getItem("currentFileStatus");
@@ -120,7 +120,7 @@ const Documents = () => {
                             } catch (e) {
                                 console.error(e);
                             }
-                            
+
                             window.dispatchEvent(new Event("fileStatusUpdated"));
                         } else {
                             Swal.fire({
@@ -148,7 +148,7 @@ const Documents = () => {
 
     const getOriginalNameAndCountry = (fileName) => {
         let name = "Unknown Document";
-        let country = "INDIA";
+        let country = "UNITED STATES";
         if (!fileName) return { name, country };
 
         // Remove query parameters if present (e.g. from S3 presigned URL)
@@ -189,7 +189,7 @@ const Documents = () => {
                 { key: "1099", apiType: "P1099B", label: "1099-NEC/B/G/DIV/INT/MISC" },
                 { key: "5498", apiType: "HSA", label: "5498/HSA 1099R/IRA" },
                 { key: "1098", apiType: "IRA", label: "1098/1098-T" },
-                { key: "other", apiType: "other", label: "Other documents" }
+                { key: "other", apiType: "OTHER DOCS", label: "Other documents" }
             ];
 
             const promises = docTypes.map(async (docType) => {
@@ -296,7 +296,7 @@ const Documents = () => {
                 size: sizeStr,
                 rawFile: file,
                 selectedType: activeTab === "all" ? "Other documents" : getCategoryLabel(activeTab),
-                selectedYear: "2026"
+                selectedYear: String(new Date().getFullYear())
             };
         });
 
@@ -329,7 +329,12 @@ const Documents = () => {
 
         const userInfoStr = localStorage.getItem("userInfo");
         if (!userInfoStr) {
-            alert("User session not found. Please log in again.");
+            Swal.fire({
+                title: "Error!",
+                text: "User session not found. Please log in again.",
+                icon: "error",
+                confirmButtonColor: "#1b3178"
+            });
             return;
         }
 
@@ -343,27 +348,17 @@ const Documents = () => {
             const metadata = [];
 
             pendingFiles.forEach((fileObj, index) => {
-                let apiType = "other";
+                let apiType = "OTHER DOCS";
                 if (fileObj.selectedType === "W2") apiType = "W2";
                 else if (fileObj.selectedType.startsWith("1099")) apiType = "P1099B";
                 else if (fileObj.selectedType.startsWith("5498")) apiType = "HSA";
                 else if (fileObj.selectedType.startsWith("1098")) apiType = "IRA";
 
-                const fileExtension = fileObj.rawFile.name.substring(fileObj.rawFile.name.lastIndexOf("."));
-                const filePrefix = selectedCountry === "US" ? "US_" : "IN_";
-                // const renamedFileName = `${filePrefix}file${index + 1}${fileExtension}`;
-                const timestamp = Date.now();
-                const renamedFileName = `${filePrefix}file${timestamp}${fileExtension}`;
-
-                const renamedFile = new File([fileObj.rawFile], renamedFileName, {
-                    type: fileObj.rawFile.type
-                });
-
-                formData.append("uploadedImages" + index, renamedFile);
+                formData.append("uploadedImages" + index, fileObj.rawFile);
                 formData.append("doctype", apiType);
 
                 metadata.push({
-                    name: renamedFileName,
+                    name: fileObj.rawFile.name,
                     doctype: apiType
                 });
             });
@@ -377,13 +372,50 @@ const Documents = () => {
             }
             const response = await webservices.uploaddocs(formData);
             if (response.data && (response.status === 200 || response.data.message)) {
-                alert(`${pendingFiles.length} file(s) uploaded successfully!`);
+                await Swal.fire({
+                    title: "Success!",
+                    text: `${pendingFiles.length} file(s) uploaded successfully!`,
+                    icon: "success",
+                    confirmButtonColor: "#1b3178",
+                    confirmButtonText: "OK"
+                });
+
+                // Show toaster message right after the Swal alert closes
+                Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 7000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                }).fire({
+                    icon: "info",
+                    title: "If you have completed uploading all documents, please check the completion checkbox below."
+                });
             } else {
-                alert("Failed to upload files.");
+                Swal.fire({
+                    title: "Failed!",
+                    text: "Failed to upload files.",
+                    icon: "error",
+                    confirmButtonColor: "#1b3178"
+                });
             }
         } catch (error) {
             console.error("General error during upload process:", error);
-            alert("An error occurred during file upload.");
+            const isTooLarge = error?.response?.status === 413;
+            const errMsg = isTooLarge
+                ? "File is too large for the server. The server Nginx upload limit is exceeded (413 Request Entity Too Large)."
+                : (error?.response?.data?.message || "An error occurred during file upload.");
+
+            Swal.fire({
+                title: isTooLarge ? "File Too Large (413)" : "Upload Error",
+                text: errMsg,
+                icon: "error",
+                confirmButtonColor: "#1b3178"
+            });
         } finally {
             setLoading(false);
             setPendingFiles([]);
@@ -395,14 +427,19 @@ const Documents = () => {
     // View document in a new tab by fetching as blob to bypass attachment headers
     const handleViewDoc = async (doc) => {
         if (!doc.url) {
-            alert("Document URL not found.");
+            Swal.fire({
+                title: "Error!",
+                text: "Document URL not found.",
+                icon: "error",
+                confirmButtonColor: "#1b3178"
+            });
             return;
         }
         try {
             setLoading(true);
             const response = await fetch(doc.url);
             const blob = await response.blob();
-            
+
             // Get correct file type from extension if S3 returned generic octet-stream
             const extension = doc.name ? doc.name.split(".").pop().toLowerCase() : "";
             let fileType = blob.type;
@@ -413,7 +450,7 @@ const Documents = () => {
                 else if (extension === "gif") fileType = "image/gif";
                 else if (extension === "txt") fileType = "text/plain";
             }
-            
+
             const viewBlob = new Blob([blob], { type: fileType });
             const blobUrl = window.URL.createObjectURL(viewBlob);
             window.open(blobUrl, "_blank");
@@ -428,14 +465,19 @@ const Documents = () => {
     // Download document by fetching as blob and triggering download
     const handleDownloadDoc = async (doc) => {
         if (!doc.url) {
-            alert("Document URL not found.");
+            Swal.fire({
+                title: "Error!",
+                text: "Document URL not found.",
+                icon: "error",
+                confirmButtonColor: "#1b3178"
+            });
             return;
         }
         try {
             setLoading(true);
             const response = await fetch(doc.url);
             const blob = await response.blob();
-            
+
             // Force content-type to application/octet-stream to trigger direct browser download
             const downloadBlob = new Blob([blob], { type: "application/octet-stream" });
             const blobUrl = window.URL.createObjectURL(downloadBlob);
@@ -461,38 +503,74 @@ const Documents = () => {
 
     // Delete an uploaded document
     const handleDeleteDoc = async (doc) => {
-        if (!window.confirm(`Are you sure you want to delete "${doc.name}"?`)) return;
+        Swal.fire({
+            title: "Are you sure?",
+            text: `Are you sure you want to delete "${doc.name}"?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#dc3545",
+            cancelButtonColor: "#cbd5e1",
+            confirmButtonText: "Yes, delete it!",
+            cancelButtonText: "Cancel",
+            customClass: {
+                confirmButton: "btn btn-danger px-4 py-2",
+                cancelButton: "btn btn-light px-4 py-2 ms-2"
+            },
+            buttonsStyling: false
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const userInfoStr = localStorage.getItem("userInfo");
+                if (!userInfoStr) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "User session not found.",
+                        icon: "error",
+                        confirmButtonColor: "#1b3178"
+                    });
+                    return;
+                }
 
-        const userInfoStr = localStorage.getItem("userInfo");
-        if (!userInfoStr) {
-            alert("User session not found.");
-            return;
-        }
+                try {
+                    setLoading(true);
+                    const userInfo = JSON.parse(userInfoStr);
+                    const client_id = userInfo.client_id;
 
-        try {
-            setLoading(true);
-            const userInfo = JSON.parse(userInfoStr);
-            const client_id = userInfo.client_id;
+                    const payload = {
+                        filename: doc.rawFileName || doc.id,
+                        uid: client_id,
+                        up_id: doc.up_id
+                    };
 
-            const payload = {
-                filename: doc.rawFileName || doc.id,
-                uid: client_id,
-                up_id: doc.up_id
-            };
-
-            const response = await webservices.deleteuploaddoc(payload);
-            if (response.data && (response.status === 200 || response.data.http_code === 200)) {
-                alert(response.data.msg || "File deleted successfully.");
-            } else {
-                alert(response.data.status_smessage || "Failed to delete file.");
+                    const response = await webservices.deleteuploaddoc(payload);
+                    if (response.data && (response.status === 200 || response.data.http_code === 200)) {
+                        Swal.fire({
+                            title: "Deleted!",
+                            text: response.data.msg || "File deleted successfully.",
+                            icon: "success",
+                            confirmButtonColor: "#1b3178"
+                        });
+                    } else {
+                        Swal.fire({
+                            title: "Failed!",
+                            text: response.data.status_smessage || "Failed to delete file.",
+                            icon: "error",
+                            confirmButtonColor: "#1b3178"
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error deleting file:", error);
+                    Swal.fire({
+                        title: "Error!",
+                        text: "An error occurred during file deletion.",
+                        icon: "error",
+                        confirmButtonColor: "#1b3178"
+                    });
+                } finally {
+                    setLoading(false);
+                    fetchAllDocs();
+                }
             }
-        } catch (error) {
-            console.error("Error deleting file:", error);
-            alert("An error occurred during file deletion.");
-        } finally {
-            setLoading(false);
-            fetchAllDocs();
-        }
+        });
     };
 
     return (
@@ -502,10 +580,13 @@ const Documents = () => {
                 <h1 className="docs-title">Upload Tax Documents</h1>
                 <button
                     className="btn btn-primary btn-upload-top d-flex align-items-center gap-2 px-4 py-2"
+                    disabled={isDoneUploaded}
                     onClick={() => {
+                        if (isDoneUploaded) return;
                         setPendingFiles([]);
                         setShowModal(true);
                     }}
+                    title={isDoneUploaded ? "Document upload has been confirmed and locked" : "Upload documents"}
                 >
                     <FiPlus size={18} />
                     <span>Upload</span>
@@ -540,7 +621,7 @@ const Documents = () => {
                         onChange={handleDoneUploadsChange}
                     />
                     <label htmlFor="doneWithUploads" className="done-uploads-label fw-semibold mb-0 cursor-pointer">
-                        {isDoneUploaded 
+                        {isDoneUploaded
                             ? "You have confirmed that your document upload is complete."
                             : "Are you done with your document upload?"}
                     </label>
@@ -568,10 +649,13 @@ const Documents = () => {
                     <p className="empty-state-subtitle text-muted mb-4">Upload your Tax Documents</p>
                     <button
                         className="btn btn-primary btn-upload-empty px-4 py-2 fw-semibold"
+                        disabled={isDoneUploaded}
                         onClick={() => {
+                            if (isDoneUploaded) return;
                             setPendingFiles([]);
                             setShowModal(true);
                         }}
+                        title={isDoneUploaded ? "Document upload has been confirmed and locked" : "Upload Documents"}
                     >
                         Upload Documents
                     </button>
@@ -670,19 +754,20 @@ const Documents = () => {
                                 <label className="modal-field-label d-block text-uppercase small text-muted fw-bold mb-2">Country</label>
                                 <div className="d-flex align-items-center gap-2">
                                     <button
+                                        type="button"
                                         className={`btn btn-country-pill d-flex align-items-center gap-2 ${selectedCountry === "US" ? "active" : ""}`}
                                         onClick={() => setSelectedCountry("US")}
                                     >
                                         <span className="flag-icon">🇺🇸</span>
                                         <span>United States</span>
                                     </button>
-                                    <button
+                                    {/* <button
                                         className={`btn btn-country-pill d-flex align-items-center gap-2 ${selectedCountry === "IN" ? "active" : ""}`}
                                         onClick={() => setSelectedCountry("IN")}
                                     >
                                         <span className="flag-icon">🇮🇳</span>
                                         <span>India</span>
-                                    </button>
+                                    </button> */}
                                 </div>
                             </div>
 

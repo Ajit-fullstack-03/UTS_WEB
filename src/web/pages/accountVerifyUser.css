@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+.verify-page-container {
+    background-color: #173b88;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 20px;
+    position: relative;
+    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.verify-ellipse-bg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    max-width: 260px;
+    width: 30vw;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.85;
+}
+
+.verify-card {
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    max-width: 520px;
+    padding: 40px 36px;
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    animation: verifyFadeIn 0.5s ease-out;
+}
+
+@keyframes verifyFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.verify-logo-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 28px;
+}
+
+.verify-logo {
+    height: 52px;
+    object-fit: contain;
+}
+
+/* Status Icon Wrapper */
+.verify-status-icon-box {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    position: relative;
+}
+
+/* Loading State */
+.verify-status-icon-box.loading {
+    background: #eef2ff;
+    color: #3b82f6;
+}
+
+.verify-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(59, 130, 246, 0.2);
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: verifySpin 1s linear infinite;
+}
+
+@keyframes verifySpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Success State */
+.verify-status-icon-box.success {
+    background: #ecfdf5;
+    color: #10b981;
+    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0.1);
+    animation: verifyPulseSuccess 2s infinite;
+}
+
+@keyframes verifyPulseSuccess {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 0 14px rgba(16, 185, 129, 0);
+    }
+}
+
+/* Warning / Expired State */
+.verify-status-icon-box.expired {
+    background: #fffbeb;
+    color: #f59e0b;
+    box-shadow: 0 0 0 10px rgba(245, 158, 11, 0.1);
+}
+
+/* Error State */
+.verify-status-icon-box.error {
+    background: #fef2f2;
+    color: #ef4444;
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0.1);
+}
+
+.verify-icon {
+    font-size: 50px;
+}
+
+/* Titles and Typography */
+.verify-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 12px;
+}
+
+.verify-message {
+    font-size: 15px;
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+/* Details Box */
+.verify-info-badge {
+    display: inline-block;
+    background: #f3f4f6;
+    color: #4b5563;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    margin-bottom: 24px;
+    font-weight: 500;
+}
+
+.verify-redirect-notice {
+    font-size: 13px;
+    color: #9ca3af;
+    margin-top: 16px;
+}
+
+/* Action Buttons */
+.verify-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 13px 24px;
+    background-color: #173b88;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 12px;
+    border: none;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(23, 59, 136, 0.3);
+}
+
+.verify-btn-primary:hover {
+    background-color: #112d69;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(23, 59, 136, 0.4);
+}
+
+.verify-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 24px;
+    background-color: transparent;
+    color: #4b5563;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.verify-btn-secondary:hover {
+    background-color: #f9fafb;
+    color: #111827;
+    border-color: #d1d5db;
+}
+
+@media (max-width: 576px) {
+    .verify-card {
+        padding: 30px 20px;
+        border-radius: 18px;
+    }
+
+    .verify-title {
+        font-size: 20px;
+    }
+
+    .verify-message {
+        font-size: 14px;
+    }
+}

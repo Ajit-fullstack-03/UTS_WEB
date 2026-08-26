@@ -35,6 +35,16 @@
     box-shadow: 0 4px 12px rgba(27, 49, 120, 0.2);
 }
 
+.btn-upload-top:disabled,
+.btn-upload-empty:disabled {
+    background-color: #94a3b8 !important;
+    border-color: #94a3b8 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+    opacity: 0.65 !important;
+}
+
 /* ════════════════════════════════════════
    TABS
    ════════════════════════════════════════ */

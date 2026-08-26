@@ -14,10 +14,11 @@ const getAuthHeaders = () => {
 
 const getUploadFileAuthHeaders = () => {
     const token = localStorage.getItem("currentUser")?.replace(/"/g, "");
-    return {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-    };
+    const headers = {};
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
+    }
+    return headers;
 };
 
 // GET with auth
@@ -54,7 +55,10 @@ const getuploaddocs = (data) => postUrl(`${API_URL}upload/getuploaddocs`, data);
 const deleteuploaddoc = (data) => postUrl(`${API_URL}upload/deleteuploaddoc`, data);
 const saveReferralContact = (data) => postUrl(`${API_URL}saveReferralContact`, data);
 const refferalslist = (data) => postUrl(`${API_URL}member/refferalslist`, data);
+const allrefferalslist = (data) => postUrl(`${API_URL}member/allrefferalslist`, data);
 const confirmdocupload = (data) => postUrl(`${API_URL}upload/confirmdocupload`, data);
+const gettotalcountofdocs = (data) => postUrl(`${API_URL}upload/gettotalcountofdocs`, data);
+const downloadZip = (data) => postUrl(`${API_URL}upload/downloadZip`, data);
 
 export const webservices = {
     currentfileststus,
@@ -69,5 +73,8 @@ export const webservices = {
     deleteuploaddoc,
     saveReferralContact,
     refferalslist,
-    confirmdocupload
+    allrefferalslist,
+    confirmdocupload,
+    gettotalcountofdocs,
+    downloadZip
 };
