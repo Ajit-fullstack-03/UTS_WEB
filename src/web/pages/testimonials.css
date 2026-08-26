@@ -1,0 +1,661 @@
+/* ============================
+   Testimonials Page — testimonials.css
+   ============================ */
+
+/* ───────────────────────────────────────────────
+   HERO SECTION
+─────────────────────────────────────────────── */
+.tpg-hero-wrapper {
+    width: 100%;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    padding-bottom: 60px;
+}
+
+/* Reuse hero-topbar classes from home.css — already defined globally */
+
+.tpg-hero-main {
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    padding: 120px 90px 0px;
+    max-width: 1300px;
+    flex-wrap: wrap;
+}
+
+.tpg-hero-content {
+    flex: 1 1 420px;
+    max-width: 520px;
+}
+
+.tpg-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid #D7DCEB;
+    border-radius: 999px;
+    background-color: #FFFFFF;
+    color: #1B2E6B;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 24px;
+}
+
+.tpg-hero-heading {
+    font-size: 46px;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin: 0 0 18px;
+    font-family: "Ancizar Serif", serif;
+}
+
+.tpg-hero-heading-accent {
+    color: #1B2E6B;
+    display: block;
+}
+
+.tpg-hero-heading-dark {
+    color: #0F1A3C;
+    display: block;
+}
+
+.tpg-hero-desc {
+    font-size: 15px;
+    color: #475569;
+    line-height: 1.7;
+    margin: 0 0 32px;
+    max-width: 440px;
+}
+
+/* Stats row in hero */
+.tpg-hero-stats {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: nowrap;
+}
+
+.tpg-hero-stat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tpg-hero-stat svg {
+    flex-shrink: 0;
+}
+
+.tpg-hero-stat-icon-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #EEF2FA;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+
+.tpg-hero-stat div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.tpg-hero-stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1B2E6B;
+    line-height: 1;
+}
+
+.tpg-hero-stat-label {
+    font-size: 11px;
+    color: #64748B;
+    font-weight: 500;
+}
+
+.tpg-hero-stat-divider {
+    width: 1px;
+    height: 36px;
+    background: #D7DCEB;
+}
+
+/* Hero Visual */
+.tpg-hero-visual {
+    flex: 1 1 380px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.tpg-hero-image-frame {
+    position: relative;
+    width: 420px;
+    height: 420px;
+}
+
+.tpg-hero-circle-bg {
+    position: absolute;
+    top: 20px;
+    right: 0px;
+    width: 340px;
+    height: 340px;
+    background: linear-gradient(135deg, #1B2E6B 0%, #3B5FC2 100%);
+    border-radius: 50%;
+    z-index: 0;
+    opacity: 0.12;
+}
+
+.tpg-hero-image {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 400px;
+    width: auto;
+    object-fit: contain;
+    z-index: 1;
+    filter: drop-shadow(0 12px 40px rgba(27,46,107,0.18));
+}
+
+/* Trust badge on hero image */
+.tpg-hero-trust-badge {
+    position: absolute;
+    bottom: 24px;
+    right: -10px;
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    box-shadow: 0 8px 32px rgba(27, 46, 107, 0.15), 0 2px 8px rgba(0,0,0,0.07);
+    z-index: 10;
+    min-width: 168px;
+    max-width: 200px;
+}
+
+.tpg-trust-badge-logo {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+     background: #0C54BE;;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(255, 138, 101, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.tpg-trust-avatars {
+    display: flex;
+    align-items: center;
+}
+
+.tpg-trust-av {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    margin-left: -8px;
+    background: linear-gradient(135deg, #1B2E6B, #3B5FC2);
+}
+
+.tpg-trust-av:first-child {
+    margin-left: 0;
+    background: linear-gradient(135deg, #F5B400, #e09800);
+}
+
+.tpg-trust-av--2 {
+    background: linear-gradient(135deg, #3B5FC2, #1B2E6B);
+}
+
+.tpg-trust-av--3 {
+    background: linear-gradient(135deg, #22C55E, #16a34a);
+}
+
+.tpg-trust-badge-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.tpg-trust-badge-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0F1A3C;
+    line-height: 1.4;
+}
+
+.tpg-trust-badge-sub {
+    font-size: 11px;
+    color: #64748B;
+    line-height: 1.5;
+}
+
+/* ───────────────────────────────────────────────
+   TESTIMONIAL CARD
+─────────────────────────────────────────────── */
+.tpg-card {
+    flex-shrink: 0;
+    width: 310px;
+    min-height: 310px;
+    background: #FFFFFF;
+    border: 1px solid #E8ECF4;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    /* box-shadow: 0 2px 12px rgba(27, 46, 107, 0.07); */
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+    margin-right: 18px;
+}
+
+.tpg-card:hover {
+    box-shadow: 0 8px 32px rgba(27,46,107,0.14);
+    transform: translateY(-2px);
+}
+
+.tpg-card-text {
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.7;
+    margin: 0;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 7;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.tpg-card-stars {
+    display: flex;
+    gap: 3px;
+}
+
+.tpg-card-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tpg-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.tpg-avatar--person {
+    background: linear-gradient(135deg, #1B2E6B 0%, #3B5FC2 100%);
+}
+
+.tpg-avatar--brand {
+    background: #F0F3FB;
+    border: 1px solid #D7DCEB;
+}
+
+.tpg-card-author-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.tpg-card-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0F1A3C;
+}
+
+.tpg-card-time {
+    font-size: 11px;
+    color: #94A3B8;
+}
+
+/* ───────────────────────────────────────────────
+   MARQUEE (SCROLLING ROWS)
+─────────────────────────────────────────────── */
+.tpg-reviews-section {
+    padding: 60px 0 20px;
+    background: #F8FAFF;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.tpg-marquee-viewport {
+    overflow: hidden;
+    width: 100%;
+    cursor: pointer;
+}
+
+/* LEFT direction → scrolls left */
+@keyframes marquee-left {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* RIGHT direction → scrolls right */
+@keyframes marquee-right {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+}
+
+.tpg-marquee-track {
+    display: flex;
+    gap: 0;          /* no gap — spacing comes from .tpg-card margin-right */
+    width: max-content;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform;
+}
+
+.tpg-marquee-track--left {
+    animation-name: marquee-left;
+}
+
+.tpg-marquee-track--right {
+    animation-name: marquee-right;
+}
+
+/* ───────────────────────────────────────────────
+   TRUST CARD SECTION
+─────────────────────────────────────────────── */
+.tpg-trust-section {
+    padding: 60px 40px;
+    background: #F8FAFF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.tpg-trust-card {
+    background: linear-gradient(135deg, #1B2E6B 0%, #0D1A40 100%);
+    border-radius: 24px;
+    padding: 48px 56px;
+    max-width: 900px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    box-shadow: 0 24px 80px rgba(27,46,107,0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.tpg-trust-card::before {
+    content: "";
+    position: absolute;
+    top: -80px;
+    right: -80px;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    pointer-events: none;
+}
+
+.tpg-trust-card::after {
+    content: "";
+    position: absolute;
+    bottom: -60px;
+    left: -60px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+    pointer-events: none;
+}
+
+.tpg-trust-card-flags {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.tpg-trust-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.tpg-trust-card-title {
+    font-size: 30px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0;
+    line-height: 1.3;
+    font-family: "Ancizar Serif", serif;
+}
+
+.tpg-trust-card-desc {
+    font-size: 15px;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.7;
+    margin: 0;
+    max-width: 680px;
+}
+
+.tpg-trust-card-stats {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.tpg-trust-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tpg-trust-stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #FFFFFF;
+    line-height: 1;
+}
+
+.tpg-trust-stat-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 500;
+}
+
+.tpg-trust-stat-div {
+    width: 1px;
+    height: 44px;
+    background: rgba(255,255,255,0.15);
+}
+
+.tpg-trust-card-stars-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tpg-trust-card-rating-text {
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 500;
+    margin-left: 6px;
+}
+
+/* ───────────────────────────────────────────────
+   HELP BAR
+─────────────────────────────────────────────── */
+.tpg-helpbar-section {
+    padding: 0 40px 60px;
+    background: #F8FAFF;
+    display: flex;
+    justify-content: center;
+}
+
+.tpg-helpbar {
+    background: linear-gradient(135deg, #1B2E6B 0%, #0D1A40 100%);
+    border-radius: 18px;
+    padding: 24px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    max-width: 900px;
+    width: 100%;
+    flex-wrap: nowrap;
+    box-shadow: 0 8px 40px rgba(27,46,107,0.18);
+}
+
+.tpg-helpbar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.tpg-helpbar-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    flex-shrink: 0;
+}
+
+.tpg-helpbar-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: #FFFFFF;
+}
+
+.tpg-helpbar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: #FFFFFF;
+    color: #1B2E6B;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
+    white-space: nowrap;
+}
+
+.tpg-helpbar-btn:hover {
+    background: #F0F3FB;
+    transform: translateY(-1px);
+}
+
+/* ───────────────────────────────────────────────
+   SCROLL TO TOP (reuse home classes)
+─────────────────────────────────────────────── */
+/* .scroll-to-top-btn is already in home.css */
+
+/* ───────────────────────────────────────────────
+   RESPONSIVE
+─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .tpg-hero-main {
+        padding: 100px 24px 0;
+        flex-direction: column;
+    }
+
+    .tpg-hero-heading {
+        font-size: 32px;
+    }
+
+    .tpg-hero-image-frame {
+        width: 320px;
+        height: 320px;
+    }
+
+    .tpg-hero-image {
+        height: 300px;
+    }
+
+    .tpg-trust-card {
+        padding: 32px 24px;
+    }
+
+    .tpg-trust-card-title {
+        font-size: 22px;
+    }
+
+    .tpg-helpbar {
+        padding: 20px 24px;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .tpg-helpbar-left {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 600px) {
+    .tpg-hero-stats {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .tpg-hero-stat-divider {
+        display: none;
+    }
+
+    .tpg-trust-card-stats {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .tpg-trust-stat-div {
+        display: none;
+    }
+}
+
+/* ─── Scroll To Top ─── */
+.scroll-to-top-btn {
+    position: fixed;
+    bottom: 36px;
+    right: 36px;
+    z-index: 9999;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1B2E6B 0%, #243680 60%, #2c4098 100%);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 24px rgba(27, 46, 107, 0.45), 0 2px 8px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(16px) scale(0.88);
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+    outline: none;
+}
+.scroll-to-top-btn--visible { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+.scroll-to-top-btn:hover { background: linear-gradient(135deg, #243680 0%, #2c4098 60%, #3450b5 100%); box-shadow: 0 10px 32px rgba(27, 46, 107, 0.55), 0 4px 12px rgba(0, 0, 0, 0.22); transform: translateY(-3px) scale(1.06); }
+.scroll-to-top-btn:active { transform: translateY(0) scale(0.97); }
+.scroll-to-top-btn svg { display: block; flex-shrink: 0; }

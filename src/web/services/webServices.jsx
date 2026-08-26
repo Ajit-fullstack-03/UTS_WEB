@@ -3,6 +3,7 @@ import axios from "axios";
 const baseurl = process.env.REACT_APP_API_URL;
 const API_URL = baseurl;
 // helper to get auth headers
+
 const getAuthHeaders = () => {
     const token = localStorage.getItem("currentUser")?.replace(/"/g, "");
     return {
