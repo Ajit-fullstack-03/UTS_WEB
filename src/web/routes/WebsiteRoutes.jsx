@@ -5,7 +5,10 @@ import WebsiteLayout from "../../layouts/WebsiteLayout";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
-// import Services from "../pages/Services";
+import Career from "../pages/Career";
+import Contact from "../pages/Contact";
+import Testimonials from "../pages/Testimonials";
+import Services from "../pages/Services";
 // ...
 
 const WebsiteRoutes = () => {
@@ -13,7 +16,10 @@ const WebsiteRoutes = () => {
         <Routes>
             <Route element={<WebsiteLayout />}>
                 <Route index element={<Home />} />
-                {/* <Route path="services" element={<Services />} /> */}
+                <Route path="careers" element={<Career />} />
+                <Route path="contact" element={<Contact />} />
+                <Route path="testimonials" element={<Testimonials />} />
+                <Route path="services" element={<Services />} />
             </Route>
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
@@ -22,3 +28,4 @@ const WebsiteRoutes = () => {
 };
 
 export default WebsiteRoutes;
+

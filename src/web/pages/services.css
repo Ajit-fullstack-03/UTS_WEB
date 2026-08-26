@@ -1,0 +1,527 @@
+﻿
+@import url('https://fonts.googleapis.com/css2?family=Ancizar+Serif:ital,wght@0,300..900;1,300..900&display=swap');
+
+body {
+    font-family: "Ancizar Serif", serif;
+}
+
+/* ====================================
+   Services Page — services.css
+   ==================================== */
+
+/* ─────────────────────────────────────
+   HERO
+───────────────────────────────────── */
+.srv-hero-wrapper {
+    width: 100%;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    overflow: hidden;
+    padding-bottom: 60px;
+}
+
+.srv-hero-main {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 48px;
+    padding: 120px 80px 0;
+    flex-wrap: wrap;
+}
+
+.srv-hero-content {
+    flex: 1 1 400px;
+    max-width: 520px;
+}
+
+.srv-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid #D7DCEB;
+    border-radius: 999px;
+    background: #FFFFFF;
+    color: #1B2E6B;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 24px;
+}
+
+.srv-hero-heading {
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #0F1A3C;
+    margin: 0 0 18px;
+    font-family: "Ancizar Serif", Georgia, serif;
+}
+
+.srv-hero-heading-accent { color: #1B2E6B; }
+
+.srv-hero-desc {
+    font-size: 15px;
+    color: #475569;
+    line-height: 1.7;
+    margin: 0 0 32px;
+    max-width: 440px;
+}
+
+.srv-hero-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 36px;
+    background: #1B2E6B;
+    color: #FFFFFF;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
+}
+.srv-hero-btn:hover { background: #16264F; transform: translateY(-2px); }
+
+.srv-hero-visual {
+    flex: 1 1 380px;
+    display: flex;
+    justify-content: center;
+}
+
+.srv-hero-img-frame {
+    position: relative;
+    width: 440px;
+    max-width: 100%;
+}
+
+.srv-hero-img {
+       height: auto;
+    display: block;
+    border-radius: 20px;
+    position: relative;
+    top: 58px;
+    object-fit: cover;
+    max-height: 380px;
+    object-position: top;
+    filter: drop-shadow(0 16px 48px rgba(27, 46, 107, 0.18));
+}
+
+.srv-hero-badge-float {
+    position: absolute;
+    bottom: 20px;
+    left: -20px;
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 6px 24px rgba(27,46,107,0.14);
+    font-size: 13px;
+    font-weight: 600;
+    color: #1B2E6B;
+    white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   US TAX FILING — STICKY STACKING SECTION
+   Animation = identical to rs-card (position sticky + stacking)
+   Design    = clean white cards from screenshot (no coloured borders)
+═══════════════════════════════════════════════════════════ */
+.srv-steps-wrapper {
+    width: 100%;
+    background: #f5f5f5;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 60px 0 120px;
+}
+
+/* Section title */
+.srv-steps-header {
+    text-align: center;
+    margin-bottom: 48px;
+    padding: 0 24px;
+}
+
+.srv-steps-title {
+    font-family: "Ancizar Serif", serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+    letter-spacing: -0.3px;
+}
+
+/* Stack container */
+.srv-steps-stack {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding: 0 24px 80px;
+}
+
+/* ── STICKY CARD  ─ keeps the rs-card animation ── */
+.srv-card {
+   position: sticky;
+    top: calc(80px + (var(--card-index, 1) - 1) * 20px);
+    z-index: var(--card-index, 1);
+    background: #f5f5f5;
+    border-radius: 16px;
+    border: none;
+    /* box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08); */
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow: hidden;
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+    will-change: transform;
+    /* box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px; */
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+}
+
+/* Even cards → image on LEFT, text on RIGHT */
+.srv-card--flip {
+    flex-direction: row-reverse;
+}
+
+/* ── TEXT SIDE ── */
+.srv-card-content {
+    flex: 1 1 0;
+    padding: 48px 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.srv-card-number { display: none; }   /* hidden — cleaner look */
+.srv-card-label  { display: none; }   /* title is enough */
+
+.srv-card-title {
+    font-family: "Ancizar Serif", serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 16px;
+    line-height: 1.25;
+}
+
+.srv-card-desc {
+    font-size: 13.5px;
+    line-height: 1.75;
+    color: #6B7280;
+    margin: 0 0 20px;
+}
+
+/* "Our support includes:" label */
+.srv-card-support-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 10px;
+}
+
+.srv-card-bullets {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.srv-card-bullet {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: 13px;
+    color: #4B5563;
+    line-height: 1.5;
+}
+
+.srv-card-bullet-dot {
+    flex-shrink: 0;
+    margin-top: 5px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #1B2E6B;
+    display: block;
+}
+
+/* ── IMAGE SIDE ── */
+.srv-card-visual {
+    flex: 0 0 42%;
+    max-width: 42%;
+    align-self: stretch;            /* full card height */
+    overflow: hidden;
+}
+
+.srv-card-img-frame {
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+}
+
+.srv-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+    padding: 51px;
+}
+
+.srv-card:hover .srv-card-img {
+    transform: scale(1.04);
+}
+
+/* ─────────────────────────────────────
+   FAQ SECTION
+───────────────────────────────────── */
+.srv-faq-wrapper {
+    background: #F8FAFF;
+    padding: 80px 20px 0;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.srv-faq-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.srv-faq-top {
+    display: flex;
+    gap: 64px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 60px;
+}
+
+.srv-faq-content {
+    flex: 1 1 260px;
+    max-width: 340px;
+}
+
+.srv-faq-badge {
+    display: inline-flex;
+    padding: 6px 14px;
+    background: #1B2E6B;
+    color: #FFFFFF;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
+}
+
+.srv-faq-heading {
+    font-size: 35px;
+    font-weight: 500;
+    color: #14141A;
+    margin: 0 0 16px;
+    line-height: 1.3;
+    font-family: "Ancizar Serif", serif;
+}
+
+.srv-faq-desc {
+    font-size: 14px;
+    color: #6B6F7B;
+    line-height: 1.7;
+    margin: 0 0 28px;
+}
+
+.srv-faq-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: #1B2E6B;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s, transform 0.2s;
+}
+.srv-faq-more:hover { background: #16264F; transform: translateY(-1px); }
+
+.srv-faq-accordion {
+    flex: 2 1 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.srv-faq-item {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.srv-faq-item--open {
+    border-color: #1B2E6B;
+    box-shadow: 0 4px 16px rgba(27,46,107,0.08);
+}
+
+.srv-faq-item-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+}
+
+.srv-faq-question {
+    font-size: 14px;
+    font-weight: 600;
+    color: #14141A;
+    line-height: 1.4;
+    flex: 1;
+}
+
+.srv-faq-chevron {
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+.srv-faq-chevron--open { transform: rotate(180deg); }
+
+.srv-faq-body {
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.srv-faq-answer {
+    padding: 0 20px 18px;
+    font-size: 13.5px;
+    color: #6B6F7B;
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* Contact bar */
+.srv-faq-bar {
+    background: linear-gradient(135deg, #1B2E6B 0%, #0D1A40 100%);
+    border-radius: 18px;
+    padding: 24px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 60px;
+    box-shadow: 0 8px 40px rgba(27,46,107,0.18);
+}
+
+.srv-faq-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.srv-faq-bar-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    flex-shrink: 0;
+}
+
+.srv-faq-bar-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: #FFFFFF;
+}
+
+.srv-faq-bar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: #FFFFFF;
+    color: #1B2E6B;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s;
+    white-space: nowrap;
+}
+.srv-faq-bar-btn:hover { background: #F0F3FB; transform: translateY(-1px); }
+
+/* ─────────────────────────────────────
+   SCROLL TO TOP
+───────────────────────────────────── */
+.scroll-to-top-btn {
+    position: fixed;
+    bottom: 36px; right: 36px; z-index: 9999;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1B2E6B 0%, #243680 60%, #2c4098 100%);
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 24px rgba(27,46,107,0.45);
+    opacity: 0; visibility: hidden;
+    transform: translateY(16px) scale(0.88);
+    transition: opacity 0.3s ease, visibility 0.3s ease,
+                transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    outline: none;
+}
+.scroll-to-top-btn--visible { opacity:1; visibility:visible; transform:translateY(0) scale(1); }
+.scroll-to-top-btn:hover { transform: translateY(-3px) scale(1.06); }
+
+/* ─────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────── */
+@media (max-width: 900px) {
+    .srv-hero-main { padding: 100px 24px 0; }
+    .srv-hero-heading { font-size: 32px; }
+
+    /* On tablet: cards stack vertically, image on top */
+    .srv-card {
+        flex-direction: column !important;
+        position: relative;
+        top: auto !important;
+    }
+    .srv-card--flip { flex-direction: column !important; }
+
+    .srv-card-visual {
+        flex: 0 0 auto;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .srv-card-img-frame {
+        min-height: 220px;
+        height: 220px;
+    }
+
+    .srv-card-content {
+        padding: 32px 28px;
+    }
+
+    .srv-steps-stack { gap: 24px; }
+}
+
+@media (max-width: 600px) {
+    .srv-steps-title { font-size: 22px; }
+    .srv-card-title  { font-size: 20px; }
+    .srv-card-content { padding: 24px 20px; }
+    .srv-faq-bar { flex-direction: column; text-align: center; padding: 20px 24px; }
+    .srv-hero-img { max-height: 240px; }
+    .srv-steps-stack { padding: 0 16px 60px; }
+}

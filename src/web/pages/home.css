@@ -5,7 +5,6 @@ body {
 }
 
 /* ===== Hero Section — Tax Filing Landing Page ===== */
-
 .hero-wrapper {
     width: 100%;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -65,11 +64,9 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 40px;
-    padding: 64px clamp(20px, 6vw, 90px) 0px;
+    padding: 64px 90px 0px;
     flex-wrap: wrap;
-    width: 100%;
-    max-width: 1470px;
-    box-sizing: border-box;
+    width: 1470px;
 }
 
 .hero-content {
@@ -386,21 +383,6 @@ body {
 }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 1200px) {
-    .hero-main {
-        padding: 64px clamp(20px, 4vw, 60px) 0px;
-        gap: 24px;
-    }
-
-    .hero-content {
-        flex: 1 1 380px;
-    }
-
-    .hero-visual {
-        flex: 1 1 380px;
-    }
-}
-
 @media (max-width: 900px) {
     .hero-main {
         flex-direction: column;
@@ -767,8 +749,6 @@ body {
     position: relative;
     z-index: 1;
     max-width: 1460px;
-    width: 100%;
-    box-sizing: border-box;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -966,19 +946,6 @@ body {
 
 /* ---------- Responsive ---------- */
 
-/* Medium laptops — chips would overflow; pull them inside */
-@media (max-width: 1280px) {
-    .wcu-chip--cpa {
-        left: auto;
-        right: -8px;
-    }
-
-    .wcu-chip--refund {
-        left: auto;
-        right: -8px;
-    }
-}
-
 /* Tablet */
 @media (max-width: 1024px) {
     .wcu-inner {
@@ -987,8 +954,7 @@ body {
     }
 
     .wcu-chip--cpa {
-        left: auto;
-        right: -8px;
+        right: 0%;
     }
 
     .wcu-chip--turnaround {
@@ -996,8 +962,7 @@ body {
     }
 
     .wcu-chip--refund {
-        left: auto;
-        right: -8px;
+        right: 0%;
     }
 }
 
@@ -2889,61 +2854,507 @@ body {
     }
 }
 
-/* ========== Country Flag in Topbar ========== */
-.hero-topbar-flag {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    border-radius: 3px;
-    overflow: hidden;
-    line-height: 0;
+/* =========================================================================
+   ================  MOBILE UI OVERRIDES (matches provided  =================
+   ================  mobile mockup — iPhone 16/17 Pro width) =================
+   =========================================================================
+   Everything below is NEW and only runs inside media queries, so nothing
+   above (desktop styles) is touched or changed. These rules are ordered
+   AFTER the desktop rules on purpose so they win the cascade on small
+   screens while leaving every desktop rule exactly as it was.
+   ========================================================================= */
+
+@media (max-width: 767px) {
+
+    /* ---------- Hero: top contact bar becomes a normal, in-flow bar ---------- */
+    .hero-topbar {
+        position: static;
+        max-width: 100%;
+        width: 100%;
+        border-radius: 0;
+        padding: 10px 16px;
+    }
+
+    .hero-topbar-inner {
+        justify-content: center;
+        gap: 8px 18px;
+    }
+
+    .hero-topbar-item {
+        font-size: 11px;
+        gap: 6px;
+    }
+
+    .hero-topbar-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* ---------- Hero: main content ---------- */
+    .hero-main {
+        width: 100%;
+        padding: 32px 20px 40px;
+        gap: 32px;
+    }
+
+    .hero-badge {
+        margin: 0 auto 20px;
+    }
+
+    .hero-heading {
+        font-size: 32px;
+    }
+
+    .hero-cta-group {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+    }
+
+    .hero-btn {
+        width: 100%;
+    }
+
+    .hero-btn-primary {
+        padding: 16px 24px;
+    }
+
+    .hero-visual {
+        max-width: 100%;
+    }
+
+    .hero-image-frame {
+        margin-top: 8px;
+    }
+
+    .hero-float-card--stats {
+        width: 160px;
+        padding: 10px 12px;
+        top: -12px;
+        left: -6px;
+        gap: 6px 8px;
+    }
+
+    .hero-float-card-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .hero-float-card-value {
+        font-size: 16px;
+    }
+
+    .hero-float-card-label,
+    .hero-float-card-sub {
+        font-size: 10px;
+    }
+
+    .hero-float-card--refund {
+        bottom: 14px;
+        right: 10px;
+        padding: 8px 14px 8px 8px;
+        font-size: 11px;
+    }
+
+    .hero-float-card-refund-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+
+    .hero-statsbar {
+        padding: 20px 16px;
+    }
+
+    .hero-statsbar-inner {
+        gap: 18px;
+        justify-content: space-between;
+    }
+
+    .hero-stat-value {
+        font-size: 18px;
+    }
+
+    .hero-stat-label {
+        font-size: 11px;
+    }
+
+    /* ---------- Why Choose Us: content first, image below ---------- */
+    .wcu-wrapper {
+        padding: 40px 20px;
+    }
+
+    .wcu-inner {
+        flex-direction: column-reverse;
+        gap: 32px;
+    }
+
+    .wcu-content {
+        text-align: center;
+    }
+
+    .wcu-description {
+        margin: 0 auto;
+    }
+
+    .wcu-heading {
+        font-size: 26px;
+    }
+
+    .wcu-visual {
+        max-width: 280px;
+    }
+
+    /* ---------- Our Services: keep a 2-column grid at every mobile size ---------- */
+    .os-wrapper {
+        padding: 40px 16px 48px;
+    }
+
+    .os-heading {
+        font-size: 22px;
+        margin-bottom: 24px;
+    }
+
+    .os-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .os-card {
+        padding: 8px 8px 14px;
+        border-radius: 12px;
+    }
+
+    .os-card-image-wrap {
+        margin-bottom: 10px;
+    }
+
+    .os-card-label {
+        font-size: 12px;
+        line-height: 1.3;
+    }
+
+    /* ---------- Tax-Saving Opportunities: single column, reorder to match mockup ---------- */
+    .tso-wrapper {
+        padding: 40px 16px 32px;
+    }
+
+    .tso-header {
+        margin-bottom: 32px;
+    }
+
+    .tso-heading {
+        font-size: 22px;
+    }
+
+    /* Swap Student Loan card above the HSA card within column 2, to match mockup order */
+    .tso-col:nth-child(2) {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .tso-col:nth-child(2) .tso-card:nth-child(2) {
+        order: -1;
+    }
+
+    /* ---------- File Smart / Get More Back ---------- */
+    .fs-wrapper {
+        padding: 20px 16px;
+    }
+
+    .fs-card {
+        padding: 20px 16px 16px;
+        border-radius: 20px;
+    }
+
+    .fs-top {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+        padding-bottom: 20px;
+    }
+
+    .fs-content {
+        max-width: 100%;
+        order: 1;
+    }
+
+    .fs-heading {
+        width: auto;
+        font-size: 26px;
+    }
+
+    .fs-visual {
+        order: 2;
+        max-width: 100%;
+        width: 100%;
+        justify-content: center;
+        margin-top: 0;
+    }
+
+    .fs-bg-circle {
+        display: none;
+    }
+
+    .fs-image-wrap {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 4 / 3.1;
+        border-radius: 18px;
+    }
+
+    .fs-refund-card {
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        transform: none;
+        width: 140px;
+        padding: 10px 12px;
+        align-items: flex-start;
+        text-align: left;
+        border-radius: 12px;
+    }
+
+    .fs-refund-value {
+        font-size: 20px;
+    }
+
+    .fs-refund-tag {
+        font-size: 10px;
+        white-space: normal;
+    }
+
+    .fs-features {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        padding: 12px 10px;
+        border-radius: 14px;
+        gap: 4px;
+    }
+
+    .fs-feature {
+        flex: 1 1 0;
+        justify-content: flex-start;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .fs-feature-icon {
+        width: 30px;
+        height: 30px;
+        flex-shrink: 0;
+    }
+
+    .fs-feature-icon svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .fs-feature-title {
+        font-size: 10.5px;
+        line-height: 1.25;
+        white-space: normal;
+    }
+
+    .fs-feature-sub {
+        font-size: 9px;
+        white-space: normal;
+    }
+
+    .fs-feature-divider {
+        display: block;
+        height: 30px;
+    }
+
+    /* ---------- Your refund, in three steps: plain stacked cards, image on top ---------- */
+    .rs-wrapper {
+        padding: 40px 16px 48px;
+    }
+
+    .rs-header {
+        margin-bottom: 28px;
+    }
+
+    .rs-heading {
+        font-size: 22px;
+    }
+
+    .rs-steps {
+        gap: 20px;
+        padding-bottom: 0;
+    }
+
+    .rs-card {
+        position: static;
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+        border-radius: 20px;
+        text-align: left;
+    }
+
+    .rs-card-visual {
+        order: 1;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .rs-card-content {
+        order: 2;
+        max-width: 100%;
+    }
+
+    .rs-visual-frame {
+        max-width: 100%;
+    }
+
+    .rs-step-title {
+        font-size: 20px;
+    }
+
+    /* ---------- Testimonials: keep the side-by-side layout, just scaled down ---------- */
+    .tm-wrapper {
+        padding: 36px 16px 44px;
+        margin-top: 32px;
+    }
+
+    .tm-heading {
+        font-size: 22px;
+    }
+
+    .tm-body {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .tm-side {
+        flex: 0 0 96px;
+        padding-top: 4px;
+    }
+
+    .tm-quote-icon {
+        width: 28px;
+        height: 21px;
+        margin-bottom: 10px;
+    }
+
+    .tm-side-heading {
+        font-size: 15px;
+        line-height: 1.3;
+        margin-bottom: 18px;
+    }
+
+    .tm-nav {
+        gap: 8px;
+    }
+
+    .tm-nav-btn {
+        width: 26px;
+        height: 26px;
+    }
+
+    .tm-nav-line {
+        width: 16px;
+    }
+
+    .tm-card {
+        flex: 0 0 78%;
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    .tm-card-text {
+        font-size: 12px;
+        margin-bottom: 14px;
+    }
+
+    /* ---------- FAQ ---------- */
+    .faq-wrapper {
+        padding: 40px 16px 32px;
+    }
+
+    .faq-heading {
+        font-size: 24px;
+    }
+
+    .faq-top {
+        padding-bottom: 40px;
+    }
 }
 
-/* ========== Scroll To Top Button ========== */
+@media (max-width: 420px) {
+
+    .hero-heading {
+        font-size: 28px;
+    }
+
+    .hero-float-card--stats {
+        width: 145px;
+    }
+
+    .tm-side {
+        flex: 0 0 84px;
+    }
+
+    .tm-side-heading {
+        font-size: 13px;
+    }
+
+    .tm-card {
+        flex: 0 0 82%;
+    }
+
+    .fs-refund-card {
+        width: 120px;
+    }
+}
+
+/* ===== Scroll To Top Button ===== */
 .scroll-to-top-btn {
     position: fixed;
-    bottom: 32px;
-    right: 32px;
-    width: 48px;
-    height: 48px;
+    bottom: 36px;
+    right: 36px;
+    z-index: 9999;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #1B2E6B 0%, #2a4aad 100%);
+    background: linear-gradient(135deg, #1B2E6B 0%, #243680 60%, #2c4098 100%);
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 20px rgba(27, 46, 107, 0.45);
+    box-shadow: 0 6px 24px rgba(27, 46, 107, 0.45), 0 2px 8px rgba(0, 0, 0, 0.18);
     opacity: 0;
-    transform: translateY(20px) scale(0.85);
-    pointer-events: none;
-    transition: opacity 0.35s ease, transform 0.35s ease, box-shadow 0.25s ease, background 0.25s ease;
-    z-index: 9999;
+    visibility: hidden;
+    transform: translateY(16px) scale(0.88);
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+    outline: none;
 }
 
 .scroll-to-top-btn--visible {
     opacity: 1;
+    visibility: visible;
     transform: translateY(0) scale(1);
-    pointer-events: auto;
 }
 
 .scroll-to-top-btn:hover {
-    background: linear-gradient(135deg, #2a4aad 0%, #3b5fcf 100%);
-    box-shadow: 0 8px 28px rgba(27, 46, 107, 0.65);
+    background: linear-gradient(135deg, #243680 0%, #2c4098 60%, #3450b5 100%);
+    box-shadow: 0 10px 32px rgba(27, 46, 107, 0.55), 0 4px 12px rgba(0, 0, 0, 0.22);
     transform: translateY(-3px) scale(1.06);
 }
 
 .scroll-to-top-btn:active {
     transform: translateY(0) scale(0.97);
-    box-shadow: 0 4px 14px rgba(27, 46, 107, 0.4);
+    box-shadow: 0 4px 16px rgba(27, 46, 107, 0.38);
 }
 
-@media (max-width: 575px) {
-    .scroll-to-top-btn {
-        bottom: 20px;
-        right: 20px;
-        width: 42px;
-        height: 42px;
-    }
+.scroll-to-top-btn svg {
+    display: block;
+    flex-shrink: 0;
 }
