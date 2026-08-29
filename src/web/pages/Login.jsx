@@ -7,6 +7,7 @@ import ellipseImg from "../../assets/image/Object.png";
 import "./login.css";
 import { webservices } from "../services/webServices";
 import Swal from "sweetalert2";
+import { setStoredTaxYear } from "../../utils/taxYear";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -27,6 +28,8 @@ const Login = () => {
                 localStorage.setItem("currentUser", JSON.stringify(response.data.uinfo.user_id));
                 // Store the full user info for future use if needed
                 localStorage.setItem("userInfo", JSON.stringify(response.data.uinfo));
+                const activeTaxYear = response.data.uinfo.taxYear || response.data.uinfo.taxyear || response.data.uinfo.current_year || new Date().getFullYear();
+                setStoredTaxYear(activeTaxYear);
                 // alert(response.data.status_smessage);
                 if (response.data.uinfo.user_type_id == 1) {
                     navigate("/admin");

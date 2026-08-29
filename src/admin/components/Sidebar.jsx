@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { adminServices } from "../services/AdminServices";
+import { getStoredTaxYear } from "../../utils/taxYear";
 import "./sidebar.css";
 
 const Sidebar = () => {
@@ -25,13 +26,12 @@ const Sidebar = () => {
         try {
             const userInfoStr = localStorage.getItem("userInfo") || localStorage.getItem("currentUser");
             let userId = "YlZwVVRHUmVXVEZpUVRkeWVYVllOQ05NVGpCektIVnpXVEJQZVVvcFprQnRVVjVEV2pCTU1FQXlUVTg9";
-            let taxYear = String(new Date().getFullYear());
+            let taxYear = getStoredTaxYear();
 
             if (userInfoStr) {
                 try {
                     const parsed = JSON.parse(userInfoStr);
                     if (parsed.user_id || parsed.id) userId = parsed.user_id || parsed.id;
-                    if (parsed.taxyear || parsed.taxYear || parsed.current_year) taxYear = String(parsed.taxyear || parsed.taxYear || parsed.current_year);
                 } catch {
                     // Ignore parsing error
                 }
@@ -83,8 +83,10 @@ const Sidebar = () => {
     useEffect(() => {
         fetchCounts();
         window.addEventListener("adminCountsUpdated", fetchCounts);
+        window.addEventListener("taxYearChanged", fetchCounts);
         return () => {
             window.removeEventListener("adminCountsUpdated", fetchCounts);
+            window.removeEventListener("taxYearChanged", fetchCounts);
         };
     }, [fetchCounts, location.pathname]);
 
@@ -127,6 +129,8 @@ const Sidebar = () => {
             if (result.isConfirmed) {
                 localStorage.removeItem("adminToken");
                 localStorage.removeItem("currentUser");
+                localStorage.removeItem("userInfo");
+                localStorage.removeItem("taxYear");
                 navigate("/login");
             }
         });

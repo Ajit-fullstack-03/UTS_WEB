@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { FiSearch, FiChevronLeft, FiChevronRight, FiChevronDown, FiRefreshCw } from "react-icons/fi";
 import Swal from "sweetalert2";
 import { adminServices } from "../services/AdminServices";
+import { getStoredTaxYear } from "../../utils/taxYear";
 import "./referrals.css";
 
 // Default mockup data matching Figma design
@@ -75,13 +76,12 @@ const AdminReferrals = () => {
     const getCredentials = () => {
         const userInfoStr = localStorage.getItem("userInfo") || localStorage.getItem("currentUser");
         let userId = "YlZwVVRHUmVXVEZpUVRkeWVYVllOQ05NVGpCektIVnpXVEJQZVVvcFprQnRVVjVEV2pCTU1FQXlUVTg9";
-        let taxYear = String(new Date().getFullYear());
+        let taxYear = getStoredTaxYear();
 
         if (userInfoStr) {
             try {
                 const parsed = JSON.parse(userInfoStr);
                 if (parsed.user_id || parsed.id) userId = parsed.user_id || parsed.id;
-                if (parsed.taxyear || parsed.taxYear || parsed.current_year) taxYear = String(parsed.taxyear || parsed.taxYear || parsed.current_year);
             } catch {
                 if (typeof userInfoStr === "string" && userInfoStr.length > 5) {
                     userId = userInfoStr.replace(/"/g, "");
@@ -178,6 +178,10 @@ const AdminReferrals = () => {
 
     useEffect(() => {
         fetchReferrals();
+        window.addEventListener("taxYearChanged", fetchReferrals);
+        return () => {
+            window.removeEventListener("taxYearChanged", fetchReferrals);
+        };
     }, [fetchReferrals]);
 
     // View referral details modal

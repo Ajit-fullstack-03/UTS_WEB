@@ -76,6 +76,93 @@
     font-weight: 600 !important;
 }
 
+/* Tax Year Dropdown Styles */
+.tax-year-dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.tax-year-dropdown-btn {
+    user-select: none;
+}
+
+.dropdown-chevron-icon {
+    font-size: 1rem;
+    transition: transform 0.2s ease-in-out;
+}
+
+.rotate-180 {
+    transform: rotate(180deg);
+}
+
+.tax-year-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 175px;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    z-index: 1050;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    animation: fadeInMenu 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInMenu {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-menu-header {
+    letter-spacing: 0.5px;
+    color: #94a3b8 !important;
+    font-size: 0.72rem !important;
+}
+
+.tax-year-list-scroll {
+    max-height: 240px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.tax-year-list-scroll::-webkit-scrollbar {
+    width: 5px;
+}
+
+.tax-year-list-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.dropdown-item-year {
+    color: #334155;
+    font-size: 0.86rem;
+    font-weight: 500;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    cursor: pointer;
+}
+
+.dropdown-item-year:hover {
+    background-color: #f1f5f9;
+    color: #1b2e6b;
+}
+
+.dropdown-item-year.selected {
+    background-color: #eff6ff;
+    color: #1b2e6b;
+}
+
+.dropdown-item-year .check-icon {
+    font-size: 0.95rem;
+    color: #1b2e6b !important;
+}
+
 /* Bell Notification */
 .btn-bell {
     color: #1b2e6b !important;
@@ -120,4 +207,3 @@
         max-width: 80%;
     }
 }
-

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 import { FiMail, FiPhone, FiCheckCircle, FiLoader, FiRefreshCw } from "react-icons/fi";
 import { adminServices } from "../services/AdminServices";
+import { getStoredTaxYear } from "../../utils/taxYear";
 import "./admin_dashboard.css";
 
 const AssignedFileNumber = () => {
@@ -32,12 +33,11 @@ const AssignedFileNumber = () => {
     const getAdminCredentials = () => {
         const userInfoStr = localStorage.getItem("userInfo") || localStorage.getItem("currentUser");
         let userId = "YlZwVVRHUmVXVEZpUVRkeWVYVllOQ05NVGpCektIVnpXVEJQZVVvcFprQnRVVjVEV2pCTU1FQXlUVTg9";
-        let taxYear = String(new Date().getFullYear());
+        let taxYear = getStoredTaxYear();
         if (userInfoStr) {
             try {
                 const parsed = JSON.parse(userInfoStr);
                 if (parsed.user_id || parsed.id) userId = parsed.user_id || parsed.id;
-                if (parsed.taxyear || parsed.taxYear || parsed.current_year) taxYear = String(parsed.taxyear || parsed.taxYear || parsed.current_year);
             } catch {
                 if (typeof userInfoStr === "string" && userInfoStr.length > 5) {
                     userId = userInfoStr.replace(/"/g, "");
@@ -113,6 +113,10 @@ const AssignedFileNumber = () => {
 
     useEffect(() => {
         fetchUsers();
+        window.addEventListener("taxYearChanged", fetchUsers);
+        return () => {
+            window.removeEventListener("taxYearChanged", fetchUsers);
+        };
     }, [fetchUsers]);
 
     // Handle Assign File Number (Card 1)

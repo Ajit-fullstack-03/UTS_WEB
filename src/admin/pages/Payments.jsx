@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { FiSearch, FiChevronLeft, FiChevronRight, FiChevronDown, FiRefreshCw } from "react-icons/fi";
 import { adminServices } from "../services/AdminServices";
+import { getStoredTaxYear } from "../../utils/taxYear";
 import "./payments.css";
 
 // Sample initial data matching Figma design mockups
@@ -74,13 +75,12 @@ const Payments = () => {
     const getCredentials = () => {
         const userInfoStr = localStorage.getItem("userInfo") || localStorage.getItem("currentUser");
         let userId = "YlZwVVRHUmVXVEZpUVRkeWVYVllOQ05NVGpCektIVnpXVEJQZVVvcFprQnRVVjVEV2pCTU1FQXlUVTg9";
-        let taxYear = String(new Date().getFullYear());
+        let taxYear = getStoredTaxYear();
 
         if (userInfoStr) {
             try {
                 const parsed = JSON.parse(userInfoStr);
                 if (parsed.user_id || parsed.id) userId = parsed.user_id || parsed.id;
-                if (parsed.taxyear || parsed.taxYear || parsed.current_year) taxYear = String(parsed.taxyear || parsed.taxYear || parsed.current_year);
             } catch {
                 if (typeof userInfoStr === "string" && userInfoStr.length > 5) {
                     userId = userInfoStr.replace(/"/g, "");
@@ -193,6 +193,10 @@ const Payments = () => {
 
     useEffect(() => {
         fetchPayments();
+        window.addEventListener("taxYearChanged", fetchPayments);
+        return () => {
+            window.removeEventListener("taxYearChanged", fetchPayments);
+        };
     }, [fetchPayments]);
 
     // Format status css class helper

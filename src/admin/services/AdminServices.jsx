@@ -30,15 +30,16 @@ const postFormData = (uri, formData) => {
 const alluserslist = (data) => postUrl(`${API_URL}member/alluserslist`, data);
 const commonprocessingcount = (data) => postUrl(`${API_URL}member/commonprocessingcount`, data);
 const commonprocessingclientdata = (data) => postUrl(`${API_URL}member/commonprocessingclientdata`, data);
+const utstaxyears = (data) => postUrl(`${API_URL}member/utstaxyears`, data);
 
 // ==========================================
 // 2. Client Profile & Info
 // ==========================================
 const userdetails = (data) => postUrl(`${API_URL}member/userdetails`, data);
 const taxpayerinfo = (data) => postUrl(`${API_URL}member/taxpayerinfo`, data);
-const getSpouseInfo = (data) => postUrl(`${API_URL}member/getSpouseInfo`, data);
-const getDependentInfo = (data) => postUrl(`${API_URL}member/getDependentInfo`, data);
-const getEmployerInfo = (data) => postUrl(`${API_URL}member/getEmployerInfo`, data);
+const getSpouseInfo = (data) => postUrl(`${API_URL}member/spouseinfo`, data);
+const getDependentInfo = (data) => postUrl(`${API_URL}member/dependentinfo`, data);
+const getEmployerInfo = (data) => postUrl(`${API_URL}member/employerinfo`, data);
 
 // ==========================================
 // 3. Document Management
@@ -46,6 +47,7 @@ const getEmployerInfo = (data) => postUrl(`${API_URL}member/getEmployerInfo`, da
 const gettotalcountofdocs = (data) => postUrl(`${API_URL}upload/gettotalcountofdocs`, data);
 const downloadZip = (data) => postUrl(`${API_URL}upload/downloadZip`, data);
 const savesynopsys = (formData) => postFormData(`${API_URL}member/savesynopsys`, formData);
+const usersynopsys = (data) => postUrl(`${API_URL}member/usersynopsys`, data);
 
 // ==========================================
 // 4. Assigned File Number & Account Management
@@ -98,6 +100,7 @@ export const adminServices = {
     alluserslist,
     commonprocessingcount,
     commonprocessingclientdata,
+    utstaxyears,
 
     // Client Profile & Info
     userdetails,
@@ -110,6 +113,7 @@ export const adminServices = {
     gettotalcountofdocs,
     downloadZip,
     savesynopsys,
+    usersynopsys,
 
     // File Number & Account Management
     usersliist,

@@ -12,13 +12,14 @@ import {
     FiChevronRight,
     FiFileText,
     FiUsers,
-    FiBriefcase,
     FiHeart,
     FiRefreshCw,
     FiPackage,
     FiExternalLink
 } from "react-icons/fi";
 import { adminServices } from "../services/AdminServices";
+import { getStoredTaxYear, getStoredTaxYearsList } from "../../utils/taxYear";
+import { exportClientDetailsPDF } from "../../utils/pdfExport";
 import "../pages/admin_dashboard.css";
 
 const filestateMap = {
@@ -117,12 +118,16 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [uploadCountry, setUploadCountry] = useState("US");
     const [uploadDocTitle, setUploadDocTitle] = useState("Tax Synopsis");
-    const [uploadTaxYear, setUploadTaxYear] = useState(String(new Date().getFullYear()));
+    const [uploadTaxYear, setUploadTaxYear] = useState(getStoredTaxYear());
+    const [taxYearsList, setTaxYearsList] = useState(getStoredTaxYearsList());
     const [selectedUploadFile, setSelectedUploadFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadedFiles, setUploadedFiles] = useState([]);
     const [docsLoading, setDocsLoading] = useState(false);
     const [zipDownloading, setZipDownloading] = useState(false);
+    const [exportingPdf, setExportingPdf] = useState(false);
+    const [synopsysList, setSynopsysList] = useState([]);
+    const [synopsysLoading, setSynopsysLoading] = useState(false);
 
     // File Status update states
     const [selectedFileState, setSelectedFileState] = useState(1);
@@ -151,7 +156,7 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
     const [referralPage, setReferralPage] = useState(1);
     const [referralRowsPerPage, setReferralRowsPerPage] = useState(10);
 
-    // Client Details API States (Mirrors Customer Profile Structure)
+    // Profile Details form state
     const [detailsLoading, setDetailsLoading] = useState(false);
     const [basicInfo, setBasicInfo] = useState({
         firstName: "",
@@ -176,13 +181,12 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
         try {
             const userInfoStr = localStorage.getItem("userInfo") || localStorage.getItem("currentUser");
             let userId = "YlZwVVRHUmVXVEZpUVRkeWVYVllOQ05NVGpCektIVnpXVEJQZVVvcFprQnRVVjVEV2pCTU1FQXlUVTg9";
-            let taxYear = String(new Date().getFullYear());
+            let taxYear = getStoredTaxYear();
 
             if (userInfoStr) {
                 try {
                     const parsed = JSON.parse(userInfoStr);
                     if (parsed.user_id || parsed.id) userId = parsed.user_id || parsed.id;
-                    if (parsed.taxyear || parsed.taxYear || parsed.current_year) taxYear = String(parsed.taxyear || parsed.taxYear || parsed.current_year);
                 } catch {
                     // Ignore JSON parse error
                 }
@@ -303,6 +307,15 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
 
     useEffect(() => {
         loadRecords();
+        const handleTaxYearChange = () => {
+            setUploadTaxYear(getStoredTaxYear());
+            setTaxYearsList(getStoredTaxYearsList());
+            loadRecords();
+        };
+        window.addEventListener("taxYearChanged", handleTaxYearChange);
+        return () => {
+            window.removeEventListener("taxYearChanged", handleTaxYearChange);
+        };
     }, [loadRecords]);
 
     // Fetch client details: taxpayerinfo, getSpouseInfo, getDependentInfo, getEmployerInfo, gettotalcountofdocs
@@ -487,7 +500,7 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
             // 6. Referrals List
             setReferralsLoading(true);
             try {
-                const taxYear = client.tax_year || client.current_year || client.year || client.rawData?.current_year || client.rawData?.tax_year || String(new Date().getFullYear());
+                const taxYear = client.tax_year || client.current_year || client.year || client.rawData?.current_year || client.rawData?.tax_year || getStoredTaxYear();
                 const refPayload = {
                     taxYear: String(taxYear),
                     client_id: String(targetUserId),
@@ -512,7 +525,7 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
             // 7. Status History from processingstatushistory
             setStatusHistoryLoading(true);
             try {
-                const psYear = client.ps_year || client.tax_year || client.taxyear || client.current_year || client.year || client.rawData?.current_year || client.rawData?.tax_year || String(new Date().getFullYear());
+                const psYear = client.ps_year || client.tax_year || client.taxyear || client.current_year || client.year || client.rawData?.current_year || client.rawData?.tax_year || getStoredTaxYear();
                 const psPayload = {
                     ps_year: String(psYear),
                     client_id: String(targetUserId),
@@ -543,9 +556,91 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
             } finally {
                 setStatusHistoryLoading(false);
             }
+
+            // 8. usersynopsys
+            setSynopsysLoading(true);
+            try {
+                const currentTaxYear = getStoredTaxYear();
+                const userInfoStr = localStorage.getItem("userInfo") || localStorage.getItem("currentUser");
+                let adminUserId = targetUserId;
+                if (userInfoStr) {
+                    try {
+                        const parsed = JSON.parse(userInfoStr);
+                        if (parsed.user_id || parsed.id) adminUserId = parsed.user_id || parsed.id;
+                    } catch {
+                        if (typeof userInfoStr === "string" && userInfoStr.length > 5) {
+                            adminUserId = userInfoStr.replace(/"/g, "");
+                        }
+                    }
+                }
+
+                const synPayload = {
+                    client_id: String(targetUserId),
+                    user_id: adminUserId,
+                    taxYear: Number(currentTaxYear) || currentTaxYear
+                };
+                const resSyn = await adminServices.usersynopsys(synPayload);
+                if (resSyn?.data?.synopsys && Array.isArray(resSyn.data.synopsys)) {
+                    setSynopsysList(resSyn.data.synopsys);
+                } else if (resSyn?.data?.data && Array.isArray(resSyn.data.data)) {
+                    setSynopsysList(resSyn.data.data);
+                } else if (Array.isArray(resSyn?.data)) {
+                    setSynopsysList(resSyn.data);
+                } else {
+                    setSynopsysList([]);
+                }
+            } catch (synErr) {
+                console.warn("Error fetching usersynopsys:", synErr);
+                setSynopsysList([]);
+            } finally {
+                setSynopsysLoading(false);
+            }
         } finally {
             setDetailsLoading(false);
             setDocsLoading(false);
+        }
+    }, []);
+
+    // Refresh synopsys documents standalone
+    const fetchUserSynopsys = useCallback(async (client) => {
+        if (!client) return;
+        const targetUserId = client.user_id || client.client_id || client.id;
+        setSynopsysLoading(true);
+        try {
+            const currentTaxYear = getStoredTaxYear();
+            const userInfoStr = localStorage.getItem("userInfo") || localStorage.getItem("currentUser");
+            let adminUserId = targetUserId;
+            if (userInfoStr) {
+                try {
+                    const parsed = JSON.parse(userInfoStr);
+                    if (parsed.user_id || parsed.id) adminUserId = parsed.user_id || parsed.id;
+                } catch {
+                    if (typeof userInfoStr === "string" && userInfoStr.length > 5) {
+                        adminUserId = userInfoStr.replace(/"/g, "");
+                    }
+                }
+            }
+
+            const synPayload = {
+                client_id: String(targetUserId),
+                user_id: adminUserId,
+                taxYear: Number(currentTaxYear) || currentTaxYear
+            };
+            const resSyn = await adminServices.usersynopsys(synPayload);
+            if (resSyn?.data?.synopsys && Array.isArray(resSyn.data.synopsys)) {
+                setSynopsysList(resSyn.data.synopsys);
+            } else if (resSyn?.data?.data && Array.isArray(resSyn.data.data)) {
+                setSynopsysList(resSyn.data.data);
+            } else if (Array.isArray(resSyn?.data)) {
+                setSynopsysList(resSyn.data);
+            } else {
+                setSynopsysList([]);
+            }
+        } catch (synErr) {
+            console.warn("Error fetching usersynopsys:", synErr);
+            setSynopsysList([]);
+        } finally {
+            setSynopsysLoading(false);
         }
     }, []);
 
@@ -733,13 +828,12 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
         try {
             const userInfoStr = localStorage.getItem("userInfo") || localStorage.getItem("currentUser");
             let adminUserId = "YlZwVVRHUmVXVEZpUVRkeWVYVllOQ05NVGpCektIVnpXVEJQZVVvcFprQnRVVjVEV2pCTU1FQXlUVTg9";
-            let currentTaxYear = uploadTaxYear || String(new Date().getFullYear());
+            let currentTaxYear = uploadTaxYear || getStoredTaxYear();
 
             if (userInfoStr) {
                 try {
                     const parsed = JSON.parse(userInfoStr);
                     if (parsed.user_id || parsed.id) adminUserId = parsed.user_id || parsed.id;
-                    if (parsed.taxyear || parsed.taxYear || parsed.current_year) currentTaxYear = String(parsed.taxyear || parsed.taxYear || parsed.current_year);
                 } catch {
                     if (typeof userInfoStr === "string" && userInfoStr.length > 5) {
                         adminUserId = userInfoStr.replace(/"/g, "");
@@ -790,6 +884,7 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
 
             if (selectedClient) {
                 fetchClientDetails(selectedClient);
+                fetchUserSynopsys(selectedClient);
             }
         } catch (error) {
             console.error("Error uploading document:", error);
@@ -807,7 +902,17 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
     // Handle updating client file status via pushtonewfilestatus
     const handleUpdateFileStatus = async (e) => {
         if (e) e.preventDefault();
-        if (!statusComment.trim()) {
+        if (selectedFileState === "" || selectedFileState === null || selectedFileState === undefined || isNaN(Number(selectedFileState))) {
+            Swal.fire({
+                icon: "warning",
+                title: "File Status Required",
+                text: "Please select a valid file status.",
+                confirmButtonColor: "#1b2e6b"
+            });
+            return;
+        }
+
+        if (!statusComment || !statusComment.trim()) {
             Swal.fire({
                 icon: "warning",
                 title: "Comment Required",
@@ -821,12 +926,11 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
         try {
             const userInfoStr = localStorage.getItem("userInfo") || localStorage.getItem("currentUser");
             let adminUserId = "YlZwVVRHUmVXVEZpUVRkeWVYVllOQ05NVGpCektIVnpXVEJQZVVvcFprQnRVVjVEV2pCTU1FQXlUVTg9";
-            let taxYear = String(new Date().getFullYear());
+            let taxYear = getStoredTaxYear();
             if (userInfoStr) {
                 try {
                     const parsed = JSON.parse(userInfoStr);
                     if (parsed.user_id || parsed.id) adminUserId = parsed.user_id || parsed.id;
-                    if (parsed.taxyear || parsed.taxYear || parsed.current_year) taxYear = String(parsed.taxyear || parsed.taxYear || parsed.current_year);
                 } catch {
                     if (typeof userInfoStr === "string" && userInfoStr.length > 5) {
                         adminUserId = userInfoStr.replace(/"/g, "");
@@ -1019,6 +1123,39 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
         document.body.removeChild(link);
     };
 
+    // Handle Export Complete Client Profile & Other Info to PDF
+    const handleExportClientDetailsPDF = async () => {
+        if (!selectedClient) return;
+        try {
+            setExportingPdf(true);
+            await exportClientDetailsPDF({
+                client: selectedClient,
+                basicInfo: basicInfo,
+                spouseInfo: spouseInfo,
+                dependentsInfo: dependentsInfo,
+                taxYear: uploadTaxYear || getStoredTaxYear()
+            });
+
+            Swal.fire({
+                icon: "success",
+                title: "PDF Exported Successfully",
+                text: "The client profile and other details have been downloaded as a PDF.",
+                confirmButtonColor: "#1b2e6b",
+                timer: 2500
+            });
+        } catch (error) {
+            console.error("Export PDF failed:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Export Failed",
+                text: "Could not generate PDF. Please try again.",
+                confirmButtonColor: "#1b2e6b"
+            });
+        } finally {
+            setExportingPdf(false);
+        }
+    };
+
     // Client Detail View
     if (selectedClient) {
         const subTabs = [
@@ -1078,10 +1215,12 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                             {(activeInnerTab === "basic_info" || activeInnerTab === "other_info") && (
                                 <button
                                     className="btn btn-action-top-right d-flex align-items-center gap-2"
-                                    onClick={() => triggerAlert("Exporting Data", "Initiated data sheet export.")}
+                                    onClick={handleExportClientDetailsPDF}
+                                    disabled={exportingPdf || detailsLoading}
+                                    title="Download complete profile & other info as PDF"
                                 >
                                     <FiDownload />
-                                    <span>Export</span>
+                                    <span>{exportingPdf ? "Exporting PDF..." : "Export PDF"}</span>
                                 </button>
                             )}
                             {activeInnerTab === "download_docs" && (
@@ -1267,16 +1406,6 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                                                 <span>Dependents</span>
                                                 <span className="badge bg-primary">{dependentsInfo.length}</span>
                                             </button>
-
-                                            <button
-                                                type="button"
-                                                className={`other-info-subnav-btn ${activeOtherSubTab === "employers" ? "active" : ""}`}
-                                                onClick={() => setActiveOtherSubTab("employers")}
-                                            >
-                                                <FiBriefcase />
-                                                <span>Employer Info</span>
-                                                <span className="badge bg-primary">{employersInfo.length}</span>
-                                            </button>
                                         </div>
 
                                         {/* 1. Spouse Info Section */}
@@ -1376,52 +1505,6 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                                                         <FiUsers size={36} className="text-muted mb-2" />
                                                         <h6>No Dependents Recorded</h6>
                                                         <p className="mb-0 small text-muted">No dependent information registered for this client.</p>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* 3. Employer Info Section */}
-                                        {activeOtherSubTab === "employers" && (
-                                            <div>
-                                                {employersInfo.length > 0 ? (
-                                                    <div className="table-responsive">
-                                                        <table className="table table-hover align-middle">
-                                                            <thead className="table-light">
-                                                                <tr>
-                                                                    <th>#</th>
-                                                                    <th>Employer Name</th>
-                                                                    <th>EIN / Tax ID</th>
-                                                                    <th>Designation / Role</th>
-                                                                    <th>Phone</th>
-                                                                    <th>Address</th>
-                                                                    <th>City</th>
-                                                                    <th>State</th>
-                                                                    <th>Zip</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {employersInfo.map((emp, idx) => (
-                                                                    <tr key={emp.id || idx}>
-                                                                        <td className="fw-semibold text-secondary">{idx + 1}</td>
-                                                                        <td className="fw-medium text-dark">{emp.employerName || "-"}</td>
-                                                                        <td>{emp.ein || "-"}</td>
-                                                                        <td>{emp.designation || "-"}</td>
-                                                                        <td>{emp.phone || "-"}</td>
-                                                                        <td>{emp.address || "-"}</td>
-                                                                        <td>{emp.city || "-"}</td>
-                                                                        <td>{emp.state || "-"}</td>
-                                                                        <td>{emp.zip || "-"}</td>
-                                                                    </tr>
-                                                                ))}
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                ) : (
-                                                    <div className="info-empty-state">
-                                                        <FiBriefcase size={36} className="text-muted mb-2" />
-                                                        <h6>No Employer Information</h6>
-                                                        <p className="mb-0 small text-muted">No employer details found on file for this client.</p>
                                                     </div>
                                                 )}
                                             </div>
@@ -1555,10 +1638,15 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                                                 value={uploadTaxYear}
                                                 onChange={e => setUploadTaxYear(e.target.value)}
                                             >
-                                                <option value="2026">2026</option>
-                                                <option value="2025">2025</option>
-                                                <option value="2024">2024</option>
-                                                <option value="2023">2023</option>
+                                                {taxYearsList.length > 0 ? (
+                                                    taxYearsList.map(item => (
+                                                        <option key={item.utstaxyear} value={String(item.utstaxyear)}>
+                                                            {item.dutstaxyear || item.utstaxyear}
+                                                        </option>
+                                                    ))
+                                                ) : (
+                                                    <option value={uploadTaxYear}>{uploadTaxYear}</option>
+                                                )}
                                             </select>
                                         </div>
 
@@ -1613,6 +1701,107 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                                         </button>
                                     </div>
                                 </form>
+
+                                {/* Uploaded Synopsis & Documents History Table (Integrated with usersynopsys API) */}
+                                <div className="card border rounded-3 overflow-hidden shadow-sm mt-4">
+                                    <div className="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center border-bottom">
+                                        <div>
+                                            <h6 className="fw-bold mb-0 text-dark">Uploaded Synopsys & Documents</h6>
+                                            <small className="text-muted">History of synopsis files uploaded for this client</small>
+                                        </div>
+                                        <div className="d-flex align-items-center gap-2">
+                                            <span className="badge bg-primary rounded-pill px-3 py-2">
+                                                {synopsysList.length} {synopsysList.length === 1 ? "File" : "Files"}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+                                                onClick={() => fetchUserSynopsys(selectedClient)}
+                                                disabled={synopsysLoading}
+                                                title="Refresh Synopsys List"
+                                            >
+                                                <FiRefreshCw className={synopsysLoading ? "spinner-border spinner-border-sm" : ""} />
+                                                <span>Refresh</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="card-body p-0">
+                                        {synopsysLoading ? (
+                                            <div className="text-center py-4">
+                                                <div className="spinner-border spinner-border-sm text-primary" role="status"></div>
+                                                <span className="ms-2 text-muted small">Loading synopsys documents...</span>
+                                            </div>
+                                        ) : synopsysList.length > 0 ? (
+                                            <div className="table-responsive">
+                                                <table className="table table-hover align-middle mb-0">
+                                                    <thead className="table-light">
+                                                        <tr>
+                                                            <th style={{ width: "60px" }}>#</th>
+                                                            <th>Document Title</th>
+                                                            <th>Uploaded Date & Time</th>
+                                                            <th className="text-end" style={{ width: "160px" }}>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {synopsysList.map((item, idx) => {
+                                                            const fileUrl = item.synopsys_file || item.file_url || item.file;
+                                                            const title = item.synopsys_title || item.title || "Tax Synopsis";
+                                                            const dateStr = item.synopsys_created_at || item.created_at;
+                                                            const formattedDate = dateStr
+                                                                ? new Date(dateStr).toLocaleString("en-US", {
+                                                                      year: "numeric",
+                                                                      month: "short",
+                                                                      day: "numeric",
+                                                                      hour: "2-digit",
+                                                                      minute: "2-digit"
+                                                                  })
+                                                                : "-";
+
+                                                            return (
+                                                                <tr key={item.synopsys_id || idx}>
+                                                                    <td className="fw-semibold text-secondary">{idx + 1}</td>
+                                                                    <td>
+                                                                        <div className="d-flex align-items-center gap-2">
+                                                                            <div className="p-2 rounded bg-light text-primary">
+                                                                                <FiFileText size={18} />
+                                                                            </div>
+                                                                            <div>
+                                                                                <div className="fw-semibold text-dark">{title}</div>
+                                                                                <small className="text-muted font-monospace">ID: #{item.synopsys_id || idx + 1}</small>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td className="text-secondary small">{formattedDate}</td>
+                                                                    <td className="text-end">
+                                                                        {fileUrl ? (
+                                                                            <a
+                                                                                href={fileUrl}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1"
+                                                                            >
+                                                                                <FiExternalLink size={14} />
+                                                                                <span>View / Download</span>
+                                                                            </a>
+                                                                        ) : (
+                                                                            <span className="text-muted small">No link</span>
+                                                                        )}
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        })}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        ) : (
+                                            <div className="text-center py-5 text-muted">
+                                                <FiFileText size={36} className="text-muted mb-2 opacity-50" />
+                                                <p className="mb-0 fw-medium">No synopsis documents uploaded yet for this tax year.</p>
+                                                <small className="text-muted">Use the form above to upload a new tax synopsis or document.</small>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         )}
 
@@ -1641,10 +1830,10 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                                             <select
                                                 className="form-select figma-form-control"
                                                 value={selectedFileState}
-                                                onChange={(e) => setSelectedFileState(Number(e.target.value))}
+                                                onChange={(e) => setSelectedFileState(e.target.value === "" ? "" : Number(e.target.value))}
                                                 required
                                             >
-                                                <option value="">Status</option>
+                                                <option value="">Select File Status</option>
                                                 {fileStatusOptions.map(opt => (
                                                     <option key={opt.value} value={opt.value}>
                                                         {opt.label}
@@ -1655,12 +1844,12 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
 
                                         <div className="mb-4">
                                             <label className="form-label fw-medium text-dark small">
-                                                Comments
+                                                Comments <span className="text-danger">*</span>
                                             </label>
                                             <textarea
                                                 className="form-control figma-form-control"
                                                 rows={4}
-                                                placeholder="Comments"
+                                                placeholder="Enter mandatory comments for this status update..."
                                                 value={statusComment}
                                                 onChange={(e) => setStatusComment(e.target.value)}
                                                 required
@@ -2141,10 +2330,15 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                                                     value={uploadTaxYear}
                                                     onChange={e => setUploadTaxYear(e.target.value)}
                                                 >
-                                                    <option value="2026">2026</option>
-                                                    <option value="2025">2025</option>
-                                                    <option value="2024">2024</option>
-                                                    <option value="2023">2023</option>
+                                                    {taxYearsList.length > 0 ? (
+                                                        taxYearsList.map(item => (
+                                                            <option key={item.utstaxyear} value={String(item.utstaxyear)}>
+                                                                {item.dutstaxyear || item.utstaxyear}
+                                                            </option>
+                                                        ))
+                                                    ) : (
+                                                        <option value={uploadTaxYear}>{uploadTaxYear}</option>
+                                                    )}
                                                 </select>
                                             </div>
                                             <div className="col-6">

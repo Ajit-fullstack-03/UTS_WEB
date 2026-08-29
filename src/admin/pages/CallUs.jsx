@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { FiSearch, FiChevronLeft, FiChevronRight, FiChevronDown, FiRefreshCw, FiTrash2 } from "react-icons/fi";
 import Swal from "sweetalert2";
 import { adminServices } from "../services/AdminServices";
+import { getStoredTaxYear } from "../../utils/taxYear";
 import "./call_us.css";
 
 // Sample initial data matching Figma design mockups
@@ -70,13 +71,12 @@ const CallUs = () => {
     const getCredentials = () => {
         const userInfoStr = localStorage.getItem("userInfo") || localStorage.getItem("currentUser");
         let userId = localStorage.getItem("currentUser");
-        let taxYear = "2026";
+        let taxYear = getStoredTaxYear();
 
         if (userInfoStr) {
             try {
                 const parsed = JSON.parse(userInfoStr);
                 if (parsed.user_id || parsed.id) userId = parsed.user_id || parsed.id;
-                if (parsed.taxyear || parsed.taxYear || parsed.current_year) taxYear = String(parsed.taxyear || parsed.taxYear || parsed.current_year);
             } catch {
                 if (typeof userInfoStr === "string" && userInfoStr.length > 5) {
                     userId = userInfoStr.replace(/"/g, "");
@@ -215,6 +215,10 @@ const CallUs = () => {
 
     useEffect(() => {
         fetchCallUsData();
+        window.addEventListener("taxYearChanged", fetchCallUsData);
+        return () => {
+            window.removeEventListener("taxYearChanged", fetchCallUsData);
+        };
     }, [fetchCallUsData]);
 
     // View complete message in modal

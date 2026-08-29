@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { FiSearch, FiChevronLeft, FiChevronRight, FiChevronDown, FiRefreshCw } from "react-icons/fi";
 import Swal from "sweetalert2";
 import { adminServices } from "../services/AdminServices";
+import { getStoredTaxYear } from "../../utils/taxYear";
 import "./comments.css";
 
 // Sample initial data matching Figma design mockups
@@ -75,14 +76,13 @@ const AdminComments = () => {
     const getCredentials = () => {
         const userInfoStr = localStorage.getItem("userInfo") || localStorage.getItem("currentUser");
         let userId = localStorage.getItem("currentUser");
-        let taxYear = "2025";
+        let taxYear = getStoredTaxYear();
         let clientId = null;
 
         if (userInfoStr) {
             try {
                 const parsed = JSON.parse(userInfoStr);
                 if (parsed.user_id || parsed.id) userId = parsed.user_id || parsed.id;
-                if (parsed.taxyear || parsed.taxYear || parsed.current_year) taxYear = String(parsed.taxyear || parsed.taxYear || parsed.current_year);
                 if (parsed.client_id || parsed.clientId) clientId = String(parsed.client_id || parsed.clientId);
             } catch {
                 if (typeof userInfoStr === "string" && userInfoStr.length > 5) {
@@ -216,6 +216,10 @@ const AdminComments = () => {
 
     useEffect(() => {
         fetchComments();
+        window.addEventListener("taxYearChanged", fetchComments);
+        return () => {
+            window.removeEventListener("taxYearChanged", fetchComments);
+        };
     }, [fetchComments]);
 
     // View complete comment in modal

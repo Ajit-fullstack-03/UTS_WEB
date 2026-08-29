@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { FiSearch, FiChevronLeft, FiChevronRight, FiChevronDown, FiRefreshCw } from "react-icons/fi";
 import { adminServices } from "../services/AdminServices";
+import { getStoredTaxYear } from "../../utils/taxYear";
 import "./login_history.css";
 
 const LoginHistory = () => {
@@ -15,13 +16,12 @@ const LoginHistory = () => {
     const getCredentials = () => {
         const userInfoStr = localStorage.getItem("userInfo") || localStorage.getItem("currentUser");
         let userId = "YlZwVVRHUmVXVEZpUVRkeWVYVllOQ05NVGpCektIVnpXVEJQZVVvcFprQnRVVjVEV2pCTU1FQXlUVTg9";
-        let taxYear = String(new Date().getFullYear());
+        let taxYear = getStoredTaxYear();
 
         if (userInfoStr) {
             try {
                 const parsed = JSON.parse(userInfoStr);
                 if (parsed.user_id || parsed.id) userId = parsed.user_id || parsed.id;
-                if (parsed.taxyear || parsed.taxYear || parsed.current_year) taxYear = String(parsed.taxyear || parsed.taxYear || parsed.current_year);
             } catch {
                 if (typeof userInfoStr === "string" && userInfoStr.length > 5) {
                     userId = userInfoStr.replace(/"/g, "");
@@ -60,6 +60,10 @@ const LoginHistory = () => {
 
     useEffect(() => {
         fetchLoginHistory();
+        window.addEventListener("taxYearChanged", fetchLoginHistory);
+        return () => {
+            window.removeEventListener("taxYearChanged", fetchLoginHistory);
+        };
     }, [fetchLoginHistory]);
 
     // Format phone helper (e.g. 7751002719 -> (775) 100-2719 or preserve if custom)

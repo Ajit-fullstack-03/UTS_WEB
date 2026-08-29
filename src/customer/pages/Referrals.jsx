@@ -9,6 +9,7 @@ import {
 } from "react-icons/fi";
 import "./referrals.css";
 import { webservices } from "../servics/CustomerServices";
+import { getStoredTaxYear } from "../../utils/taxYear";
 
 const Referrals = () => {
     const [view, setView] = useState("list"); // 'list' or 'form'
@@ -36,10 +37,11 @@ const Referrals = () => {
             setLoading(true);
             const userInfo = JSON.parse(userInfoStr);
             const client_id = userInfo.client_id;
-            const taxYear = userInfo.taxyear || userInfo.taxYear || userInfo.current_year || String(new Date().getFullYear());
+            const taxYear = getStoredTaxYear();
 
             const payload = {
                 taxYear: String(taxYear),
+                taxyear: String(taxYear),
                 client_id: String(client_id)
             };
 

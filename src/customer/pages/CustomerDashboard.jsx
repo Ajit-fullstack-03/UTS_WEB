@@ -9,6 +9,7 @@ import {
     FiChevronRight
 } from "react-icons/fi";
 import { webservices } from "../servics/CustomerServices";
+import { getStoredTaxYear } from "../../utils/taxYear";
 import "./dashboard.css";
 
 const CustomerDashboard = () => {
@@ -80,10 +81,11 @@ const CustomerDashboard = () => {
             try {
                 const userInfo = JSON.parse(userInfoStr);
                 const client_id = userInfo.client_id;
-                const taxYear = userInfo.taxyear || userInfo.taxYear || userInfo.current_year || String(new Date().getFullYear());
+                const taxYear = getStoredTaxYear();
                 const payload = {
                     client_id: String(client_id),
-                    taxyear: String(taxYear)
+                    taxyear: String(taxYear),
+                    taxYear: String(taxYear)
                 };
                 const res = await webservices.currentfileststus(payload);
                 if (res.data && res.data.http_code === 200) {

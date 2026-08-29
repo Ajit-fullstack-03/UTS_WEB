@@ -100,6 +100,7 @@ const Sidebar = () => {
                                         localStorage.removeItem("currentUser");
                                         localStorage.removeItem("userInfo");
                                         localStorage.removeItem("currentFileStatus");
+                                        localStorage.removeItem("taxYear");
                                         navigate("/login");
                                     }
                                 });

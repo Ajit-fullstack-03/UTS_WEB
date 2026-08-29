@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FiBell, FiGift } from "react-icons/fi";
 import { webservices } from "../servics/CustomerServices";
+import { getStoredTaxYear } from "../../utils/taxYear";
 import "./header.css";
 
 const Header = () => {
@@ -16,10 +17,11 @@ const Header = () => {
             try {
                 const userInfo = JSON.parse(userInfoStr);
                 const client_id = userInfo.client_id;
-                const taxYear = userInfo.taxyear || userInfo.taxYear || userInfo.current_year || String(new Date().getFullYear());
+                const taxYear = getStoredTaxYear();
                 const payload = {
                     client_id: String(client_id),
-                    taxyear: String(taxYear)
+                    taxyear: String(taxYear),
+                    taxYear: String(taxYear)
                 };
 
                 const res = await webservices.currentfileststus(payload);
