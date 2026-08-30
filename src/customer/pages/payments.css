@@ -1,0 +1,460 @@
+/* Customer Payments Page & Order Summary Modal Styling */
+
+.customer-payments-container {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+/* Header Section */
+.cp-header {
+    margin-bottom: 28px;
+}
+
+.cp-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 6px;
+}
+
+.cp-subtitle {
+    color: #64748b;
+    font-size: 0.92rem;
+    margin-bottom: 0;
+}
+
+/* Stats Row */
+.cp-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.cp-stat-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.cp-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.cp-stat-icon.warning {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.cp-stat-icon.success {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.cp-stat-icon.primary {
+    background-color: #e0e7ff;
+    color: #4338ca;
+}
+
+.cp-stat-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+.cp-stat-label {
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-bottom: 0;
+}
+
+/* Main Card & Filter Tabs */
+.cp-main-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+.cp-card-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.cp-filter-tabs {
+    display: flex;
+    gap: 8px;
+}
+
+.cp-tab-btn {
+    border: none;
+    background: #f1f5f9;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 7px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cp-tab-btn:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+.cp-tab-btn.active {
+    background: #1b2e6b;
+    color: #ffffff;
+}
+
+/* Orders Table */
+.cp-table-responsive {
+    overflow-x: auto;
+}
+
+.cp-table {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: collapse;
+}
+
+.cp-table th {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 14px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+.cp-table td {
+    padding: 16px 20px;
+    color: #334155;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.cp-table tr:hover td {
+    background-color: #fafbfc;
+}
+
+/* Status Badges */
+.cp-badge-unpaid {
+    background-color: #fef3c7;
+    color: #b45309;
+    font-weight: 600;
+    font-size: 0.78rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.cp-badge-paid {
+    background-color: #dcfce7;
+    color: #15803d;
+    font-weight: 600;
+    font-size: 0.78rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Pay Action Button in Table */
+.btn-pay-action {
+    background-color: #1b2e6b;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 7px 16px;
+    border-radius: 6px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btn-pay-action:hover {
+    background-color: #142352;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(27, 46, 107, 0.2);
+}
+
+.btn-view-receipt {
+    background-color: #f1f5f9;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 7px 16px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btn-view-receipt:hover {
+    background-color: #e2e8f0;
+    color: #1e293b;
+}
+
+/* Empty State */
+.cp-empty-state {
+    padding: 60px 20px;
+    text-align: center;
+    color: #64748b;
+}
+
+.cp-empty-icon {
+    font-size: 3rem;
+    color: #cbd5e1;
+    margin-bottom: 12px;
+}
+
+/* =========================================================
+   ORDER SUMMARY SCREEN / MODAL (Exact match to screenshot)
+   ========================================================= */
+
+.order-summary-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+    padding: 20px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.order-summary-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 440px;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.05);
+    padding: 28px 24px 24px;
+    position: relative;
+    animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px) scale(0.97);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.order-summary-close-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.25rem;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.order-summary-close-btn:hover {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+/* File Badge */
+.file-badge-pill {
+    background-color: #eaf7ed;
+    color: #1e6b37;
+    border-radius: 10px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.file-badge-pill svg {
+    font-size: 1.15rem;
+    color: #1e6b37;
+}
+
+/* Divider Line */
+.summary-divider {
+    border-top: 1px solid #edf2f7;
+    margin: 18px 0;
+}
+
+/* Order Summary Section */
+.order-summary-header-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 14px;
+}
+
+.summary-line-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 0.92rem;
+}
+
+.summary-item-label {
+    color: #718096;
+    font-weight: 400;
+}
+
+.summary-item-amount {
+    color: #2d3748;
+    font-weight: 600;
+}
+
+.summary-item-discount {
+    color: #1e6b37;
+    font-weight: 500;
+}
+
+.summary-item-discount-amt {
+    color: #1e6b37;
+    font-weight: 600;
+}
+
+/* Total Due Section */
+.total-due-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+}
+
+.total-due-text {
+    font-size: 1.05rem;
+    color: #718096;
+    font-weight: 500;
+}
+
+.total-due-val {
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: #1a202c;
+    letter-spacing: -0.5px;
+}
+
+/* Trust Badges Row */
+.trust-badges-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    padding: 8px 4px 18px;
+}
+
+.trust-badge-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+}
+
+.trust-badge-item svg {
+    color: #718096;
+    font-size: 1.1rem;
+}
+
+.trust-badge-item span {
+    font-size: 0.72rem;
+    color: #718096;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Main Payment Button */
+.btn-order-make-payment {
+    background-color: #1b2e6b;
+    color: #ffffff;
+    width: 100%;
+    padding: 13px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(27, 46, 107, 0.25);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-order-make-payment:hover {
+    background-color: #142352;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(27, 46, 107, 0.35);
+}
+
+.btn-order-make-payment:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}

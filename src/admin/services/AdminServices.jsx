@@ -77,6 +77,7 @@ const loginshistory = (data) => postUrl(`${API_URL}user/loginshistory`, data);
 const paymenthistory = (data) => postUrl(`${API_URL}member/paymenthistory`, data);
 const paymentshistory = (data) => postUrl(`${API_URL}user/paymentshistory`, data);
 const paymentslist = (data) => postUrl(`${API_URL}member/paymentslist`, data);
+const createOrder = (data) => postUrl(`${API_URL}payment/createOrder`, data);
 const calluslist = (data) => postUrl(`${API_URL}member/calluslist`, data);
 const wantusinfo = (data) => postUrl(`${API_URL}user/wantusinfo`, data);
 const deletecallus = (data) => postUrl(`${API_URL}member/deletecallus`, data);
@@ -136,6 +137,7 @@ export const adminServices = {
     paymenthistory,
     paymentshistory,
     paymentslist,
+    createOrder,
     calluslist,
     wantusinfo,
     deletecallus,

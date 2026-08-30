@@ -116,9 +116,9 @@ const Header = () => {
 
             <div className="header-actions d-flex align-items-center gap-3">
                 {/* Make Payment button */}
-                <button className="btn btn-make-payment fw-semibold">
+                <Link to="/customer/payments" className="btn btn-make-payment fw-semibold text-decoration-none">
                     Make Payment
-                </button>
+                </Link>
 
                 {/* Refer and Earn button */}
                 <Link to="/customer/referrals" className="btn btn-refer-earn fw-semibold d-flex align-items-center gap-2 text-decoration-none">

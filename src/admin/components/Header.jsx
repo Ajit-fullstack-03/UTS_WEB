@@ -159,10 +159,10 @@ const Header = () => {
         : (selectedTaxYear ? `TY ${selectedTaxYear}` : "Select TY");
 
     return (
-        <header className="admin-header py-3 px-4 d-flex align-items-center justify-content-between bg-white">
+        <header className="admin-header px-4 d-flex align-items-center justify-content-between bg-white">
             {/* Logo on Left */}
             <div
-                className="header-logo-container d-flex align-items-center gap-2"
+                className="header-logo-container d-flex align-items-center"
                 onClick={() => navigate("/admin/all-records")}
             >
                 <img
@@ -170,10 +170,6 @@ const Header = () => {
                     alt="Umpire Tax Solutions Logo"
                     className="header-logo img-fluid"
                 />
-                {/* <div className="header-logo-text d-flex flex-column lh-1">
-                    <span className="logo-text-top fw-bold">UMPIRE TAX</span>
-                    <span className="logo-text-bottom fw-bold text-warning">SOLUTIONS</span>
-                </div> */}
             </div>
 
             {/* Navigation Tabs in Center-Right */}

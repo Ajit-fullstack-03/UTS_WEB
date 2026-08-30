@@ -1,36 +1,37 @@
 /* Admin Header Styles */
 
 .admin-header {
-    height: 75px;
-    min-height: 75px;
+    height: 72px;
+    min-height: 72px;
     padding: 0 28px;
     position: relative;
     z-index: 100;
     background-color: #ffffff;
     border-bottom: 1px solid #eaedf3;
     font-family: 'Outfit', 'Inter', sans-serif;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
 }
 
 /* Logo Section */
 .header-logo-container {
     user-select: none;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
 }
 
 .header-logo {
-    max-height: 38px;
+    max-height: 48px;
+    height: auto;
+    width: auto;
     object-fit: contain;
+    display: block;
+    transition: transform 0.2s ease;
 }
 
-.header-logo-text {
-    font-family: 'Outfit', sans-serif;
-}
-
-.logo-text-top {
-    font-size: 0.92rem;
-    color: #1b2e6b;
-    letter-spacing: 0.5px;
-    font-weight: 700;
+.header-logo-container:hover .header-logo {
+    transform: scale(1.02);
 }
 
 .logo-text-bottom {

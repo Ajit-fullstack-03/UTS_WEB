@@ -138,16 +138,52 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
     const [statusHistoryPage, setStatusHistoryPage] = useState(1);
     const [statusHistoryRowsPerPage, setStatusHistoryRowsPerPage] = useState(10);
 
-    // Payment tab states
+    // Payment tab states (/payment/createOrder)
     const [paymentForm, setPaymentForm] = useState({
-        paymentId: "",
-        standardAmount: "",
-        discountType: "",
-        discountValue: "",
-        finalAmount: "",
-        comments: ""
+        p_standardAmount: "",
+        p_discountType: "Flat",
+        p_discountValue: "",
+        p_amount: "",
+        currency: "USA",
+        comment: ""
     });
     const [paymentSubmitting, setPaymentSubmitting] = useState(false);
+
+    // Helper to calculate final payable amount based on standard amount and discount
+    const calculateFinalAmount = (standardAmount, discountType, discountValue) => {
+        const std = parseFloat(standardAmount);
+        if (isNaN(std) || std < 0) return "";
+
+        const disc = parseFloat(discountValue);
+        if (isNaN(disc) || disc <= 0 || discountType === "None" || !discountType) {
+            return std.toString();
+        }
+
+        let finalAmount = std;
+        if (discountType === "Flat") {
+            finalAmount = Math.max(0, std - disc);
+        } else if (discountType === "Percentage") {
+            finalAmount = Math.max(0, std - (std * disc) / 100);
+        }
+
+        const rounded = Math.round(finalAmount * 100) / 100;
+        return rounded.toString();
+    };
+
+    const handlePaymentInputChange = (field, value) => {
+        setPaymentForm(prev => {
+            const updated = { ...prev, [field]: value };
+            if (field === "p_standardAmount" || field === "p_discountType" || field === "p_discountValue") {
+                const newAmount = calculateFinalAmount(
+                    field === "p_standardAmount" ? value : updated.p_standardAmount,
+                    field === "p_discountType" ? value : updated.p_discountType,
+                    field === "p_discountValue" ? value : updated.p_discountValue
+                );
+                updated.p_amount = newAmount;
+            }
+            return updated;
+        });
+    };
 
     // Referral tab states
     const [referralsList, setReferralsList] = useState([]);
@@ -1061,27 +1097,98 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
         }
     };
 
-    // Handle Payment form submission
-    const handlePaymentSubmit = (e) => {
+    // Handle Payment form submission (/payment/createOrder)
+    const handlePaymentSubmit = async (e) => {
         e.preventDefault();
-        setPaymentSubmitting(true);
-        setTimeout(() => {
-            setPaymentSubmitting(false);
+        if (!selectedClient) return;
+
+        const clientId =
+            selectedClient.user_id ||
+            selectedClient.client_id ||
+            selectedClient.rawItem?.unlists_u_id ||
+            selectedClient.rawItem?.user_id ||
+            selectedClient.id;
+
+        if (!clientId) {
             Swal.fire({
-                icon: "success",
-                title: "Payment Link Sent",
-                text: `Payment link of $${paymentForm.finalAmount || paymentForm.standardAmount || "0"} sent to ${selectedClient.name}.`,
+                icon: "warning",
+                title: "Missing Client ID",
+                text: "Could not find a valid Client ID for this record.",
                 confirmButtonColor: "#1b2e6b"
             });
-            setPaymentForm({
-                paymentId: "",
-                standardAmount: "",
-                discountType: "",
-                discountValue: "",
-                finalAmount: "",
-                comments: ""
+            return;
+        }
+
+        if (!paymentForm.p_standardAmount || isNaN(parseFloat(paymentForm.p_standardAmount))) {
+            Swal.fire({
+                icon: "warning",
+                title: "Invalid Standard Amount",
+                text: "Please enter a valid standard amount.",
+                confirmButtonColor: "#1b2e6b"
             });
-        }, 600);
+            return;
+        }
+
+        const finalAmt = paymentForm.p_amount !== "" ? paymentForm.p_amount : paymentForm.p_standardAmount;
+        const currentTaxYear = getStoredTaxYear() || "2025";
+
+        const payload = {
+            client_id: isNaN(Number(clientId)) ? clientId : Number(clientId),
+            p_standardAmount: String(paymentForm.p_standardAmount),
+            p_discountType: paymentForm.p_discountType || "Flat",
+            p_discountValue: String(paymentForm.p_discountValue || "0"),
+            p_amount: String(finalAmt),
+            currency: paymentForm.currency || "USA",
+            comment: paymentForm.comment || "",
+            taxyear: String(currentTaxYear)
+        };
+
+        setPaymentSubmitting(true);
+        try {
+            const res = await adminServices.createOrder(payload);
+            const resData = res?.data;
+
+            if (
+                resData?.http_code === 200 ||
+                resData?.status === 200 ||
+                resData?.success ||
+                resData?.order_id ||
+                resData?.id ||
+                res?.status === 200
+            ) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Order Created Successfully",
+                    text: resData?.message || `Payment order created for ${selectedClient.name} with amount ${payload.currency} ${payload.p_amount}.`,
+                    confirmButtonColor: "#1b2e6b"
+                });
+                setPaymentForm({
+                    p_standardAmount: "",
+                    p_discountType: "Flat",
+                    p_discountValue: "",
+                    p_amount: "",
+                    currency: "USA",
+                    comment: ""
+                });
+            } else {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Notice",
+                    text: resData?.message || "Order creation completed with warnings.",
+                    confirmButtonColor: "#1b2e6b"
+                });
+            }
+        } catch (err) {
+            console.error("Error creating payment order:", err);
+            Swal.fire({
+                icon: "error",
+                title: "Failed to Create Order",
+                text: err?.response?.data?.message || err?.message || "Could not process order creation on server.",
+                confirmButtonColor: "#1b2e6b"
+            });
+        } finally {
+            setPaymentSubmitting(false);
+        }
     };
 
     // Handle Download Referrals
@@ -1979,17 +2086,17 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                             );
                         })()}
 
-                        {/* Payment Tab (Figma Design 2342-15457) */}
+                        {/* Payment Tab (Figma Design 2342-15457 & /payment/createOrder Integration) */}
                         {activeInnerTab === "payment" && (
                             <div className="py-2">
                                 {/* Status Pill Badge */}
                                 <div className="status-pill-figma">
-                                    Status : {selectedClient.status || "Cancel Filing"}
+                                    Status : {selectedClient.status || "Payment Pending"}
                                 </div>
 
                                 <form onSubmit={handlePaymentSubmit}>
                                     <div className="row g-3">
-                                        {/* Row 1 */}
+                                        {/* Row 1: Customer Name & File Number */}
                                         <div className="col-12 col-md-6">
                                             <label className="form-label fw-medium text-dark small">
                                                 Customer Name <span className="text-danger">*</span>
@@ -2013,91 +2120,115 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                                             />
                                         </div>
 
-                                        {/* Row 2 */}
-                                        <div className="col-12 col-md-6">
-                                            <label className="form-label fw-medium text-dark small">
-                                                Payment ID <span className="text-danger">*</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className="form-control figma-form-control"
-                                                placeholder="Enter The ID"
-                                                value={paymentForm.paymentId}
-                                                onChange={e => setPaymentForm(prev => ({ ...prev, paymentId: e.target.value }))}
-                                                required
-                                            />
-                                        </div>
+                                        {/* Row 2: Standard Amount & Currency */}
                                         <div className="col-12 col-md-6">
                                             <label className="form-label fw-medium text-dark small">
                                                 Standard Amount <span className="text-danger">*</span>
                                             </label>
                                             <input
-                                                type="text"
+                                                type="number"
+                                                step="any"
+                                                min="0"
                                                 className="form-control figma-form-control"
-                                                placeholder="Enter Customer Name"
-                                                value={paymentForm.standardAmount}
-                                                onChange={e => setPaymentForm(prev => ({ ...prev, standardAmount: e.target.value }))}
+                                                placeholder="Enter Standard Amount (e.g. 1000)"
+                                                value={paymentForm.p_standardAmount}
+                                                onChange={e => handlePaymentInputChange("p_standardAmount", e.target.value)}
                                                 required
                                             />
                                         </div>
+                                        <div className="col-12 col-md-6">
+                                            <label className="form-label fw-medium text-dark small">
+                                                Currency <span className="text-danger">*</span>
+                                            </label>
+                                            <select
+                                                className="form-select figma-form-control"
+                                                value={paymentForm.currency}
+                                                onChange={e => handlePaymentInputChange("currency", e.target.value)}
+                                                required
+                                            >
+                                                <option value="USA">USA</option>
+                                                <option value="INDIA">INDIA</option>
+                                            </select>
+                                        </div>
 
-                                        {/* Row 3 */}
+                                        {/* Row 3: Discount Type & Discount Value */}
                                         <div className="col-12 col-md-6">
                                             <label className="form-label fw-medium text-dark small">
                                                 Discount Type <span className="text-danger">*</span>
                                             </label>
                                             <select
                                                 className="form-select figma-form-control"
-                                                value={paymentForm.discountType}
-                                                onChange={e => setPaymentForm(prev => ({ ...prev, discountType: e.target.value }))}
+                                                value={paymentForm.p_discountType}
+                                                onChange={e => handlePaymentInputChange("p_discountType", e.target.value)}
                                                 required
                                             >
-                                                <option value="">Select Discount Type</option>
-                                                <option value="percentage">Percentage (%)</option>
-                                                <option value="flat">Flat Discount ($)</option>
-                                                <option value="coupon">Coupon Code</option>
+                                                <option value="Flat">Flat Discount</option>
+                                                <option value="Percentage">Percentage (%)</option>
+                                                <option value="None">None</option>
                                             </select>
                                         </div>
                                         <div className="col-12 col-md-6">
                                             <label className="form-label fw-medium text-dark small">
-                                                Discount Value <span className="text-danger">*</span>
+                                                Discount Value {paymentForm.p_discountType !== "None" && <span className="text-danger">*</span>}
                                             </label>
                                             <input
-                                                type="text"
+                                                type="number"
+                                                step="any"
+                                                min="0"
                                                 className="form-control figma-form-control"
-                                                placeholder="Enter Discount Value"
-                                                value={paymentForm.discountValue}
-                                                onChange={e => setPaymentForm(prev => ({ ...prev, discountValue: e.target.value }))}
-                                                required
+                                                placeholder={paymentForm.p_discountType === "Percentage" ? "Enter Percentage (e.g. 20)" : "Enter Discount Amount (e.g. 200)"}
+                                                value={paymentForm.p_discountValue}
+                                                onChange={e => handlePaymentInputChange("p_discountValue", e.target.value)}
+                                                disabled={paymentForm.p_discountType === "None"}
+                                                required={paymentForm.p_discountType !== "None"}
                                             />
                                         </div>
 
-                                        {/* Row 4 */}
+                                        {/* Row 4: Final Payable Amount & Tax Year */}
                                         <div className="col-12 col-md-6">
                                             <label className="form-label fw-medium text-dark small">
-                                                Final Payable Amount <span className="text-danger">*</span>
+                                                Final Payable Amount (p_amount) <span className="text-danger">*</span>
+                                            </label>
+                                            <input
+                                                type="number"
+                                                step="any"
+                                                min="0"
+                                                className="form-control figma-form-control"
+                                                placeholder="Calculated Final Amount (e.g. 800)"
+                                                value={paymentForm.p_amount}
+                                                onChange={e => handlePaymentInputChange("p_amount", e.target.value)}
+                                                required
+                                            />
+                                            <small className="text-muted" style={{ fontSize: "0.78rem" }}>
+                                                Auto-calculated based on Standard Amount and Discount. You can also adjust manually.
+                                            </small>
+                                        </div>
+                                        <div className="col-12 col-md-6">
+                                            <label className="form-label fw-medium text-dark small">
+                                                Tax Year
                                             </label>
                                             <input
                                                 type="text"
-                                                className="form-control figma-form-control"
-                                                placeholder="Enter Final Payable Amount"
-                                                value={paymentForm.finalAmount}
-                                                onChange={e => setPaymentForm(prev => ({ ...prev, finalAmount: e.target.value }))}
-                                                required
+                                                className="form-control figma-form-control bg-light"
+                                                value={getStoredTaxYear() || "2025"}
+                                                readOnly
                                             />
+                                            <small className="text-muted" style={{ fontSize: "0.78rem" }}>
+                                                Captured automatically from local storage.
+                                            </small>
                                         </div>
 
-                                        {/* Row 5 */}
+                                        {/* Row 5: Comment */}
                                         <div className="col-12">
                                             <label className="form-label fw-medium text-dark small">
-                                                Comments <span className="text-danger">*</span>
+                                                Comment <span className="text-danger">*</span>
                                             </label>
                                             <textarea
                                                 className="form-control figma-form-control"
-                                                rows={4}
-                                                placeholder="Add Commemts"
-                                                value={paymentForm.comments}
-                                                onChange={e => setPaymentForm(prev => ({ ...prev, comments: e.target.value }))}
+                                                rows={3}
+                                                placeholder="e.g. Early bird discount applied for 2025 filing"
+                                                value={paymentForm.comment}
+                                                onChange={e => handlePaymentInputChange("comment", e.target.value)}
                                                 required
                                             ></textarea>
                                         </div>
@@ -2106,10 +2237,17 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                                     <div className="d-flex justify-content-end mt-4">
                                         <button
                                             type="submit"
-                                            className="btn btn-figma-primary px-5"
+                                            className="btn btn-figma-primary px-5 d-flex align-items-center gap-2"
                                             disabled={paymentSubmitting}
                                         >
-                                            {paymentSubmitting ? "sending..." : "send"}
+                                            {paymentSubmitting ? (
+                                                <>
+                                                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                <span>Creating Order...</span>
+                                            </>
+                                        ) : (
+                                            <span>Create Order</span>
+                                        )}
                                         </button>
                                     </div>
                                 </form>

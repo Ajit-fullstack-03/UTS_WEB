@@ -59,6 +59,9 @@ const allrefferalslist = (data) => postUrl(`${API_URL}member/allrefferalslist`, 
 const confirmdocupload = (data) => postUrl(`${API_URL}upload/confirmdocupload`, data);
 const gettotalcountofdocs = (data) => postUrl(`${API_URL}upload/gettotalcountofdocs`, data);
 const downloadZip = (data) => postUrl(`${API_URL}upload/downloadZip`, data);
+const viewOrders = (data) => postUrl(`${API_URL}payment/viewOrders`, data);
+const initiateOrder = (data) => postUrl(`${API_URL}payment/initiateOrder`, data);
+const verifyOrder = (data) => postUrl(`${API_URL}payment/verifyOrder`, data);
 
 export const webservices = {
     currentfileststus,
@@ -76,5 +79,8 @@ export const webservices = {
     allrefferalslist,
     confirmdocupload,
     gettotalcountofdocs,
-    downloadZip
+    downloadZip,
+    viewOrders,
+    initiateOrder,
+    verifyOrder
 };

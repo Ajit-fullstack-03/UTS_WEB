@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
+import { FiArrowLeft } from "react-icons/fi";
 import logoImg from "../../assets/image/umpire_tax_logo.png";
 import registerCallImg from "../../assets/image/frame1l2.png";
 import ellipseImg from "../../assets/image/Object.png";
@@ -77,6 +78,12 @@ const Register = () => {
 
     return (
         <div className="auth-page-container">
+            {/* Back to Home Button */}
+            <Link to="/" className="auth-back-home-btn text-decoration-none">
+                <FiArrowLeft size={16} />
+                <span>Back to Home</span>
+            </Link>
+
             {/* Top Right Circle Pattern Graphic */}
             <img
                 src={ellipseImg}
@@ -88,7 +95,6 @@ const Register = () => {
                 {/* Left Panel - Hero Graphic (50% Width) */}
                 <div className="col-lg-6 p-0 d-none d-lg-block h-100">
                     <div className="auth-left-panel">
-
                         <img
                             src={registerCallImg}
                             alt="Customer Talking to Tax Advisor"
@@ -97,13 +103,9 @@ const Register = () => {
                         <h2 className="auth-left-heading">
                             <span>Join Thousands Who</span> <br />
                             <span> Trust Us with Their Taxes </span>
-
-
                         </h2>
                     </div>
                 </div>
-
-
 
                 {/* Right Panel - Form (50% Width) */}
                 <div className="col-lg-6 p-0 h-100">
@@ -262,6 +264,16 @@ const Register = () => {
                                             Login Now.
                                         </Link>
                                     </p>
+                                </div>
+
+                                {/* Back to Home inline option */}
+                                <div className="text-center mt-3">
+                                    <Link
+                                        to="/"
+                                        className="auth-link text-decoration-none small d-inline-flex align-items-center gap-1"
+                                    >
+                                        <FiArrowLeft size={13} /> Back to Home
+                                    </Link>
                                 </div>
                             </form>
                         </div>

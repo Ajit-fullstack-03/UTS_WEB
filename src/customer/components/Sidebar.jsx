@@ -5,6 +5,7 @@ import {
     FiLayout,
     FiUser,
     FiFileText,
+    FiCreditCard,
     FiGift,
     FiLogOut
 } from "react-icons/fi";
@@ -63,6 +64,18 @@ const Sidebar = () => {
                         >
                             <FiFileText className="menu-icon" />
                             <span>Documents</span>
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink
+                            to="/customer/payments"
+                            className={({ isActive }) =>
+                                `sidebar-menu-item d-flex align-items-center gap-3 text-decoration-none ${isActive ? "active" : ""
+                                }`
+                            }
+                        >
+                            <FiCreditCard className="menu-icon" />
+                            <span>Payments</span>
                         </NavLink>
                     </li>
                     <li>

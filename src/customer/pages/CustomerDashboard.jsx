@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     FiFileText,
     FiCreditCard,
@@ -13,6 +14,7 @@ import { getStoredTaxYear } from "../../utils/taxYear";
 import "./dashboard.css";
 
 const CustomerDashboard = () => {
+    const navigate = useNavigate();
     const [greeting, setGreeting] = useState("Good Morning");
     const [userName, setUserName] = useState("Somya");
     const [fileStatus, setFileStatus] = useState({
@@ -248,7 +250,7 @@ const CustomerDashboard = () => {
             </section>
 
             <section className="db-stats-grid">
-                <div className="db-stat-card">
+                <div className="db-stat-card" style={{ cursor: "pointer" }} onClick={() => navigate("/customer/documents")}>
                     <div className="db-stat-top">
                         <div className="db-icon-box success"><FiFileText /></div>
                         <span className="db-tag-action">Action Needed</span>
@@ -257,7 +259,7 @@ const CustomerDashboard = () => {
                     <p className="db-stat-label">Document Uploaded</p>
                 </div>
 
-                <div className="db-stat-card">
+                <div className="db-stat-card" style={{ cursor: "pointer" }} onClick={() => navigate("/customer/payments")}>
                     <div className="db-stat-top">
                         <div className="db-icon-box warning"><FiCreditCard /></div>
                         <span className="db-tag-due">Due Now</span>
@@ -275,7 +277,7 @@ const CustomerDashboard = () => {
                     <p className="db-stat-label">Tax Filing Status</p>
                 </div>
 
-                <div className="db-stat-card invite">
+                <div className="db-stat-card invite" style={{ cursor: "pointer" }} onClick={() => navigate("/customer/referrals")}>
                     <div className="db-stat-top">
                         <div className="db-icon-box white"><FiGift /></div>
                         <span className="db-tag-earn">Earn Upto $100</span>
@@ -310,17 +312,31 @@ const CustomerDashboard = () => {
                         <span>{completedCount} of {tasks.length} completed</span>
                     </div>
                     <div className="db-task-list">
-                        {tasks.map((task) => (
-                            <div key={task.id} className={`db-task-item ${task.completed ? "done" : ""} disabled-task`}>
-                                <input type="checkbox" checked={task.completed} disabled />
-                                <div className="db-task-body">
-                                    <p>{task.text}</p>
-                                    <span>{task.subtext}</span>
+                        {tasks.map((task) => {
+                            const getTaskRoute = (id) => {
+                                if (id === 1) return "/customer/profile";
+                                if (id === 2) return "/customer/documents";
+                                if (id === 4) return "/customer/payments";
+                                return "/customer";
+                            };
+
+                            return (
+                                <div
+                                    key={task.id}
+                                    className={`db-task-item ${task.completed ? "done" : ""}`}
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => navigate(getTaskRoute(task.id))}
+                                >
+                                    <input type="checkbox" checked={task.completed} readOnly />
+                                    <div className="db-task-body">
+                                        <p>{task.text}</p>
+                                        <span>{task.subtext}</span>
+                                    </div>
+                                    {task.urgent && !task.completed && <span className="db-task-urgent">Urgent</span>}
+                                    <FiChevronRight />
                                 </div>
-                                {task.urgent && !task.completed && <span className="db-task-urgent">Urgent</span>}
-                                <FiChevronRight />
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </section>

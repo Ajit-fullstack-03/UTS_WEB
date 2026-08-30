@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
+import { FiArrowLeft } from "react-icons/fi";
 import logoImg from "../../assets/image/umpire_tax_logo.png";
 import loginCollabImg from "../../assets/image/frame1l.png";
 import ellipseImg from "../../assets/image/Object.png";
@@ -21,23 +22,20 @@ const Login = () => {
         const payload = {
             email: email,
             password: password
-        }
+        };
         try {
             const response = await webservices.login(payload);
             if (response.data.http_code === 200) {
                 localStorage.setItem("currentUser", JSON.stringify(response.data.uinfo.user_id));
-                // Store the full user info for future use if needed
                 localStorage.setItem("userInfo", JSON.stringify(response.data.uinfo));
                 const activeTaxYear = response.data.uinfo.taxYear || response.data.uinfo.taxyear || response.data.uinfo.current_year || new Date().getFullYear();
                 setStoredTaxYear(activeTaxYear);
-                // alert(response.data.status_smessage);
                 if (response.data.uinfo.user_type_id == 1) {
                     navigate("/admin");
                 } else if (response.data.uinfo.user_type_id == 2) {
                     navigate("/customer");
                 } else if (response.data.uinfo.user_type_id == 3) {
-                    // navigate("/customer");
-                    alert("Analysist Not design.")
+                    alert("Analyst Not design.");
                 }
             } else {
                 Swal.fire({
@@ -60,6 +58,12 @@ const Login = () => {
 
     return (
         <div className="auth-page-container">
+            {/* Back to Home Button */}
+            <Link to="/" className="auth-back-home-btn text-decoration-none">
+                <FiArrowLeft size={16} />
+                <span>Back to Home</span>
+            </Link>
+
             <img
                 src={ellipseImg}
                 alt="Background decorative pattern"
@@ -207,6 +211,16 @@ const Login = () => {
                                             Register Now.
                                         </Link>
                                     </p>
+                                </div>
+
+                                {/* Back to Home inline option */}
+                                <div className="text-center mt-3">
+                                    <Link
+                                        to="/"
+                                        className="auth-link text-decoration-none small d-inline-flex align-items-center gap-1"
+                                    >
+                                        <FiArrowLeft size={13} /> Back to Home
+                                    </Link>
                                 </div>
                             </form>
                         </div>
