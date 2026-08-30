@@ -4,67 +4,9 @@ import { adminServices } from "../services/AdminServices";
 import { getStoredTaxYear } from "../../utils/taxYear";
 import "./payments.css";
 
-// Sample initial data matching Figma design mockups
-const DEFAULT_PAYMENTS_DATA = [
-    {
-        id: "1",
-        user_name: "SRINIVAS PALLIKARNA THIRUMALA",
-        email_id: "reddy.ushakar05@gmailcom",
-        file_number: "UTS0540",
-        amount: "280",
-        order_transaction_id: "order_THP6lbX9dYDfVB",
-        order_status: "Payment Success",
-        order_placed_date: "07-24-2026",
-        order_placed_time: "14:59:23"
-    },
-    {
-        id: "2",
-        user_name: "SRINIVAS PALLIKARNA THIRUMALA",
-        email_id: "reddy.ushakar05@gmailcom",
-        file_number: "UTS0540",
-        amount: "249.99",
-        order_transaction_id: "order_THP6lbX9dYDfVB",
-        order_status: "Payment Success",
-        order_placed_date: "07-24-2026",
-        order_placed_time: "14:59:23"
-    },
-    {
-        id: "3",
-        user_name: "USHAKAR REDDY",
-        email_id: "ptsrinu2792@gmail.com",
-        file_number: "UTS8209",
-        amount: "220",
-        order_transaction_id: "order_THP6lbX9dYDfVB",
-        order_status: "Payment Pending",
-        order_placed_date: "07-24-2026",
-        order_placed_time: "14:59:23"
-    },
-    {
-        id: "4",
-        user_name: "SRINIVAS PALLIKARNA THIRUMALA",
-        email_id: "reddy.ushakar05@gmailcom",
-        file_number: "UTS0540",
-        amount: "100",
-        order_transaction_id: "order_THP6lbX9dYDfVB",
-        order_status: "Payment Success",
-        order_placed_date: "07-24-2026",
-        order_placed_time: "14:59:23"
-    },
-    {
-        id: "5",
-        user_name: "USHAKAR REDDY",
-        email_id: "ptsrinu2792@gmail.com",
-        file_number: "UTS8209",
-        amount: "220",
-        order_transaction_id: "order_THP6lbX9dYDfVB",
-        order_status: "Payment Pending",
-        order_placed_date: "Assigned",
-        order_placed_time: ""
-    }
-];
-
 const Payments = () => {
     const [paymentsList, setPaymentsList] = useState([]);
+    const [totalRecords, setTotalRecords] = useState(0);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -128,18 +70,30 @@ const Payments = () => {
             const { userId, taxYear } = getCredentials();
             const payload = {
                 user_id: userId,
-                taxYear: String(taxYear)
+                taxYear: String(taxYear),
+                page: currentPage,
+                per_page: rowsPerPage,
+                perpage: rowsPerPage,
+                start: (currentPage - 1) * rowsPerPage,
+                length: rowsPerPage,
+                limit: rowsPerPage,
+                offset: (currentPage - 1) * rowsPerPage,
+                search: searchTerm ? searchTerm.trim() : ""
             };
 
             let dataLoaded = false;
+            let countTotal = 0;
 
             // Attempt 1: paymenthistory endpoint
             try {
                 const res = await adminServices.paymenthistory(payload);
-                if (res && res.data && (res.data.data || Array.isArray(res.data))) {
-                    const raw = res.data.data || res.data;
+                if (res && res.data) {
+                    const raw = res.data.data || (Array.isArray(res.data) ? res.data : []);
+                    countTotal = res.data.recordsTotal || res.data.recordsFiltered || res.data.total_records || res.data.total || (Array.isArray(raw) ? raw.length : 0);
+
                     if (Array.isArray(raw) && raw.length > 0) {
                         setPaymentsList(raw);
+                        setTotalRecords(countTotal);
                         dataLoaded = true;
                     }
                 }
@@ -151,10 +105,13 @@ const Payments = () => {
             if (!dataLoaded) {
                 try {
                     const res = await adminServices.paymentshistory(payload);
-                    if (res && res.data && (res.data.data || Array.isArray(res.data))) {
-                        const raw = res.data.data || res.data;
+                    if (res && res.data) {
+                        const raw = res.data.data || (Array.isArray(res.data) ? res.data : []);
+                        countTotal = res.data.recordsTotal || res.data.recordsFiltered || res.data.total_records || res.data.total || (Array.isArray(raw) ? raw.length : 0);
+
                         if (Array.isArray(raw) && raw.length > 0) {
                             setPaymentsList(raw);
+                            setTotalRecords(countTotal);
                             dataLoaded = true;
                         }
                     }
@@ -167,10 +124,13 @@ const Payments = () => {
             if (!dataLoaded) {
                 try {
                     const res = await adminServices.paymentslist(payload);
-                    if (res && res.data && (res.data.data || Array.isArray(res.data))) {
-                        const raw = res.data.data || res.data;
+                    if (res && res.data) {
+                        const raw = res.data.data || (Array.isArray(res.data) ? res.data : []);
+                        countTotal = res.data.recordsTotal || res.data.recordsFiltered || res.data.total_records || res.data.total || (Array.isArray(raw) ? raw.length : 0);
+
                         if (Array.isArray(raw) && raw.length > 0) {
                             setPaymentsList(raw);
+                            setTotalRecords(countTotal);
                             dataLoaded = true;
                         }
                     }
@@ -179,23 +139,31 @@ const Payments = () => {
                 }
             }
 
-            // Fallback: Populate design default data so UI matches Figma perfectly
             if (!dataLoaded) {
-                setPaymentsList(DEFAULT_PAYMENTS_DATA);
+                setPaymentsList([]);
+                setTotalRecords(0);
             }
         } catch (err) {
             console.error("Error loading payments:", err);
-            setPaymentsList(DEFAULT_PAYMENTS_DATA);
+            setPaymentsList([]);
+            setTotalRecords(0);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [currentPage, rowsPerPage, searchTerm]);
 
     useEffect(() => {
         fetchPayments();
-        window.addEventListener("taxYearChanged", fetchPayments);
+    }, [fetchPayments]);
+
+    useEffect(() => {
+        const handleTaxYearChange = () => {
+            setCurrentPage(1);
+            fetchPayments();
+        };
+        window.addEventListener("taxYearChanged", handleTaxYearChange);
         return () => {
-            window.removeEventListener("taxYearChanged", fetchPayments);
+            window.removeEventListener("taxYearChanged", handleTaxYearChange);
         };
     }, [fetchPayments]);
 
@@ -244,12 +212,17 @@ const Payments = () => {
         setCurrentPage(1);
     }, [searchTerm, rowsPerPage]);
 
-    // Pagination calculations
-    const totalPages = Math.max(1, Math.ceil(filteredRecords.length / rowsPerPage));
+    // Total records count: uses server's recordsTotal if available
+    const effectiveTotalCount = totalRecords > 0 ? totalRecords : filteredRecords.length;
+    const totalPages = Math.max(1, Math.ceil(effectiveTotalCount / rowsPerPage));
+
     const paginatedRecords = useMemo(() => {
+        if (totalRecords > paymentsList.length && paymentsList.length <= rowsPerPage) {
+            return filteredRecords;
+        }
         const start = (currentPage - 1) * rowsPerPage;
         return filteredRecords.slice(start, start + rowsPerPage);
-    }, [filteredRecords, currentPage, rowsPerPage]);
+    }, [filteredRecords, totalRecords, paymentsList.length, rowsPerPage, currentPage]);
 
     // Pagination numbers list with ellipses
     const getPageNumbers = () => {
@@ -394,7 +367,10 @@ const Payments = () => {
                             <select
                                 className="pm-select"
                                 value={rowsPerPage}
-                                onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                                onChange={(e) => {
+                                    setRowsPerPage(Number(e.target.value));
+                                    setCurrentPage(1);
+                                }}
                             >
                                 <option value={10}>10 / page</option>
                                 <option value={25}>25 / page</option>

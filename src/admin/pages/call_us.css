@@ -8,12 +8,45 @@
     min-height: 100%;
 }
 
-/* Top Search Bar */
+/* Top Search & Actions Bar */
 .callus-topbar {
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    gap: 12px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.callus-export-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    background-color: #107c41;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    box-shadow: 0 2px 6px rgba(16, 124, 65, 0.2);
+    white-space: nowrap;
+}
+
+.callus-export-btn:hover {
+    background-color: #0d6535;
+    box-shadow: 0 4px 10px rgba(16, 124, 65, 0.3);
+    transform: translateY(-1px);
+}
+
+.callus-export-btn:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .callus-search-box {
@@ -154,31 +187,88 @@
     color: #64748b;
 }
 
-/* Delete / Status Badges */
-.callus-assigned-badge {
-    color: #16a34a;
-    font-weight: 600;
-    font-size: 0.88rem;
-    white-space: nowrap;
-}
-
-.callus-btn-delete {
-    background: transparent;
-    border: none;
-    color: #ef4444;
-    cursor: pointer;
-    font-size: 1.1rem;
-    padding: 4px;
-    border-radius: 4px;
-    transition: all 0.15s ease;
+/* Status Badges */
+.callus-status-badge {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+    text-transform: capitalize;
 }
 
-.callus-btn-delete:hover {
+.callus-status-get-registered {
+    background-color: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.callus-status-follow-up {
+    background-color: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.callus-status-no-responses {
     background-color: #fee2e2;
-    color: #dc2626;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.callus-status-pending,
+.callus-status-default {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+}
+
+/* Action Dropdown Select */
+.callus-action-select-wrapper {
+    position: relative;
+    display: inline-block;
+    min-width: 150px;
+}
+
+.callus-action-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 100%;
+    height: 36px;
+    padding: 6px 32px 6px 12px;
+    background-color: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.84rem;
+    font-weight: 500;
+    color: #1e293b;
+    outline: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+.callus-action-select:hover {
+    border-color: #cbd5e1;
+    background-color: #ffffff;
+}
+
+.callus-action-select:focus {
+    border-color: #1b2e6b;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(27, 46, 107, 0.1);
+}
+
+.callus-action-select-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 0.9rem;
+    pointer-events: none;
 }
 
 /* Pagination Footer */

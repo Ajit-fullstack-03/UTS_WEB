@@ -1,67 +1,16 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { FiSearch, FiChevronLeft, FiChevronRight, FiChevronDown, FiRefreshCw, FiTrash2 } from "react-icons/fi";
+import { FiSearch, FiChevronLeft, FiChevronRight, FiChevronDown, FiRefreshCw, FiDownload } from "react-icons/fi";
 import Swal from "sweetalert2";
 import { adminServices } from "../services/AdminServices";
 import { getStoredTaxYear } from "../../utils/taxYear";
+import { exportToExcel } from "../../utils/excelExport";
 import "./call_us.css";
-
-// Sample initial data matching Figma design mockups
-const DEFAULT_CALLUS_DATA = [
-    {
-        id: "1",
-        client_name: "UTS0540",
-        email_id: "reddy.ushakar05@gmailcom",
-        phone: "(510) 935-6510",
-        message: "I NEED US TAX FILING SERVICES FOR THE YEAR 2025. I WAS WORKING IS US IN L VISA AND NOW I HAVE RETURNED BACK TO INDIA. I WORKED TILL 12TH MARCH 2025 ... HENCE FILING PERIOD WILL BE 01/01/25 TILL 03/12/25.",
-        date: "07-24-2026",
-        time: "06:59:32",
-        status: "Assigned"
-    },
-    {
-        id: "2",
-        client_name: "UTS0540",
-        email_id: "reddy.ushakar05@gmailcom",
-        phone: "(510) 935-6510",
-        message: "I NEED US TAX FILING SERVICES FOR THE YEAR 2025. I WAS WORKING IS US IN L VISA AND NOW I HAVE RETURNED BACK TO INDIA. I WORKED TILL 12TH MARCH 2025 ... HENCE FILING PERIOD WILL BE 01/01/25 TILL 03/12/25.",
-        date: "07-24-2026",
-        time: "06:59:32",
-        status: "Assigned"
-    },
-    {
-        id: "3",
-        client_name: "UTS8209",
-        email_id: "ptsrinu2792@gmail.com",
-        phone: "(470) 338-2209",
-        message: "I NEED US TAX FILING SERVICES FOR THE YEAR 2025. I WAS WORKING IS US IN L VISA AND NOW I HAVE RETURNED BACK TO INDIA. I WORKED TILL 12TH MARCH 2025 ... HENCE FILING PERIOD WILL BE 01/01/25 TILL 03/12/25.",
-        date: "07-24-2026",
-        time: "06:59:32",
-        status: "Assigned"
-    },
-    {
-        id: "4",
-        client_name: "UTS0540",
-        email_id: "reddy.ushakar05@gmailcom",
-        phone: "(510) 935-6510",
-        message: "I NEED US TAX FILING SERVICES FOR THE YEAR 2025. I WAS WORKING IS US IN L VISA AND NOW I HAVE RETURNED BACK TO INDIA. I WORKED TILL 12TH MARCH 2025 ... HENCE FILING PERIOD WILL BE 01/01/25 TILL 03/12/25.",
-        date: "07-24-2026",
-        time: "06:59:32",
-        status: "Assigned"
-    },
-    {
-        id: "5",
-        client_name: "UTS8209",
-        email_id: "ptsrinu2792@gmail.com",
-        phone: "(470) 338-2209",
-        message: "I NEED US TAX FILING SERVICES FOR THE YEAR 2025. I WAS WORKING IS US IN L VISA AND NOW I HAVE RETURNED BACK TO INDIA. I WORKED TILL 12TH MARCH 2025 ... HENCE FILING PERIOD WILL BE 01/01/25 TILL 03/12/25.",
-        date: "07-24-2026",
-        time: "06:59:32",
-        status: "Assigned"
-    }
-];
 
 const CallUs = () => {
     const [callUsList, setCallUsList] = useState([]);
+    const [totalRecords, setTotalRecords] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [exporting, setExporting] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -70,7 +19,7 @@ const CallUs = () => {
     // Extract credentials helper
     const getCredentials = () => {
         const userInfoStr = localStorage.getItem("userInfo") || localStorage.getItem("currentUser");
-        let userId = localStorage.getItem("currentUser");
+        let userId = "YlZwVVRHUmVXVEZpUVRkeWVYVllOQ05NVGpCektIVnpXVEJQZVVvcFprQnRVVjVEV2pCTU1FQXlUVTg9";
         let taxYear = getStoredTaxYear();
 
         if (userInfoStr) {
@@ -133,6 +82,21 @@ const CallUs = () => {
         }
     };
 
+    // Status badge styling helper
+    const getStatusBadgeClass = (statusStr) => {
+        const s = String(statusStr || "").toLowerCase().replace(/[\s_-]+/g, "");
+        if (s.includes("getregistered") || s.includes("registered")) {
+            return "callus-status-badge callus-status-get-registered";
+        }
+        if (s.includes("followup")) {
+            return "callus-status-badge callus-status-follow-up";
+        }
+        if (s.includes("noresponse") || s.includes("noresponses")) {
+            return "callus-status-badge callus-status-no-responses";
+        }
+        return "callus-status-badge callus-status-pending";
+    };
+
     // Fetch Call Us data
     const fetchCallUsData = useCallback(async () => {
         setLoading(true);
@@ -141,16 +105,27 @@ const CallUs = () => {
             const { userId, taxYear } = getCredentials();
             const payload = {
                 user_id: userId,
-                taxYear: String(taxYear)
+                taxYear: String(taxYear),
+                page: currentPage,
+                per_page: rowsPerPage,
+                perpage: rowsPerPage,
+                start: (currentPage - 1) * rowsPerPage,
+                length: rowsPerPage,
+                limit: rowsPerPage,
+                offset: (currentPage - 1) * rowsPerPage,
+                search: searchTerm ? searchTerm.trim() : ""
             };
 
             let dataLoaded = false;
+            let countTotal = 0;
 
             // 1. Primary API: /api/user/wantusinfo
             try {
                 const res = await adminServices.wantusinfo(payload);
-                if (res && res.data && (res.data.data || Array.isArray(res.data))) {
-                    const raw = res.data.data || res.data;
+                if (res && res.data) {
+                    const raw = res.data.data || (Array.isArray(res.data) ? res.data : []);
+                    countTotal = res.data.recordsTotal || res.data.recordsFiltered || res.data.total_records || res.data.total || (Array.isArray(raw) ? raw.length : 0);
+
                     if (Array.isArray(raw) && raw.length > 0) {
                         const mapped = raw.map((item, idx) => {
                             const dt = formatDateTime(item.c_created_at || item.created_at || item.createdat || item.date);
@@ -162,10 +137,11 @@ const CallUs = () => {
                                 message: item.c_message || item.message || item.comments || item.description || "-",
                                 date: dt.date,
                                 time: dt.time,
-                                status: item.status || "Assigned"
+                                current_status: item.current_status || item.status || "Pending"
                             };
                         });
                         setCallUsList(mapped);
+                        setTotalRecords(countTotal);
                         dataLoaded = true;
                     }
                 }
@@ -177,8 +153,10 @@ const CallUs = () => {
             if (!dataLoaded) {
                 try {
                     const res = await adminServices.calluslist(payload);
-                    if (res && res.data && (res.data.data || Array.isArray(res.data))) {
-                        const raw = res.data.data || res.data;
+                    if (res && res.data) {
+                        const raw = res.data.data || (Array.isArray(res.data) ? res.data : []);
+                        countTotal = res.data.recordsTotal || res.data.recordsFiltered || res.data.total_records || res.data.total || (Array.isArray(raw) ? raw.length : 0);
+
                         if (Array.isArray(raw) && raw.length > 0) {
                             const mapped = raw.map((item, idx) => {
                                 const dt = formatDateTime(item.c_created_at || item.created_at || item.createdat || item.date);
@@ -190,10 +168,11 @@ const CallUs = () => {
                                     message: item.c_message || item.message || item.comments || item.description || "-",
                                     date: dt.date,
                                     time: dt.time,
-                                    status: item.status || "Assigned"
+                                    current_status: item.current_status || item.status || "Pending"
                                 };
                             });
                             setCallUsList(mapped);
+                            setTotalRecords(countTotal);
                             dataLoaded = true;
                         }
                     }
@@ -203,23 +182,75 @@ const CallUs = () => {
             }
 
             if (!dataLoaded) {
-                setCallUsList(DEFAULT_CALLUS_DATA);
+                setCallUsList([]);
+                setTotalRecords(0);
             }
         } catch (err) {
             console.error("Error fetching call us records:", err);
-            setCallUsList(DEFAULT_CALLUS_DATA);
+            setCallUsList([]);
+            setTotalRecords(0);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [currentPage, rowsPerPage, searchTerm]);
 
     useEffect(() => {
         fetchCallUsData();
-        window.addEventListener("taxYearChanged", fetchCallUsData);
+    }, [fetchCallUsData]);
+
+    useEffect(() => {
+        const handleTaxYearChange = () => {
+            setCurrentPage(1);
+            fetchCallUsData();
+        };
+        window.addEventListener("taxYearChanged", handleTaxYearChange);
         return () => {
-            window.removeEventListener("taxYearChanged", fetchCallUsData);
+            window.removeEventListener("taxYearChanged", handleTaxYearChange);
         };
     }, [fetchCallUsData]);
+
+    // Handle status change via Action dropdown
+    const handleStatusChange = async (item, newStatus) => {
+        if (!newStatus) return;
+        try {
+            const payload = {
+                contact_id: item.id,
+                current_status: newStatus
+            };
+
+            // Optimistic update
+            setCallUsList((prev) =>
+                prev.map((r) => (r.id === item.id ? { ...r, current_status: newStatus } : r))
+            );
+
+            const res = await adminServices.updatecontactstatus(payload);
+            if (res && res.data && (res.data.http_code === 200 || res.data.status === true)) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Status Updated",
+                    text: `Status updated to "${newStatus}" for ${item.client_name}`,
+                    timer: 2000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: "top-end"
+                });
+            } else {
+                fetchCallUsData();
+            }
+        } catch (err) {
+            console.error("Error updating contact status:", err);
+            Swal.fire({
+                icon: "error",
+                title: "Update Failed",
+                text: "Failed to update contact status. Please try again.",
+                timer: 2500,
+                showConfirmButton: false,
+                toast: true,
+                position: "top-end"
+            });
+            fetchCallUsData();
+        }
+    };
 
     // View complete message in modal
     const handleViewMessage = (item) => {
@@ -231,6 +262,7 @@ const CallUs = () => {
                         <b>Client:</b> ${item.client_name}<br/>
                         <b>Email:</b> ${item.email_id}<br/>
                         <b>Phone:</b> ${item.phone}<br/>
+                        <b>Status:</b> ${item.current_status}<br/>
                         <b>Date:</b> ${item.date} ${item.time}
                     </div>
                     <div>
@@ -250,35 +282,6 @@ const CallUs = () => {
         });
     };
 
-    // Delete inquiry handler
-    const handleDelete = (item) => {
-        Swal.fire({
-            title: "Delete Inquiry?",
-            text: `Are you sure you want to delete inquiry for ${item.client_name}?`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Yes, delete",
-            cancelButtonText: "Cancel",
-            confirmButtonColor: "#dc2626",
-            cancelButtonColor: "#cbd5e1",
-            customClass: {
-                confirmButton: "btn btn-danger px-4 py-2",
-                cancelButton: "btn btn-light px-4 py-2 ms-2"
-            },
-            buttonsStyling: false
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    await adminServices.deletecallus({ id: item.id });
-                } catch (e) {
-                    // ignore
-                }
-                setCallUsList((prev) => prev.filter((r) => r.id !== item.id));
-                Swal.fire("Deleted!", "Inquiry record has been removed.", "success");
-            }
-        });
-    };
-
     // Search filter
     const filteredRecords = useMemo(() => {
         if (!searchTerm.trim()) return callUsList;
@@ -289,7 +292,7 @@ const CallUs = () => {
             const phone = (item.phone || "").toLowerCase();
             const message = (item.message || "").toLowerCase();
             const dateStr = (item.date + " " + item.time).toLowerCase();
-            const status = (item.status || "").toLowerCase();
+            const status = (item.current_status || "").toLowerCase();
 
             return (
                 client.includes(term) ||
@@ -302,17 +305,17 @@ const CallUs = () => {
         });
     }, [callUsList, searchTerm]);
 
-    // Reset page on search or rowsPerPage change
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm, rowsPerPage]);
+    // Total records count: uses server's recordsTotal if available
+    const effectiveTotalCount = totalRecords > 0 ? totalRecords : filteredRecords.length;
+    const totalPages = Math.max(1, Math.ceil(effectiveTotalCount / rowsPerPage));
 
-    // Pagination calculations
-    const totalPages = Math.max(1, Math.ceil(filteredRecords.length / rowsPerPage));
     const paginatedRecords = useMemo(() => {
+        if (totalRecords > callUsList.length && callUsList.length <= rowsPerPage) {
+            return filteredRecords;
+        }
         const start = (currentPage - 1) * rowsPerPage;
         return filteredRecords.slice(start, start + rowsPerPage);
-    }, [filteredRecords, currentPage, rowsPerPage]);
+    }, [filteredRecords, totalRecords, callUsList.length, rowsPerPage, currentPage]);
 
     // Pagination numbers list with ellipses
     const getPageNumbers = () => {
@@ -343,15 +346,103 @@ const CallUs = () => {
         return pages;
     };
 
+    // Export all Call Us inquiries to Excel with export: true
+    const handleExportExcel = async () => {
+        try {
+            setExporting(true);
+            const { userId, taxYear } = getCredentials();
+            const payload = {
+                user_id: userId,
+                taxYear: String(taxYear),
+                export: true
+            };
+
+            let rawList = [];
+            try {
+                const res = await adminServices.wantusinfo(payload);
+                if (res && res.data) {
+                    rawList = res.data.data || (Array.isArray(res.data) ? res.data : []);
+                }
+            } catch (err) {
+                console.warn("wantusinfo export fallback:", err);
+                try {
+                    const fallbackRes = await adminServices.calluslist(payload);
+                    if (fallbackRes && fallbackRes.data) {
+                        rawList = fallbackRes.data.data || (Array.isArray(fallbackRes.data) ? fallbackRes.data : []);
+                    }
+                } catch (e) {
+                    console.warn("calluslist export fallback error:", e);
+                }
+            }
+
+            if (!rawList || rawList.length === 0) {
+                Swal.fire({
+                    icon: "info",
+                    title: "No Records",
+                    text: "There are no inquiry records to export."
+                });
+                return;
+            }
+
+            // Map and format rows for Excel spreadsheet
+            const excelData = rawList.map((item, idx) => {
+                const dt = formatDateTime(item.c_created_at || item.created_at || item.createdat || item.date);
+                return {
+                    "Sl No": idx + 1,
+                    "Client Name": item.c_name || item.client_name || item.name || item.userfilename || item.filenumber || "-",
+                    "Email ID": item.c_email || item.email_id || item.email || item.useremail || "-",
+                    "Phone": formatPhoneNumber(item.c_phone || item.phone || item.mobile || item.userphone, item.c_phone_ext || item.phone_ext || item.ext),
+                    "Message": item.c_message || item.message || item.comments || item.description || "-",
+                    "Current Status": item.current_status || item.status || "Pending",
+                    "Date": dt.date || "-",
+                    "Time": dt.time || "-",
+                    "Tax Year": item.c_year || taxYear
+                };
+            });
+
+            exportToExcel(excelData, `UTS_CallUs_Inquiries_${taxYear}_${new Date().toISOString().slice(0, 10)}`, "Inquiries");
+
+            Swal.fire({
+                icon: "success",
+                title: "Export Complete",
+                text: `Exported ${excelData.length} inquiry records to Excel.`,
+                timer: 2000,
+                showConfirmButton: false,
+                toast: true,
+                position: "top-end"
+            });
+        } catch (error) {
+            console.error("Export error:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Export Failed",
+                text: "Could not export inquiries data. Please try again."
+            });
+        } finally {
+            setExporting(false);
+        }
+    };
+
     return (
         <div className="admin-callus-container">
-            {/* Top Search Bar */}
+            {/* Top Search & Actions Bar */}
             <div className="callus-topbar">
+                <button
+                    type="button"
+                    className="callus-export-btn"
+                    onClick={handleExportExcel}
+                    disabled={exporting || loading}
+                    title="Export all inquiries to Excel"
+                >
+                    <FiDownload />
+                    {exporting ? "Exporting..." : "Export Excel"}
+                </button>
+
                 <div className="callus-search-box">
                     <input
                         type="text"
                         className="callus-search-input"
-                        placeholder="Search"
+                        placeholder="Search inquiries..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -369,14 +460,15 @@ const CallUs = () => {
                                 <th>Email ID</th>
                                 <th>Phone</th>
                                 <th>Message</th>
+                                <th>Current Status</th>
                                 <th>Date</th>
-                                <th>Delete</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan="6">
+                                    <td colSpan="7">
                                         <div className="callus-loading-state">
                                             <div className="callus-spinner"></div>
                                             <p className="mb-0">Loading inquiries...</p>
@@ -385,7 +477,7 @@ const CallUs = () => {
                                 </tr>
                             ) : errorMsg ? (
                                 <tr>
-                                    <td colSpan="6">
+                                    <td colSpan="7">
                                         <div className="callus-empty-state text-danger">
                                             <p className="mb-2">{errorMsg}</p>
                                             <button
@@ -399,7 +491,7 @@ const CallUs = () => {
                                 </tr>
                             ) : paginatedRecords.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6">
+                                    <td colSpan="7">
                                         <div className="callus-empty-state">
                                             <p className="mb-0">No call requests found.</p>
                                         </div>
@@ -418,24 +510,33 @@ const CallUs = () => {
                                         >
                                             {item.message}
                                         </td>
+                                        <td>
+                                            <span className={getStatusBadgeClass(item.current_status)}>
+                                                {item.current_status}
+                                            </span>
+                                        </td>
                                         <td className="callus-cell-date">
                                             <span className="callus-date-line">{item.date}</span>
                                             {item.time && <span className="callus-time-line">{item.time}</span>}
                                         </td>
                                         <td>
-                                            {item.status === "Assigned" ? (
-                                                <span className="callus-assigned-badge">
-                                                    Assigned
-                                                </span>
-                                            ) : (
-                                                <button
-                                                    className="callus-btn-delete"
-                                                    title="Delete Inquiry"
-                                                    onClick={() => handleDelete(item)}
+                                            <div className="callus-action-select-wrapper">
+                                                <select
+                                                    className="callus-action-select"
+                                                    value={["Get Registered", "Follow Up", "No Responses"].includes(item.current_status) ? item.current_status : ""}
+                                                    onChange={(e) => handleStatusChange(item, e.target.value)}
                                                 >
-                                                    <FiTrash2 />
-                                                </button>
-                                            )}
+                                                    <option value="" disabled hidden>
+                                                        {item.current_status && !["Get Registered", "Follow Up", "No Responses"].includes(item.current_status)
+                                                            ? item.current_status
+                                                            : "Select Action"}
+                                                    </option>
+                                                    <option value="Get Registered">Get Registered</option>
+                                                    <option value="Follow Up">Follow Up</option>
+                                                    <option value="No Responses">No Responses</option>
+                                                </select>
+                                                <FiChevronDown className="callus-action-select-icon" />
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -454,7 +555,10 @@ const CallUs = () => {
                             <select
                                 className="callus-select"
                                 value={rowsPerPage}
-                                onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                                onChange={(e) => {
+                                    setRowsPerPage(Number(e.target.value));
+                                    setCurrentPage(1);
+                                }}
                             >
                                 <option value={10}>10 / page</option>
                                 <option value={25}>25 / page</option>

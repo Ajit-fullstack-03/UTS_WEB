@@ -1,73 +1,17 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { FiSearch, FiChevronLeft, FiChevronRight, FiChevronDown, FiRefreshCw } from "react-icons/fi";
+import { FiSearch, FiChevronLeft, FiChevronRight, FiChevronDown, FiRefreshCw, FiDownload } from "react-icons/fi";
 import Swal from "sweetalert2";
 import { adminServices } from "../services/AdminServices";
 import { getStoredTaxYear } from "../../utils/taxYear";
+import { exportToExcel } from "../../utils/excelExport";
 import "./referrals.css";
-
-// Default mockup data matching Figma design
-const DEFAULT_REFERRALS_DATA = [
-    {
-        id: "1",
-        referral_name: "UTS0540",
-        referral_email: "reddy.ushakar05@gmailcom",
-        referral_phone: "(510) 935-6510",
-        referral_to_name: "JHON DOE",
-        referral_to_email: "reddy.ushakar05@gmailcom",
-        referral_to_phone: "(510) 935-6510",
-        registered_status: "Not Registered",
-        created_at: "2026-07-24"
-    },
-    {
-        id: "2",
-        referral_name: "UTS0540",
-        referral_email: "reddy.ushakar05@gmailcom",
-        referral_phone: "(510) 935-6510",
-        referral_to_name: "JHON DOE",
-        referral_to_email: "reddy.ushakar05@gmailcom",
-        referral_to_phone: "(510) 935-6510",
-        registered_status: "Not Registered",
-        created_at: "2026-07-24"
-    },
-    {
-        id: "3",
-        referral_name: "UTS8209",
-        referral_email: "reddy.ushakar05@gmailcom",
-        referral_phone: "(470) 338-2209",
-        referral_to_name: "JAYANTH RAAMPALLY",
-        referral_to_email: "reddy.ushakar05@gmailcom",
-        referral_to_phone: "(470) 338-2209",
-        registered_status: "Registered",
-        created_at: "2026-07-24"
-    },
-    {
-        id: "4",
-        referral_name: "UTS0540",
-        referral_email: "reddy.ushakar05@gmailcom",
-        referral_phone: "(510) 935-6510",
-        referral_to_name: "JHON DOE",
-        referral_to_email: "reddy.ushakar05@gmailcom",
-        referral_to_phone: "(510) 935-6510",
-        registered_status: "Registered",
-        created_at: "2026-07-24"
-    },
-    {
-        id: "5",
-        referral_name: "UTS8209",
-        referral_email: "reddy.ushakar05@gmailcom",
-        referral_phone: "(470) 338-2209",
-        referral_to_name: "JAYANTH RAAMPALLY",
-        referral_to_email: "reddy.ushakar05@gmailcom",
-        referral_to_phone: "(470) 338-2209",
-        registered_status: "Registered",
-        created_at: "2026-07-24"
-    }
-];
 
 const AdminReferrals = () => {
     const [referralsList, setReferralsList] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [exporting, setExporting] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState("ALL"); // "ALL" | "NOT_REGISTERED" | "REGISTERED"
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [errorMsg, setErrorMsg] = useState("");
@@ -143,14 +87,16 @@ const AdminReferrals = () => {
 
             if (rawList && rawList.length > 0) {
                 const mapped = rawList.map((item, idx) => {
-                    const statusVal = item.rf_status !== undefined ? item.rf_status : item.status;
-                    const isRegistered =
-                        item.is_registered === true ||
-                        item.registered === true ||
-                        statusVal === 1 ||
-                        statusVal === "1" ||
-                        statusVal === "Completed" ||
-                        statusVal === "Registered";
+                    const rawStatus = item.registration_status !== undefined
+                        ? item.registration_status
+                        : (item.rf_status !== undefined ? item.rf_status : item.status);
+
+                    let regStatus = "Not Registered";
+                    if (rawStatus === 1 || rawStatus === "1" || String(rawStatus).toLowerCase() === "registered" || rawStatus === true || rawStatus === "true") {
+                        regStatus = "Registered";
+                    } else if (typeof rawStatus === "string" && rawStatus.trim() !== "") {
+                        regStatus = rawStatus.trim();
+                    }
 
                     return {
                         id: item.rf_id || item.id || `ref_${idx}`,
@@ -160,17 +106,17 @@ const AdminReferrals = () => {
                         referral_to_name: (item.rf_name || item.referral_to_name || item.friend_name || item.name || "CLIENT").toUpperCase(),
                         referral_to_email: item.rf_email || item.referral_to_email || item.friend_email || "-",
                         referral_to_phone: formatPhoneNumber(item.rf_phone || item.referral_to_phone || item.friend_phone),
-                        registered_status: isRegistered ? "Registered" : "Not Registered",
+                        registered_status: regStatus,
                         created_at: item.rf_created_at || item.created_at || ""
                     };
                 });
                 setReferralsList(mapped);
             } else {
-                setReferralsList(DEFAULT_REFERRALS_DATA);
+                setReferralsList([]);
             }
         } catch (err) {
             console.error("Error fetching referrals:", err);
-            setReferralsList(DEFAULT_REFERRALS_DATA);
+            setReferralsList([]);
         } finally {
             setLoading(false);
         }
@@ -219,35 +165,71 @@ const AdminReferrals = () => {
         });
     };
 
-    // Filter referrals by search term
-    const filteredRecords = useMemo(() => {
-        if (!searchTerm.trim()) return referralsList;
-        const term = searchTerm.toLowerCase().trim();
-        return referralsList.filter((item) => {
-            const refName = (item.referral_name || "").toLowerCase();
-            const refEmail = (item.referral_email || "").toLowerCase();
-            const refPhone = (item.referral_phone || "").toLowerCase();
-            const toName = (item.referral_to_name || "").toLowerCase();
-            const toEmail = (item.referral_to_email || "").toLowerCase();
-            const toPhone = (item.referral_to_phone || "").toLowerCase();
-            const status = (item.registered_status || "").toLowerCase();
+    // Calculate category counts
+    const counts = useMemo(() => {
+        let total = referralsList.length;
+        let notRegistered = 0;
+        let registered = 0;
 
-            return (
-                refName.includes(term) ||
-                refEmail.includes(term) ||
-                refPhone.includes(term) ||
-                toName.includes(term) ||
-                toEmail.includes(term) ||
-                toPhone.includes(term) ||
-                status.includes(term)
-            );
+        referralsList.forEach((item) => {
+            if (String(item.registered_status).toLowerCase() === "registered") {
+                registered += 1;
+            } else {
+                notRegistered += 1;
+            }
         });
-    }, [referralsList, searchTerm]);
 
-    // Reset pagination when search changes
+        return { total, notRegistered, registered };
+    }, [referralsList]);
+
+    // Filter referrals by status and search term, with default sort: 1st Not Registered, then Registered
+    const filteredRecords = useMemo(() => {
+        let list = referralsList;
+
+        // 1. Filter by registration status
+        if (statusFilter === "REGISTERED") {
+            list = list.filter((item) => String(item.registered_status).toLowerCase() === "registered");
+        } else if (statusFilter === "NOT_REGISTERED") {
+            list = list.filter((item) => String(item.registered_status).toLowerCase() !== "registered");
+        }
+
+        // 2. Filter by search term
+        if (searchTerm.trim()) {
+            const term = searchTerm.toLowerCase().trim();
+            list = list.filter((item) => {
+                const refName = (item.referral_name || "").toLowerCase();
+                const refEmail = (item.referral_email || "").toLowerCase();
+                const refPhone = (item.referral_phone || "").toLowerCase();
+                const toName = (item.referral_to_name || "").toLowerCase();
+                const toEmail = (item.referral_to_email || "").toLowerCase();
+                const toPhone = (item.referral_to_phone || "").toLowerCase();
+                const status = (item.registered_status || "").toLowerCase();
+
+                return (
+                    refName.includes(term) ||
+                    refEmail.includes(term) ||
+                    refPhone.includes(term) ||
+                    toName.includes(term) ||
+                    toEmail.includes(term) ||
+                    toPhone.includes(term) ||
+                    status.includes(term)
+                );
+            });
+        }
+
+        // 3. Sort order: 1st Not Registered, then Registered
+        return [...list].sort((a, b) => {
+            const aReg = String(a.registered_status).toLowerCase() === "registered";
+            const bReg = String(b.registered_status).toLowerCase() === "registered";
+            if (aReg === bReg) return 0;
+            return aReg ? 1 : -1; // false (Not registered) comes first, true (Registered) comes second
+        });
+    }, [referralsList, statusFilter, searchTerm]);
+
+    // Reset pagination when search or status filter changes
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchTerm, rowsPerPage]);
+    }, [searchTerm, statusFilter, rowsPerPage]);
 
     // Pagination calculations
     const totalPages = Math.max(1, Math.ceil(filteredRecords.length / rowsPerPage));
@@ -285,19 +267,164 @@ const AdminReferrals = () => {
         return pages;
     };
 
+    // Export all referrals to Excel with export: true
+    const handleExportExcel = async () => {
+        try {
+            setExporting(true);
+            const { userId, taxYear } = getCredentials();
+            const payload = {
+                user_id: userId,
+                taxYear: String(taxYear),
+                export: true
+            };
+
+            let rawList = [];
+            try {
+                const res = await adminServices.allrefferalslist(payload);
+                if (res && res.data) {
+                    rawList = Array.isArray(res.data)
+                        ? res.data
+                        : (Array.isArray(res.data.data)
+                            ? res.data.data
+                            : (Array.isArray(res.data.list) ? res.data.list : []));
+                }
+            } catch (err) {
+                console.warn("allrefferalslist export fallback:", err);
+                try {
+                    const fallbackRes = await adminServices.refferalslist(payload);
+                    if (fallbackRes && fallbackRes.data) {
+                        rawList = Array.isArray(fallbackRes.data)
+                            ? fallbackRes.data
+                            : (Array.isArray(fallbackRes.data.data)
+                                ? fallbackRes.data.data
+                                : (Array.isArray(fallbackRes.data.list) ? fallbackRes.data.list : []));
+                    }
+                } catch (fallbackErr) {
+                    console.warn("refferalslist fallback failed:", fallbackErr);
+                }
+            }
+
+            if (!rawList || rawList.length === 0) {
+                Swal.fire({
+                    icon: "info",
+                    title: "No Records",
+                    text: "There are no referral records to export."
+                });
+                return;
+            }
+
+            // Map and format rows for Excel spreadsheet
+            const excelData = rawList.map((item, idx) => {
+                const rawStatus = item.registration_status !== undefined
+                    ? item.registration_status
+                    : (item.rf_status !== undefined ? item.rf_status : item.status);
+
+                let regStatus = "Not Registered";
+                if (rawStatus === 1 || rawStatus === "1" || String(rawStatus).toLowerCase() === "registered" || rawStatus === true || rawStatus === "true") {
+                    regStatus = "Registered";
+                } else if (typeof rawStatus === "string" && rawStatus.trim() !== "") {
+                    regStatus = rawStatus.trim();
+                }
+
+                return {
+                    "Sl No": idx + 1,
+                    "Referrer Name / Code": item.rf_on_fileno || item.userfilename || item.rf_on_name || item.referral_name || "-",
+                    "Referrer Email": item.rf_on_email || item.referral_email || item.email || "-",
+                    "Referrer Phone": formatPhoneNumber(item.rf_on_phone || item.referral_phone || item.phone),
+                    "Referred Name": (item.rf_name || item.referral_to_name || item.friend_name || item.name || "-").toUpperCase(),
+                    "Referred Email": item.rf_email || item.referral_to_email || item.friend_email || "-",
+                    "Referred Phone": formatPhoneNumber(item.rf_phone || item.referral_to_phone || item.friend_phone),
+                    "Registration Status": regStatus,
+                    "Comment": item.rf_comment || "-",
+                    "Tax Year": item.rf_year || taxYear,
+                    "Date": item.rf_created_at || item.created_at || item.added_at || "-"
+                };
+            });
+
+            // Sort with Not Registered first, Registered second
+            excelData.sort((a, b) => {
+                const aReg = String(a["Registration Status"]).toLowerCase() === "registered";
+                const bReg = String(b["Registration Status"]).toLowerCase() === "registered";
+                if (aReg === bReg) return 0;
+                return aReg ? 1 : -1;
+            });
+
+            exportToExcel(excelData, `UTS_Referrals_${taxYear}_${new Date().toISOString().slice(0, 10)}`, "Referrals");
+
+            Swal.fire({
+                icon: "success",
+                title: "Export Complete",
+                text: `Exported ${excelData.length} referral records to Excel.`,
+                timer: 2000,
+                showConfirmButton: false,
+                toast: true,
+                position: "top-end"
+            });
+        } catch (error) {
+            console.error("Export error:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Export Failed",
+                text: "Could not export referral data. Please try again."
+            });
+        } finally {
+            setExporting(false);
+        }
+    };
+
     return (
         <div className="admin-referrals-container">
-            {/* Top Search Bar */}
+            {/* Top Search & Filter Bar */}
             <div className="ref-topbar">
-                <div className="ref-search-box">
-                    <input
-                        type="text"
-                        className="ref-search-input"
-                        placeholder="Search"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    <FiSearch className="ref-search-icon" />
+                <div className="ref-filters">
+                    <button
+                        type="button"
+                        className={`ref-filter-btn ${statusFilter === "ALL" ? "active" : ""}`}
+                        onClick={() => setStatusFilter("ALL")}
+                    >
+                        All
+                        <span className="ref-filter-badge">{counts.total}</span>
+                    </button>
+                    <button
+                        type="button"
+                        className={`ref-filter-btn ${statusFilter === "NOT_REGISTERED" ? "active" : ""}`}
+                        onClick={() => setStatusFilter("NOT_REGISTERED")}
+                    >
+                        Not Registered
+                        <span className="ref-filter-badge">{counts.notRegistered}</span>
+                    </button>
+                    <button
+                        type="button"
+                        className={`ref-filter-btn ${statusFilter === "REGISTERED" ? "active" : ""}`}
+                        onClick={() => setStatusFilter("REGISTERED")}
+                    >
+                        Registered
+                        <span className="ref-filter-badge">{counts.registered}</span>
+                    </button>
+                </div>
+
+                <div className="ref-actions">
+                    <button
+                        type="button"
+                        className="ref-export-btn"
+                        onClick={handleExportExcel}
+                        disabled={exporting || loading}
+                        title="Export all referrals to Excel"
+                    >
+                        <FiDownload />
+                        {exporting ? "Exporting..." : "Export Excel"}
+                    </button>
+
+                    <div className="ref-search-box">
+                        <input
+                            type="text"
+                            className="ref-search-input"
+                            placeholder="Search referrals..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <FiSearch className="ref-search-icon" />
+                    </div>
                 </div>
             </div>
 
@@ -394,7 +521,10 @@ const AdminReferrals = () => {
                             <select
                                 className="ref-select"
                                 value={rowsPerPage}
-                                onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                                onChange={(e) => {
+                                    setRowsPerPage(Number(e.target.value));
+                                    setCurrentPage(1);
+                                }}
                             >
                                 <option value={10}>10 / page</option>
                                 <option value={25}>25 / page</option>

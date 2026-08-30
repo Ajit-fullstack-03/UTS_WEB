@@ -6,6 +6,7 @@ import "./login_history.css";
 
 const LoginHistory = () => {
     const [loginRecords, setLoginRecords] = useState([]);
+    const [totalRecords, setTotalRecords] = useState(0);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -39,30 +40,50 @@ const LoginHistory = () => {
             const { userId, taxYear } = getCredentials();
             const payload = {
                 user_id: userId,
-                taxYear: String(taxYear)
+                taxYear: String(taxYear),
+                page: currentPage,
+                per_page: rowsPerPage,
+                perpage: rowsPerPage,
+                start: (currentPage - 1) * rowsPerPage,
+                length: rowsPerPage,
+                limit: rowsPerPage,
+                offset: (currentPage - 1) * rowsPerPage,
+                search: searchTerm ? searchTerm.trim() : ""
             };
 
             const response = await adminServices.loginshistory(payload);
             
             if (response && response.data) {
                 const rawData = response.data.data || response.data.history || (Array.isArray(response.data) ? response.data : []);
+                const countTotal = response.data.recordsTotal || response.data.recordsFiltered || response.data.total_records || response.data.total || (Array.isArray(rawData) ? rawData.length : 0);
                 setLoginRecords(rawData);
+                setTotalRecords(countTotal);
             } else {
                 setLoginRecords([]);
+                setTotalRecords(0);
             }
         } catch (err) {
             console.error("Error fetching login history:", err);
             setErrorMsg("Failed to load login history records. Please try again.");
+            setLoginRecords([]);
+            setTotalRecords(0);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [currentPage, rowsPerPage, searchTerm]);
 
     useEffect(() => {
         fetchLoginHistory();
-        window.addEventListener("taxYearChanged", fetchLoginHistory);
+    }, [fetchLoginHistory]);
+
+    useEffect(() => {
+        const handleTaxYearChange = () => {
+            setCurrentPage(1);
+            fetchLoginHistory();
+        };
+        window.addEventListener("taxYearChanged", handleTaxYearChange);
         return () => {
-            window.removeEventListener("taxYearChanged", fetchLoginHistory);
+            window.removeEventListener("taxYearChanged", handleTaxYearChange);
         };
     }, [fetchLoginHistory]);
 
@@ -132,17 +153,17 @@ const LoginHistory = () => {
         });
     }, [loginRecords, searchTerm]);
 
-    // Reset pagination when search changes
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm, rowsPerPage]);
+    // Total records count: uses server's recordsTotal if available
+    const effectiveTotalCount = totalRecords > 0 ? totalRecords : filteredRecords.length;
+    const totalPages = Math.max(1, Math.ceil(effectiveTotalCount / rowsPerPage));
 
-    // Pagination calculations
-    const totalPages = Math.max(1, Math.ceil(filteredRecords.length / rowsPerPage));
     const paginatedRecords = useMemo(() => {
+        if (totalRecords > loginRecords.length && loginRecords.length <= rowsPerPage) {
+            return filteredRecords;
+        }
         const start = (currentPage - 1) * rowsPerPage;
         return filteredRecords.slice(start, start + rowsPerPage);
-    }, [filteredRecords, currentPage, rowsPerPage]);
+    }, [filteredRecords, totalRecords, loginRecords.length, rowsPerPage, currentPage]);
 
     // Pagination page list with ellipses
     const getPageNumbers = () => {
@@ -273,7 +294,10 @@ const LoginHistory = () => {
                             <select
                                 className="lh-select"
                                 value={rowsPerPage}
-                                onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                                onChange={(e) => {
+                                    setRowsPerPage(Number(e.target.value));
+                                    setCurrentPage(1);
+                                }}
                             >
                                 <option value={10}>10 / page</option>
                                 <option value={25}>25 / page</option>

@@ -170,10 +170,10 @@ const Header = () => {
                     alt="Umpire Tax Solutions Logo"
                     className="header-logo img-fluid"
                 />
-                <div className="header-logo-text d-flex flex-column lh-1">
+                {/* <div className="header-logo-text d-flex flex-column lh-1">
                     <span className="logo-text-top fw-bold">UMPIRE TAX</span>
                     <span className="logo-text-bottom fw-bold text-warning">SOLUTIONS</span>
-                </div>
+                </div> */}
             </div>
 
             {/* Navigation Tabs in Center-Right */}
@@ -191,15 +191,13 @@ const Header = () => {
                                 <button
                                     type="button"
                                     onClick={() => setIsDropdownOpen((prev) => !prev)}
-                                    className={`btn btn-nav-pill tax-year-dropdown-btn px-3 py-2 rounded-pill fw-semibold text-nowrap d-flex align-items-center gap-2 ${
-                                        active || isDropdownOpen ? "active" : ""
-                                    }`}
+                                    className={`btn btn-nav-pill tax-year-dropdown-btn px-3 py-2 rounded-pill fw-semibold text-nowrap d-flex align-items-center gap-2 ${active || isDropdownOpen ? "active" : ""
+                                        }`}
                                 >
                                     <span>{selectedDisplayLabel}</span>
                                     <FiChevronDown
-                                        className={`dropdown-chevron-icon transition-transform ${
-                                            isDropdownOpen ? "rotate-180" : ""
-                                        }`}
+                                        className={`dropdown-chevron-icon transition-transform ${isDropdownOpen ? "rotate-180" : ""
+                                            }`}
                                     />
                                 </button>
 
@@ -218,9 +216,8 @@ const Header = () => {
                                                             key={tYear.utstaxyear}
                                                             type="button"
                                                             onClick={() => handleSelectTaxYear(tYear)}
-                                                            className={`dropdown-item-year d-flex align-items-center justify-content-between px-3 py-2 w-100 border-0 bg-transparent text-start ${
-                                                                isSelected ? "selected fw-bold" : ""
-                                                            }`}
+                                                            className={`dropdown-item-year d-flex align-items-center justify-content-between px-3 py-2 w-100 border-0 bg-transparent text-start ${isSelected ? "selected fw-bold" : ""
+                                                                }`}
                                                         >
                                                             <span className="year-label">
                                                                 {tYear.dutstaxyear || tYear.utstaxyear}
@@ -247,9 +244,8 @@ const Header = () => {
                         <button
                             key={idx}
                             onClick={() => handleNavClick(item)}
-                            className={`btn btn-nav-pill px-3 py-2 rounded-pill fw-semibold text-nowrap ${
-                                active ? "active" : ""
-                            }`}
+                            className={`btn btn-nav-pill px-3 py-2 rounded-pill fw-semibold text-nowrap ${active ? "active" : ""
+                                }`}
                         >
                             {item.label}
                         </button>

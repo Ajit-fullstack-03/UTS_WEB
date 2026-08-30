@@ -5,67 +5,9 @@ import { adminServices } from "../services/AdminServices";
 import { getStoredTaxYear } from "../../utils/taxYear";
 import "./comments.css";
 
-// Sample initial data matching Figma design mockups
-const DEFAULT_COMMENTS_DATA = [
-    {
-        id: "1",
-        file_number: "UTS0540",
-        client_name: "(510) 935-6510",
-        analyst_name: "Admin Rajesh",
-        comment: "fees:$304.94_1040 .. admin after disc $280 .. said that he will make the payment in sometime",
-        previous_state: "E-Filing Complete",
-        present_state: "E-Filing Complete",
-        date: "07-24-2026",
-        time: "06:59:32"
-    },
-    {
-        id: "2",
-        file_number: "UTS0540",
-        client_name: "(510) 935-6510",
-        analyst_name: "Admin Rajesh",
-        comment: "fees:$304.94_1040 .. admin after disc $280 .. said that he will make the payment in sometime",
-        previous_state: "Confirmation Pending",
-        present_state: "E-Filing Complete",
-        date: "07-24-2026",
-        time: "06:59:32"
-    },
-    {
-        id: "3",
-        file_number: "UTS8209",
-        client_name: "(470) 338-2209",
-        analyst_name: "Admin SaiKiran",
-        comment: "fees:$304.94_1040 .. admin after disc $280 .. said that he will make the payment in sometime",
-        previous_state: "Review Pending",
-        present_state: "E-Filing Complete",
-        date: "07-24-2026",
-        time: "06:59:32"
-    },
-    {
-        id: "4",
-        file_number: "UTS0540",
-        client_name: "(510) 935-6510",
-        analyst_name: "Admin Rajesh",
-        comment: "reddy.ushakar05@gmailcom",
-        previous_state: "Payment Pending",
-        present_state: "E-Filing Complete",
-        date: "07-24-2026",
-        time: "06:59:32"
-    },
-    {
-        id: "5",
-        file_number: "UTS8209",
-        client_name: "(470) 338-2209",
-        analyst_name: "Admin SaiKiran",
-        comment: "ptsrinu2792@gmail.com",
-        previous_state: "Payment Pending",
-        present_state: "E-Filing Complete",
-        date: "07-24-2026",
-        time: "06:59:32"
-    }
-];
-
 const AdminComments = () => {
     const [commentsList, setCommentsList] = useState([]);
+    const [totalRecords, setTotalRecords] = useState(0);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -131,7 +73,7 @@ const AdminComments = () => {
         }
     };
 
-    // Fetch comments list
+    // Fetch comments list with server-side and client-side pagination parameters
     const fetchComments = useCallback(async () => {
         setLoading(true);
         setErrorMsg("");
@@ -140,16 +82,27 @@ const AdminComments = () => {
             const payload = {
                 user_id: userId,
                 taxYear: String(taxYear),
+                page: currentPage,
+                per_page: rowsPerPage,
+                perpage: rowsPerPage,
+                start: (currentPage - 1) * rowsPerPage,
+                length: rowsPerPage,
+                limit: rowsPerPage,
+                offset: (currentPage - 1) * rowsPerPage,
+                search: searchTerm ? searchTerm.trim() : "",
                 ...(clientId ? { client_id: String(clientId) } : {})
             };
 
             let dataLoaded = false;
+            let countTotal = 0;
 
             // 1. Primary API endpoint: /api/member/usercomments
             try {
                 const res = await adminServices.usercomments(payload);
-                if (res && res.data && (res.data.data || Array.isArray(res.data))) {
-                    const raw = res.data.data || res.data;
+                if (res && res.data) {
+                    const raw = res.data.data || (Array.isArray(res.data) ? res.data : []);
+                    countTotal = res.data.recordsTotal || res.data.recordsFiltered || res.data.total_records || res.data.total || (Array.isArray(raw) ? raw.length : 0);
+
                     if (Array.isArray(raw) && raw.length > 0) {
                         const mapped = raw.map((item, idx) => {
                             const dt = formatDateTime(item.cmt_created_at || item.created_at || item.createdat || item.date);
@@ -166,6 +119,7 @@ const AdminComments = () => {
                             };
                         });
                         setCommentsList(mapped);
+                        setTotalRecords(countTotal);
                         dataLoaded = true;
                     }
                 }
@@ -177,8 +131,10 @@ const AdminComments = () => {
             if (!dataLoaded) {
                 try {
                     const res = await adminServices.commentslist(payload);
-                    if (res && res.data && (res.data.data || Array.isArray(res.data))) {
-                        const raw = res.data.data || res.data;
+                    if (res && res.data) {
+                        const raw = res.data.data || (Array.isArray(res.data) ? res.data : []);
+                        countTotal = res.data.recordsTotal || res.data.recordsFiltered || res.data.total_records || res.data.total || (Array.isArray(raw) ? raw.length : 0);
+
                         if (Array.isArray(raw) && raw.length > 0) {
                             const mapped = raw.map((item, idx) => {
                                 const dt = formatDateTime(item.cmt_created_at || item.created_at || item.createdat || item.date);
@@ -195,6 +151,7 @@ const AdminComments = () => {
                                 };
                             });
                             setCommentsList(mapped);
+                            setTotalRecords(countTotal);
                             dataLoaded = true;
                         }
                     }
@@ -204,21 +161,30 @@ const AdminComments = () => {
             }
 
             if (!dataLoaded) {
-                setCommentsList(DEFAULT_COMMENTS_DATA);
+                setCommentsList([]);
+                setTotalRecords(0);
             }
         } catch (err) {
             console.error("Error fetching comments:", err);
-            setCommentsList(DEFAULT_COMMENTS_DATA);
+            setCommentsList([]);
+            setTotalRecords(0);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [currentPage, rowsPerPage, searchTerm]);
 
     useEffect(() => {
         fetchComments();
-        window.addEventListener("taxYearChanged", fetchComments);
+    }, [fetchComments]);
+
+    useEffect(() => {
+        const handleTaxYearChange = () => {
+            setCurrentPage(1);
+            fetchComments();
+        };
+        window.addEventListener("taxYearChanged", handleTaxYearChange);
         return () => {
-            window.removeEventListener("taxYearChanged", fetchComments);
+            window.removeEventListener("taxYearChanged", handleTaxYearChange);
         };
     }, [fetchComments]);
 
@@ -253,7 +219,7 @@ const AdminComments = () => {
         });
     };
 
-    // Filter comments by search term
+    // Filter comments by search term if search is performed on the active page
     const filteredRecords = useMemo(() => {
         if (!searchTerm.trim()) return commentsList;
         const term = searchTerm.toLowerCase().trim();
@@ -278,17 +244,18 @@ const AdminComments = () => {
         });
     }, [commentsList, searchTerm]);
 
-    // Reset pagination on search change
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm, rowsPerPage]);
+    // Total records count: uses server's recordsTotal if available
+    const effectiveTotalCount = totalRecords > 0 ? totalRecords : filteredRecords.length;
+    const totalPages = Math.max(1, Math.ceil(effectiveTotalCount / rowsPerPage));
 
-    // Pagination calculations
-    const totalPages = Math.max(1, Math.ceil(filteredRecords.length / rowsPerPage));
+    // Handle paginated records: if the server already returned paginated slice (e.g. 10 items out of 11 total), use filteredRecords directly. Otherwise slice on client.
     const paginatedRecords = useMemo(() => {
+        if (totalRecords > commentsList.length && commentsList.length <= rowsPerPage) {
+            return filteredRecords;
+        }
         const start = (currentPage - 1) * rowsPerPage;
         return filteredRecords.slice(start, start + rowsPerPage);
-    }, [filteredRecords, currentPage, rowsPerPage]);
+    }, [filteredRecords, totalRecords, commentsList.length, rowsPerPage, currentPage]);
 
     // Pagination numbers list with ellipses
     const getPageNumbers = () => {
@@ -422,7 +389,10 @@ const AdminComments = () => {
                             <select
                                 className="comments-select"
                                 value={rowsPerPage}
-                                onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                                onChange={(e) => {
+                                    setRowsPerPage(Number(e.target.value));
+                                    setCurrentPage(1);
+                                }}
                             >
                                 <option value={10}>10 / page</option>
                                 <option value={25}>25 / page</option>

@@ -80,6 +80,7 @@ const paymentslist = (data) => postUrl(`${API_URL}member/paymentslist`, data);
 const calluslist = (data) => postUrl(`${API_URL}member/calluslist`, data);
 const wantusinfo = (data) => postUrl(`${API_URL}user/wantusinfo`, data);
 const deletecallus = (data) => postUrl(`${API_URL}member/deletecallus`, data);
+const updatecontactstatus = (data) => postUrl(`${API_URL}member/updatecontactstatus`, data);
 const commentslist = (data) => postUrl(`${API_URL}member/commentslist`, data);
 const usercomments = (data) => postUrl(`${API_URL}member/usercomments`, data);
 const sendEmailToClient = (data) => postUrl(`${API_URL}settings/sendemailtoclient`, data);
@@ -138,6 +139,7 @@ export const adminServices = {
     calluslist,
     wantusinfo,
     deletecallus,
+    updatecontactstatus,
     commentslist,
     usercomments,
     sendEmailToClient,

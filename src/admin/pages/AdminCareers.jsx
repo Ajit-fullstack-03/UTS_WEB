@@ -4,62 +4,9 @@ import Swal from "sweetalert2";
 import { adminServices } from "../services/AdminServices";
 import "./careers.css";
 
-// Sample initial data matching Figma design mockups
-const DEFAULT_CAREERS_DATA = [
-    {
-        id: "1",
-        first_name: "Maruthiram",
-        last_name: "Katragadda",
-        email: "maruthiram88@gmail.com",
-        phone: "(510) 935-6510",
-        message: "Maruthiram",
-        date: "07-24-2026",
-        time: "06:59:32"
-    },
-    {
-        id: "2",
-        first_name: "UTS0540",
-        last_name: "UTS0540",
-        email: "reddy.ushakar05@gmail.com",
-        phone: "(510) 935-6510",
-        message: "Maruthiram",
-        date: "07-24-2026",
-        time: "06:59:32"
-    },
-    {
-        id: "3",
-        first_name: "UTS8209",
-        last_name: "UTS8209",
-        email: "ptsrinu2792@gmail.com",
-        phone: "(470) 338-2209",
-        message: "Maruthiram",
-        date: "07-24-2026",
-        time: "06:59:32"
-    },
-    {
-        id: "4",
-        first_name: "UTS0540",
-        last_name: "UTS0540",
-        email: "reddy.ushakar05@gmail.com",
-        phone: "(510) 935-6510",
-        message: "Maruthiram",
-        date: "07-24-2026",
-        time: "06:59:32"
-    },
-    {
-        id: "5",
-        first_name: "UTS8209",
-        last_name: "UTS8209",
-        email: "ptsrinu2792@gmail.com",
-        phone: "(470) 338-2209",
-        message: "Maruthiram",
-        date: "07-24-2026",
-        time: "06:59:32"
-    }
-];
-
 const AdminCareers = () => {
     const [careersList, setCareersList] = useState([]);
+    const [totalRecords, setTotalRecords] = useState(0);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -152,14 +99,25 @@ const AdminCareers = () => {
         try {
             const { userId } = getCredentials();
             const payload = {
-                user_id: userId
+                user_id: userId,
+                page: currentPage,
+                per_page: rowsPerPage,
+                perpage: rowsPerPage,
+                start: (currentPage - 1) * rowsPerPage,
+                length: rowsPerPage,
+                limit: rowsPerPage,
+                offset: (currentPage - 1) * rowsPerPage,
+                search: searchTerm ? searchTerm.trim() : ""
             };
 
             let dataLoaded = false;
+            let countTotal = 0;
             try {
                 const res = await adminServices.careerslist(payload);
-                if (res && res.data && (res.data.data || Array.isArray(res.data))) {
-                    const raw = res.data.data || res.data;
+                if (res && res.data) {
+                    const raw = res.data.data || (Array.isArray(res.data) ? res.data : []);
+                    countTotal = res.data.recordsTotal || res.data.recordsFiltered || res.data.total_records || res.data.total || (Array.isArray(raw) ? raw.length : 0);
+
                     if (Array.isArray(raw) && raw.length > 0) {
                         const mapped = raw.map((item, idx) => {
                             const dt = formatDateTime(item.createdat || item.created_at || item.date);
@@ -175,6 +133,7 @@ const AdminCareers = () => {
                             };
                         });
                         setCareersList(mapped);
+                        setTotalRecords(countTotal);
                         dataLoaded = true;
                     }
                 }
@@ -183,15 +142,17 @@ const AdminCareers = () => {
             }
 
             if (!dataLoaded) {
-                setCareersList(DEFAULT_CAREERS_DATA);
+                setCareersList([]);
+                setTotalRecords(0);
             }
         } catch (err) {
             console.error("Error fetching careers list:", err);
-            setCareersList(DEFAULT_CAREERS_DATA);
+            setCareersList([]);
+            setTotalRecords(0);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [currentPage, rowsPerPage, searchTerm]);
 
     useEffect(() => {
         fetchCareers();
@@ -226,11 +187,11 @@ const AdminCareers = () => {
         });
     };
 
-    // Delete applicant
+    // Delete application
     const handleDelete = (item) => {
         Swal.fire({
-            title: "Delete Applicant?",
-            text: `Are you sure you want to delete application for ${item.first_name} ${item.last_name}?`,
+            title: "Are you sure?",
+            text: `Do you want to delete applicant ${item.first_name} ${item.last_name}?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Yes, delete",
@@ -293,12 +254,17 @@ const AdminCareers = () => {
         setCurrentPage(1);
     }, [searchTerm, rowsPerPage]);
 
-    // Pagination calculations
-    const totalPages = Math.max(1, Math.ceil(filteredRecords.length / rowsPerPage));
+    // Total records count: uses server's recordsTotal if available
+    const effectiveTotalCount = totalRecords > 0 ? totalRecords : filteredRecords.length;
+    const totalPages = Math.max(1, Math.ceil(effectiveTotalCount / rowsPerPage));
+
     const paginatedRecords = useMemo(() => {
+        if (totalRecords > careersList.length && careersList.length <= rowsPerPage) {
+            return filteredRecords;
+        }
         const start = (currentPage - 1) * rowsPerPage;
         return filteredRecords.slice(start, start + rowsPerPage);
-    }, [filteredRecords, currentPage, rowsPerPage]);
+    }, [filteredRecords, totalRecords, careersList.length, rowsPerPage, currentPage]);
 
     // Pagination numbers list with ellipses
     const getPageNumbers = () => {
@@ -435,7 +401,10 @@ const AdminCareers = () => {
                             <select
                                 className="careers-select"
                                 value={rowsPerPage}
-                                onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                                onChange={(e) => {
+                                    setRowsPerPage(Number(e.target.value));
+                                    setCurrentPage(1);
+                                }}
                             >
                                 <option value={10}>10 / page</option>
                                 <option value={25}>25 / page</option>
