@@ -3,9 +3,11 @@ import Swal from "sweetalert2";
 import { FiMail, FiPhone, FiCheckCircle, FiLoader, FiRefreshCw } from "react-icons/fi";
 import { adminServices } from "../services/AdminServices";
 import { getStoredTaxYear } from "../../utils/taxYear";
+import { isAnalystUser } from "../../utils/userRole";
 import "./admin_dashboard.css";
 
 const AssignedFileNumber = () => {
+    const isAnalyst = isAnalystUser();
     const [userList, setUserList] = useState([]);
     const [fetchingUsers, setFetchingUsers] = useState(false);
 
@@ -82,16 +84,16 @@ const AssignedFileNumber = () => {
 
             const mapped = (rawList || []).map((item, idx) => {
                 const dbUserId = item.u_user_id || item.user_id || item.client_id || item.id || "";
-                const unique_code = item.unique_code || item.filenumber || item.file_number || dbUserId || `U_${idx}`;
+                const rawUniqueCode = item.unique_code !== undefined && item.unique_code !== null ? String(item.unique_code).trim() : "";
                 const name = item.user_name || item.client_name || item.name || `${item.first_name || ""} ${item.last_name || ""}`.trim() || "Client";
-                const filenumber = item.filenumber || item.file_number || item.unique_code || "";
+                const filenumber = item.filenumber || item.file_number || "";
                 const email = item.email || item.email_id || item.emailaddress || item.email_address || "";
                 const phone = item.phone || item.phone_no || item.mobilenumber || item.mobile || item.mobile_no || "";
                 const phoneext = item.phoneext || item.phone_ext || "US";
 
                 return {
-                    id: String(unique_code),
-                    unique_code: String(unique_code),
+                    id: String(rawUniqueCode || dbUserId || `U_${idx}`),
+                    unique_code: rawUniqueCode,
                     client_id: String(dbUserId),
                     user_id: String(dbUserId),
                     name,
@@ -125,32 +127,62 @@ const AssignedFileNumber = () => {
             Swal.fire({
                 icon: "warning",
                 title: "Missing Information",
-                text: "Please select a user and enter a file number.",
+                text: "Please select a user and enter a file number (e.g. UTS0001).",
                 confirmButtonColor: "#1b2e6b"
             });
             return;
         }
 
-        const selectedObj = userList.find(u => u.unique_code === assignedUser || u.client_id === assignedUser);
+        let newCode = assignedFileNum.trim();
+        if (newCode.toLowerCase().startsWith("uts")) {
+            newCode = "UTS" + newCode.slice(3);
+        } else if (!newCode.startsWith("UTS")) {
+            newCode = "UTS" + newCode;
+        }
+
+        const selectedObj = userList.find(u => u.unique_code === assignedUser || u.client_id === assignedUser || u.id === assignedUser);
         setLoadingAssigned(true);
         try {
             const { userId, taxYear } = getAdminCredentials();
-            const newCode = assignedFileNum.trim();
             const payload = {
                 user_id: userId,
-                client_id: selectedObj?.client_id || assignedUser,
+                client_id: selectedObj?.client_id || selectedObj?.user_id || assignedUser,
                 unique_code: newCode,
                 filenumber: newCode,
                 file_number: newCode,
-                old_unique_code: selectedObj?.unique_code || "",
+                old_unique_code: selectedObj?.rawData?.unique_code || selectedObj?.unique_code || "",
                 taxYear: String(taxYear)
             };
 
-            const response = await adminServices.setnewfilenumberusers(payload);
-            const isSuccess = response?.data?.status === true || response?.data?.status === "success" || response?.status === 200;
-            const message = response?.data?.message || `File number ${newCode} has been assigned successfully.`;
+            const response = await adminServices.confirmAssigningFileNumberToNewUsers(payload);
+            const dataObj = response?.data?.data;
+            const filestatus = dataObj?.filestatus;
 
-            if (isSuccess) {
+            if (filestatus) {
+                if (filestatus.toLowerCase().includes("other client")) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Already Assigned",
+                        text: filestatus,
+                        confirmButtonColor: "#1b2e6b"
+                    });
+                } else if (filestatus.toLowerCase().includes("this client") || filestatus.toLowerCase().includes("already exits")) {
+                    Swal.fire({
+                        icon: "info",
+                        title: "File Number Notice",
+                        text: filestatus,
+                        confirmButtonColor: "#1b2e6b"
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "File Number Notice",
+                        text: filestatus,
+                        confirmButtonColor: "#1b2e6b"
+                    });
+                }
+            } else if (response?.data?.status === true || response?.data?.http_code === 200 || response?.status === 200) {
+                const message = response?.data?.status_smessage || response?.data?.message || `File number ${newCode} has been assigned successfully.`;
                 Swal.fire({
                     icon: "success",
                     title: "File Number Assigned",
@@ -164,16 +196,17 @@ const AssignedFileNumber = () => {
                 Swal.fire({
                     icon: "error",
                     title: "Failed to Assign File Number",
-                    text: response?.data?.message || "An error occurred while assigning the file number.",
+                    text: response?.data?.status_smessage || response?.data?.message || "An error occurred while assigning the file number.",
                     confirmButtonColor: "#1b2e6b"
                 });
             }
         } catch (err) {
             console.error("Error assigning file number:", err);
+            const errMsg = err?.response?.data?.status_smessage || err?.response?.data?.message || err?.response?.data?.errMessage || "Entered File number format is wrong (EX: UTS0001).";
             Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: err?.response?.data?.message || "Failed to communicate with the server.",
+                text: errMsg,
                 confirmButtonColor: "#1b2e6b"
             });
         } finally {
@@ -184,9 +217,14 @@ const AssignedFileNumber = () => {
     // Handle Edit File Number (Card 2)
     const handleEditUserChange = (selectedCode) => {
         setEditUser(selectedCode);
-        const found = userList.find(u => u.unique_code === selectedCode || u.client_id === selectedCode);
+        const found = userList.find(u => u.unique_code === selectedCode || u.client_id === selectedCode || u.id === selectedCode);
         if (found) {
-            setEditFileNum(found.filenumber || found.unique_code || "");
+            const rawUnique = found.rawData?.unique_code;
+            if (rawUnique !== undefined && rawUnique !== null && String(rawUnique).trim() !== "" && !String(rawUnique).startsWith("U_")) {
+                setEditFileNum(String(rawUnique).trim());
+            } else {
+                setEditFileNum("");
+            }
         } else {
             setEditFileNum("");
         }
@@ -197,35 +235,65 @@ const AssignedFileNumber = () => {
             Swal.fire({
                 icon: "warning",
                 title: "Missing Information",
-                text: "Please select a user and enter updated file number.",
+                text: "Please select a user and enter updated file number (e.g. UTS0001).",
                 confirmButtonColor: "#1b2e6b"
             });
             return;
         }
 
-        const selectedObj = userList.find(u => u.unique_code === editUser || u.client_id === editUser);
+        let updatedCode = editFileNum.trim();
+        if (updatedCode.toLowerCase().startsWith("uts")) {
+            updatedCode = "UTS" + updatedCode.slice(3);
+        } else if (!updatedCode.startsWith("UTS")) {
+            updatedCode = "UTS" + updatedCode;
+        }
+
+        const selectedObj = userList.find(u => u.unique_code === editUser || u.client_id === editUser || u.id === editUser);
         setLoadingEdit(true);
         try {
             const { userId, taxYear } = getAdminCredentials();
-            const updatedCode = editFileNum.trim();
             const payload = {
                 user_id: userId,
-                client_id: selectedObj?.client_id || editUser,
+                client_id: selectedObj?.client_id || selectedObj?.user_id || editUser,
                 unique_code: updatedCode,
                 filenumber: updatedCode,
                 file_number: updatedCode,
-                old_unique_code: selectedObj?.unique_code || editUser,
-                old_filenumber: selectedObj?.filenumber || selectedObj?.unique_code || editUser,
+                old_unique_code: selectedObj?.rawData?.unique_code || selectedObj?.unique_code || editUser,
+                old_filenumber: selectedObj?.rawData?.unique_code || selectedObj?.filenumber || selectedObj?.unique_code || editUser,
                 new_filenumber: updatedCode,
                 new_unique_code: updatedCode,
                 taxYear: String(taxYear)
             };
 
-            const response = await adminServices.existingassignfilenumber(payload);
-            const isSuccess = response?.data?.status === true || response?.data?.status === "success" || response?.status === 200;
-            const message = response?.data?.message || `File number updated to ${updatedCode} successfully.`;
+            const response = await adminServices.confirmAssigningFileNumberToNewUsers(payload);
+            const dataObj = response?.data?.data;
+            const filestatus = dataObj?.filestatus;
 
-            if (isSuccess) {
+            if (filestatus) {
+                if (filestatus.toLowerCase().includes("other client")) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Already Assigned",
+                        text: filestatus,
+                        confirmButtonColor: "#1b2e6b"
+                    });
+                } else if (filestatus.toLowerCase().includes("this client") || filestatus.toLowerCase().includes("already exits")) {
+                    Swal.fire({
+                        icon: "info",
+                        title: "File Number Notice",
+                        text: filestatus,
+                        confirmButtonColor: "#1b2e6b"
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "File Number Notice",
+                        text: filestatus,
+                        confirmButtonColor: "#1b2e6b"
+                    });
+                }
+            } else if (response?.data?.status === true || response?.data?.http_code === 200 || response?.status === 200) {
+                const message = response?.data?.status_smessage || response?.data?.message || `File number updated to ${updatedCode} successfully.`;
                 Swal.fire({
                     icon: "success",
                     title: "File Number Updated",
@@ -239,16 +307,17 @@ const AssignedFileNumber = () => {
                 Swal.fire({
                     icon: "error",
                     title: "Failed to Update File Number",
-                    text: response?.data?.message || "An error occurred while updating the file number.",
+                    text: response?.data?.status_smessage || response?.data?.message || "An error occurred while updating the file number.",
                     confirmButtonColor: "#1b2e6b"
                 });
             }
         } catch (err) {
             console.error("Error editing file number:", err);
+            const errMsg = err?.response?.data?.status_smessage || err?.response?.data?.message || err?.response?.data?.errMessage || "Entered File number format is wrong (EX: UTS0001).";
             Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: err?.response?.data?.message || "Failed to communicate with the server.",
+                text: errMsg,
                 confirmButtonColor: "#1b2e6b"
             });
         } finally {
@@ -259,7 +328,7 @@ const AssignedFileNumber = () => {
     // Handle Set Email Address (Card 3)
     const handleEmailUserChange = (selectedCode) => {
         setEmailUser(selectedCode);
-        const found = userList.find(u => u.unique_code === selectedCode || u.client_id === selectedCode);
+        const found = userList.find(u => u.client_id === selectedCode || u.user_id === selectedCode || u.unique_code === selectedCode || u.id === selectedCode);
         if (found && found.email) {
             setEmailAddr(found.email);
         } else {
@@ -289,17 +358,17 @@ const AssignedFileNumber = () => {
             return;
         }
 
-        const selectedObj = userList.find(u => u.unique_code === emailUser || u.client_id === emailUser);
+        const selectedObj = userList.find(u => u.client_id === emailUser || u.user_id === emailUser || u.unique_code === emailUser || u.id === emailUser);
         setLoadingEmail(true);
         try {
             const { userId, taxYear } = getAdminCredentials();
             const emailVal = emailAddr.trim();
             const payload = {
                 user_id: userId,
-                client_id: selectedObj?.client_id || emailUser,
+                client_id: selectedObj?.client_id || selectedObj?.user_id || emailUser,
                 newemailaddr: emailVal,
                 email: emailVal,
-                unique_code: selectedObj?.unique_code || emailUser,
+                unique_code: selectedObj?.rawData?.unique_code || selectedObj?.unique_code || emailUser,
                 taxYear: String(taxYear)
             };
 
@@ -341,7 +410,7 @@ const AssignedFileNumber = () => {
     // Handle Set Mobile Number (Card 4)
     const handlePhoneUserChange = (selectedCode) => {
         setPhoneUser(selectedCode);
-        const found = userList.find(u => u.unique_code === selectedCode || u.client_id === selectedCode);
+        const found = userList.find(u => u.client_id === selectedCode || u.user_id === selectedCode || u.unique_code === selectedCode || u.id === selectedCode);
         if (found) {
             if (found.phone) setPhoneNum(found.phone);
             if (found.phoneext) setCountryCode(found.phoneext);
@@ -361,19 +430,19 @@ const AssignedFileNumber = () => {
             return;
         }
 
-        const selectedObj = userList.find(u => u.unique_code === phoneUser || u.client_id === phoneUser);
+        const selectedObj = userList.find(u => u.client_id === phoneUser || u.user_id === phoneUser || u.unique_code === phoneUser || u.id === phoneUser);
         setLoadingPhone(true);
         try {
             const { userId, taxYear } = getAdminCredentials();
             const phoneVal = phoneNum.trim();
             const payload = {
                 user_id: userId,
-                client_id: selectedObj?.client_id || phoneUser,
+                client_id: selectedObj?.client_id || selectedObj?.user_id || phoneUser,
                 mobilenumber: phoneVal,
                 phone_ext: countryCode,
                 phone: phoneVal,
                 phone_no: phoneVal,
-                unique_code: selectedObj?.unique_code || phoneUser,
+                unique_code: selectedObj?.rawData?.unique_code || selectedObj?.unique_code || phoneUser,
                 taxYear: String(taxYear)
             };
 
@@ -425,113 +494,117 @@ const AssignedFileNumber = () => {
                 </button>
             </div>
 
-            {/* 1. Assigned File Number Card */}
-            <div className="col-12 col-md-6">
-                <div className="card shadow-sm border-0 rounded-3 p-4 card-config h-100 d-flex flex-column justify-content-between">
-                    <div>
-                        <div className="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
-                            <h5 className="fw-bold text-dark mb-0">Assigned File Number</h5>
-                            {fetchingUsers && <span className="badge bg-light text-muted small"><FiLoader className="me-1 spin" /> Loading...</span>}
+            {/* 1. Assigned File Number Card (Admin Only) */}
+            {!isAnalyst && (
+                <div className="col-12 col-md-6">
+                    <div className="card shadow-sm border-0 rounded-3 p-4 card-config h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div className="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                                <h5 className="fw-bold text-dark mb-0">Assigned File Number</h5>
+                                {fetchingUsers && <span className="badge bg-light text-muted small"><FiLoader className="me-1 spin" /> Loading...</span>}
+                            </div>
+                            <div className="mb-3">
+                                <label className="form-label fw-semibold text-secondary">Users:</label>
+                                <select
+                                    className="form-select config-select"
+                                    value={assignedUser}
+                                    onChange={e => setAssignedUser(e.target.value)}
+                                    disabled={fetchingUsers}
+                                >
+                                    <option value="">Select User</option>
+                                    {userList.map(c => (
+                                        <option key={`assign-${c.id || c.client_id || c.unique_code}`} value={c.id || c.client_id || c.unique_code}>
+                                            {c.name} {c.unique_code ? `(${c.unique_code})` : ""}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="mb-3">
+                                <label className="form-label fw-semibold text-secondary">Update File Number:</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="File Number Ex: UTS0001"
+                                    value={assignedFileNum}
+                                    onChange={e => setAssignedFileNum(e.target.value)}
+                                />
+                            </div>
                         </div>
-                        <div className="mb-3">
-                            <label className="form-label fw-semibold text-secondary">Users:</label>
-                            <select
-                                className="form-select config-select"
-                                value={assignedUser}
-                                onChange={e => setAssignedUser(e.target.value)}
-                                disabled={fetchingUsers}
-                            >
-                                <option value="">Select User</option>
-                                {userList.map(c => (
-                                    <option key={`assign-${c.unique_code}`} value={c.unique_code}>
-                                        {c.name} ({c.unique_code})
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label fw-semibold text-secondary">Update File Number:</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                placeholder="File Number Ex: UTS0001"
-                                value={assignedFileNum}
-                                onChange={e => setAssignedFileNum(e.target.value)}
-                            />
-                        </div>
+                        <button
+                            className="btn btn-config-update w-100 py-2 mt-2 fw-semibold d-flex align-items-center justify-content-center"
+                            onClick={handleAssignFileNumber}
+                            disabled={loadingAssigned || fetchingUsers}
+                        >
+                            {loadingAssigned ? (
+                                <>
+                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Updating...
+                                </>
+                            ) : (
+                                <>
+                                    <FiCheckCircle className="me-2" /> Update
+                                </>
+                            )}
+                        </button>
                     </div>
-                    <button
-                        className="btn btn-config-update w-100 py-2 mt-2 fw-semibold d-flex align-items-center justify-content-center"
-                        onClick={handleAssignFileNumber}
-                        disabled={loadingAssigned || fetchingUsers}
-                    >
-                        {loadingAssigned ? (
-                            <>
-                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                Updating...
-                            </>
-                        ) : (
-                            <>
-                                <FiCheckCircle className="me-2" /> Update
-                            </>
-                        )}
-                    </button>
                 </div>
-            </div>
+            )}
 
-            {/* 2. Edit File Number Card */}
-            <div className="col-12 col-md-6">
-                <div className="card shadow-sm border-0 rounded-3 p-4 card-config h-100 d-flex flex-column justify-content-between">
-                    <div>
-                        <div className="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
-                            <h5 className="fw-bold text-dark mb-0">Edit File Number</h5>
-                            {fetchingUsers && <span className="badge bg-light text-muted small"><FiLoader className="me-1 spin" /> Loading...</span>}
+            {/* 2. Edit File Number Card (Admin Only) */}
+            {!isAnalyst && (
+                <div className="col-12 col-md-6">
+                    <div className="card shadow-sm border-0 rounded-3 p-4 card-config h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div className="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                                <h5 className="fw-bold text-dark mb-0">Edit File Number</h5>
+                                {fetchingUsers && <span className="badge bg-light text-muted small"><FiLoader className="me-1 spin" /> Loading...</span>}
+                            </div>
+                            <div className="mb-3">
+                                <label className="form-label fw-semibold text-secondary">Users:</label>
+                                <select
+                                    className="form-select config-select"
+                                    value={editUser}
+                                    onChange={e => handleEditUserChange(e.target.value)}
+                                    disabled={fetchingUsers}
+                                >
+                                    <option value="">Select User</option>
+                                    {userList.map(c => (
+                                        <option key={`edit-${c.id || c.client_id || c.unique_code}`} value={c.id || c.client_id || c.unique_code}>
+                                            {c.name} {c.unique_code ? `(${c.unique_code})` : ""}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="mb-3">
+                                <label className="form-label fw-semibold text-secondary">Update File Number:</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="File Number Ex: UTS0001"
+                                    value={editFileNum}
+                                    onChange={e => setEditFileNum(e.target.value)}
+                                />
+                            </div>
                         </div>
-                        <div className="mb-3">
-                            <label className="form-label fw-semibold text-secondary">Users:</label>
-                            <select
-                                className="form-select config-select"
-                                value={editUser}
-                                onChange={e => handleEditUserChange(e.target.value)}
-                                disabled={fetchingUsers}
-                            >
-                                <option value="">Select User</option>
-                                {userList.map(c => (
-                                    <option key={`edit-${c.unique_code}`} value={c.unique_code}>
-                                        {c.name} ({c.unique_code})
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label fw-semibold text-secondary">Update File Number:</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                placeholder="File Number Ex: UTS0001"
-                                value={editFileNum}
-                                onChange={e => setEditFileNum(e.target.value)}
-                            />
-                        </div>
+                        <button
+                            className="btn btn-config-update w-100 py-2 mt-2 fw-semibold d-flex align-items-center justify-content-center"
+                            onClick={handleEditFileNumber}
+                            disabled={loadingEdit || fetchingUsers}
+                        >
+                            {loadingEdit ? (
+                                <>
+                                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Updating...
+                                </>
+                            ) : (
+                                <>
+                                    <FiCheckCircle className="me-2" /> Update
+                                </>
+                            )}
+                        </button>
                     </div>
-                    <button
-                        className="btn btn-config-update w-100 py-2 mt-2 fw-semibold d-flex align-items-center justify-content-center"
-                        onClick={handleEditFileNumber}
-                        disabled={loadingEdit || fetchingUsers}
-                    >
-                        {loadingEdit ? (
-                            <>
-                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                Updating...
-                            </>
-                        ) : (
-                            <>
-                                <FiCheckCircle className="me-2" /> Update
-                            </>
-                        )}
-                    </button>
                 </div>
-            </div>
+            )}
 
             {/* 3. Set Email Address Card */}
             <div className="col-12 col-md-6">
@@ -551,8 +624,8 @@ const AssignedFileNumber = () => {
                             >
                                 <option value="">Select User</option>
                                 {userList.map(c => (
-                                    <option key={`email-${c.unique_code}`} value={c.unique_code}>
-                                        {c.name} ({c.unique_code})
+                                    <option key={`email-${c.id || c.client_id || c.unique_code}`} value={c.id || c.client_id || c.unique_code}>
+                                        {c.name} {c.unique_code ? `(${c.unique_code})` : ""}
                                     </option>
                                 ))}
                             </select>
@@ -608,8 +681,8 @@ const AssignedFileNumber = () => {
                             >
                                 <option value="">Select User</option>
                                 {userList.map(c => (
-                                    <option key={`phone-${c.unique_code}`} value={c.unique_code}>
-                                        {c.name} ({c.unique_code})
+                                    <option key={`phone-${c.id || c.client_id || c.unique_code}`} value={c.id || c.client_id || c.unique_code}>
+                                        {c.name} {c.unique_code ? `(${c.unique_code})` : ""}
                                     </option>
                                 ))}
                             </select>

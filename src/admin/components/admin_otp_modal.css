@@ -1,0 +1,106 @@
+/* Admin OTP Security Verification Modal Styles */
+
+.otp-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(6px);
+    z-index: 2500;
+}
+
+.otp-modal-card {
+    width: 90%;
+    max-width: 460px;
+    font-family: 'Outfit', 'Inter', sans-serif;
+    animation: scaleInOtp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+@keyframes scaleInOtp {
+    from {
+        opacity: 0;
+        transform: scale(0.92) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.otp-icon-bubble {
+    width: 64px;
+    height: 64px;
+    background-color: #eff6ff;
+    color: #1b2e6b !important;
+}
+
+.btn-close-otp {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-close-otp:hover {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+
+.otp-digit-input {
+    width: 48px;
+    height: 54px;
+    font-size: 1.4rem !important;
+    color: #1e293b;
+    border: 1.5px solid #cbd5e1;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.otp-digit-input:focus {
+    border-color: #1b2e6b !important;
+    box-shadow: 0 0 0 4px rgba(27, 46, 107, 0.15) !important;
+    background-color: #ffffff;
+}
+
+.otp-digit-input.filled {
+    background-color: #f8fafc;
+    border-color: #1b2e6b;
+    color: #1b2e6b;
+}
+
+.btn-primary-verify {
+    background: linear-gradient(135deg, #1b2e6b 0%, #2563eb 100%) !important;
+    border: none !important;
+    font-size: 0.95rem;
+    padding-top: 11px !important;
+    padding-bottom: 11px !important;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(27, 46, 107, 0.2);
+}
+
+.btn-primary-verify:hover:not(:disabled) {
+    background: linear-gradient(135deg, #13214e 0%, #1d4ed8 100%) !important;
+    box-shadow: 0 6px 16px rgba(27, 46, 107, 0.3);
+    transform: translateY(-1px);
+}
+
+.demo-otp-banner {
+    background-color: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+@keyframes shakeError {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+
+.animate-shake {
+    animation: shakeError 0.35s ease-in-out;
+}

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
+import { IoEyeOutline, IoEyeOffOutline, IoAlertCircleOutline, IoCheckmarkCircleOutline } from "react-icons/io5";
 import { FiArrowLeft } from "react-icons/fi";
 import logoImg from "../../assets/image/umpire_tax_logo.png";
 import registerCallImg from "../../assets/image/frame1l2.png";
@@ -12,35 +12,161 @@ import Swal from "sweetalert2";
 const Register = () => {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+    const [showEmail, setShowEmail] = useState(false);
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
-    const [phoneCode, setPhoneCode] = useState("+91");
+
+    // Country Code: Default "+1" (USA), options: +1, +91, other
+    const [phoneCodeSelect, setPhoneCodeSelect] = useState("+1");
+    const [customPhoneCode, setCustomPhoneCode] = useState("+");
     const [phoneNumber, setPhoneNumber] = useState("");
+
     const [email, setEmail] = useState("");
+    const [confirmEmail, setConfirmEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
 
+    // Track touched fields for instant validation display
+    const [touched, setTouched] = useState({
+        phone: false,
+        email: false,
+        confirmEmail: false,
+    });
+
+    const effectivePhoneCode = phoneCodeSelect === "other" ? customPhoneCode.trim() : phoneCodeSelect;
+
     const getMobileCountry = (code) => {
         const clean = code.replace("+", "").trim();
-        if (clean === "91") return "INDIA";
         if (clean === "1") return "USA";
+        if (clean === "91") return "INDIA";
         if (clean === "44") return "UNITED KINGDOM";
-        return "INDIA"; // Default fallback
+        return "USA"; // Default fallback
     };
+
+    const handlePreventPaste = (e, fieldName = "Email") => {
+        e.preventDefault();
+        Swal.fire({
+            toast: true,
+            position: "top-end",
+            icon: "warning",
+            title: `Pasting is disabled for ${fieldName}. Please type manually.`,
+            showConfirmButton: false,
+            timer: 2500,
+            timerProgressBar: true
+        });
+    };
+
+    // Validation helpers
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const cleanPhoneDigits = phoneNumber.replace(/\D/g, "");
+
+    // Real-time error messages
+    const getEmailError = () => {
+        if (!email) return "";
+        if (!emailRegex.test(email.trim())) {
+            return "Please enter a valid email address (e.g. name@example.com).";
+        }
+        return "";
+    };
+
+    const getConfirmEmailStatus = () => {
+        if (!confirmEmail) return { error: "", isMatch: false };
+        if (!emailRegex.test(confirmEmail.trim())) {
+            return { error: "Please enter a valid email format.", isMatch: false };
+        }
+        if (confirmEmail.trim().toLowerCase() !== email.trim().toLowerCase()) {
+            return { error: "Email Id and Confirm Email Id do not match.", isMatch: false };
+        }
+        return { error: "", isMatch: true };
+    };
+
+    const getPhoneError = () => {
+        if (!phoneNumber) return "";
+        if (effectivePhoneCode === "+1") {
+            if (cleanPhoneDigits.length !== 10) {
+                return "US phone number must be exactly 10 digits.";
+            }
+        } else if (effectivePhoneCode === "+91") {
+            if (cleanPhoneDigits.length !== 10) {
+                return "Indian phone number must be exactly 10 digits.";
+            }
+        } else {
+            if (cleanPhoneDigits.length < 7 || cleanPhoneDigits.length > 15) {
+                return "Phone number must be between 7 and 15 digits.";
+            }
+            if (!effectivePhoneCode || effectivePhoneCode === "+") {
+                return "Please enter a valid country code (e.g. +44).";
+            }
+        }
+        return "";
+    };
+
+    const emailError = getEmailError();
+    const { error: confirmEmailError, isMatch: isConfirmEmailMatch } = getConfirmEmailStatus();
+    const phoneError = getPhoneError();
 
     const handleRegister = async (e) => {
         e.preventDefault();
+
+        // 1. Phone validation
+        const phoneValidationErr = getPhoneError();
+        if (phoneValidationErr || !phoneNumber.trim()) {
+            Swal.fire({
+                title: "Invalid Phone Number",
+                text: phoneValidationErr || "Please enter a valid phone number.",
+                icon: "warning",
+                confirmButtonColor: "#1b3178"
+            });
+            return;
+        }
+
+        // 2. Email format validation
+        const cleanEmail = email.trim();
+        const cleanConfirmEmail = confirmEmail.trim();
+
+        if (!emailRegex.test(cleanEmail)) {
+            Swal.fire({
+                title: "Invalid Email",
+                text: "Please enter a valid email address.",
+                icon: "warning",
+                confirmButtonColor: "#1b3178"
+            });
+            return;
+        }
+
+        // 3. Email matching validation
+        if (cleanEmail.toLowerCase() !== cleanConfirmEmail.toLowerCase()) {
+            Swal.fire({
+                title: "Emails Do Not Match",
+                text: "Email Id and Confirm Email Id must match exactly.",
+                icon: "warning",
+                confirmButtonColor: "#1b3178"
+            });
+            return;
+        }
+
+        // 4. Password validation
+        if (!password || password.length < 6) {
+            Swal.fire({
+                title: "Weak Password",
+                text: "Password must be at least 6 characters long.",
+                icon: "warning",
+                confirmButtonColor: "#1b3178"
+            });
+            return;
+        }
+
         setLoading(true);
 
         const payload = {
-            first_name: firstName,
-            last_name: lastName,
-            phone: phoneNumber,
-            email: email,
+            first_name: firstName.trim(),
+            last_name: lastName.trim(),
+            phone: cleanPhoneDigits || phoneNumber.trim(),
+            email: cleanEmail,
             password: password,
             confirmpassword: password,
-            confirmemail: email,
-            mobileCountry: getMobileCountry(phoneCode),
+            confirmemail: cleanConfirmEmail,
+            mobileCountry: getMobileCountry(effectivePhoneCode),
             user_id: null
         };
 
@@ -180,41 +306,148 @@ const Register = () => {
                                         Phone Number
                                     </label>
                                     <div className="row g-2">
-                                        <div className="col-3 col-sm-3 col-md-3">
-                                            <input
-                                                type="text"
-                                                className="auth-input text-center px-1"
-                                                value={phoneCode}
-                                                onChange={(e) => setPhoneCode(e.target.value)}
-                                                placeholder="+91"
-                                                required
-                                            />
+                                        <div className="col-4 col-sm-4 col-md-4">
+                                            {phoneCodeSelect === "other" ? (
+                                                <div>
+                                                    <input
+                                                        type="text"
+                                                        className={`auth-input text-center px-1 ${effectivePhoneCode && !effectivePhoneCode.startsWith("+") ? "auth-input-invalid" : ""}`}
+                                                        value={customPhoneCode}
+                                                        onChange={(e) => {
+                                                            let val = e.target.value;
+                                                            if (val && !val.startsWith("+")) {
+                                                                val = "+" + val.replace(/\+/g, "");
+                                                            }
+                                                            setCustomPhoneCode(val);
+                                                        }}
+                                                        placeholder="+XX"
+                                                        required
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className="auth-code-back-btn"
+                                                        onClick={() => {
+                                                            setPhoneCodeSelect("+1");
+                                                        }}
+                                                    >
+                                                        Back to List
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <select
+                                                    className="auth-select text-center"
+                                                    value={phoneCodeSelect}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value;
+                                                        setPhoneCodeSelect(val);
+                                                        if (val === "other") {
+                                                            setCustomPhoneCode("+");
+                                                        }
+                                                    }}
+                                                >
+                                                    <option value="+1">+1</option>
+                                                    <option value="+91">+91</option>
+                                                    <option value="other">Other</option>
+                                                </select>
+                                            )}
                                         </div>
-                                        <div className="col-9 col-sm-9 col-md-9">
+                                        <div className="col-8 col-sm-8 col-md-8">
                                             <input
                                                 type="tel"
-                                                className="auth-input"
-                                                placeholder="000-000-000"
+                                                className={`auth-input ${touched.phone && phoneError ? "auth-input-invalid" : ""}`}
+                                                placeholder={effectivePhoneCode === "+1" ? "10-digit US number" : effectivePhoneCode === "+91" ? "10-digit Indian number" : "Phone number"}
                                                 value={phoneNumber}
-                                                onChange={(e) => setPhoneNumber(e.target.value)}
+                                                onChange={(e) => {
+                                                    setPhoneNumber(e.target.value);
+                                                    setTouched((prev) => ({ ...prev, phone: true }));
+                                                }}
+                                                onBlur={() => setTouched((prev) => ({ ...prev, phone: true }))}
                                                 required
                                             />
                                         </div>
                                     </div>
+                                    {touched.phone && phoneError && (
+                                        <p className="auth-error-text">
+                                            <IoAlertCircleOutline size={14} /> {phoneError}
+                                        </p>
+                                    )}
                                 </div>
 
-                                <div className="auth-input-group mb-2">
+                                {/* Masked Email ID (Password format / *** format) */}
+                                <div className="auth-input-group mb-2 position-relative">
                                     <label className="auth-input-label">
                                         Email Id
                                     </label>
+                                    <div className="input-group-auth position-relative">
+                                        <input
+                                            type={showEmail ? "text" : "password"}
+                                            className={`auth-input pe-5 ${touched.email && emailError ? "auth-input-invalid" : ""}`}
+                                            placeholder="example@gmail.com"
+                                            value={email}
+                                            onChange={(e) => {
+                                                setEmail(e.target.value);
+                                                setTouched((prev) => ({ ...prev, email: true }));
+                                            }}
+                                            onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
+                                            onPaste={(e) => handlePreventPaste(e, "Email Id")}
+                                            onCopy={(e) => e.preventDefault()}
+                                            onCut={(e) => e.preventDefault()}
+                                            onDrop={(e) => e.preventDefault()}
+                                            autoComplete="new-password"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            className="password-toggle-btn position-absolute end-0 top-50 translate-middle-y"
+                                            onClick={() => setShowEmail(!showEmail)}
+                                            title={showEmail ? "Hide Email" : "Show Email"}
+                                        >
+                                            {showEmail ? (
+                                                <IoEyeOffOutline size={20} />
+                                            ) : (
+                                                <IoEyeOutline size={20} />
+                                            )}
+                                        </button>
+                                    </div>
+                                    {touched.email && emailError && (
+                                        <p className="auth-error-text">
+                                            <IoAlertCircleOutline size={14} /> {emailError}
+                                        </p>
+                                    )}
+                                </div>
+
+                                {/* Confirm Email ID */}
+                                <div className="auth-input-group mb-2">
+                                    <label className="auth-input-label">
+                                        Confirm Email Id
+                                    </label>
                                     <input
                                         type="email"
-                                        className="auth-input"
-                                        placeholder="example@gmail.com"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        className={`auth-input ${confirmEmail && confirmEmailError ? "auth-input-invalid" : isConfirmEmailMatch ? "auth-input-valid" : ""}`}
+                                        placeholder="Confirm example@gmail.com"
+                                        value={confirmEmail}
+                                        onChange={(e) => {
+                                            setConfirmEmail(e.target.value);
+                                            setTouched((prev) => ({ ...prev, confirmEmail: true }));
+                                        }}
+                                        onBlur={() => setTouched((prev) => ({ ...prev, confirmEmail: true }))}
+                                        onPaste={(e) => handlePreventPaste(e, "Confirm Email Id")}
+                                        onDrop={(e) => e.preventDefault()}
+                                        autoComplete="off"
                                         required
                                     />
+                                    {/* Instant red error message below confirm email */}
+                                    {confirmEmail && confirmEmailError && (
+                                        <p className="auth-error-text">
+                                            <IoAlertCircleOutline size={14} /> {confirmEmailError}
+                                        </p>
+                                    )}
+                                    {/* Instant green match message below confirm email */}
+                                    {confirmEmail && isConfirmEmailMatch && (
+                                        <p className="auth-success-text">
+                                            <IoCheckmarkCircleOutline size={14} /> Email Id and Confirm Email Id match!
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="auth-input-group mb-3 position-relative">
@@ -292,3 +525,4 @@ const Register = () => {
 };
 
 export default Register;
+

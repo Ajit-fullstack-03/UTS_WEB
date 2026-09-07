@@ -14,8 +14,8 @@
     background-color: #1b2e6b !important;
     color: #ffffff !important;
     border-radius: 10px !important;
-    padding: 10px 20px !important;
-    font-size: 0.9rem;
+    padding: 9px 18px !important;
+    font-size: 0.88rem;
     font-family: 'Outfit', sans-serif;
     transition: all 0.2s ease;
     border: none !important;
@@ -34,8 +34,8 @@
     color: #1b2e6b !important;
     border: 1.5px solid #1b2e6b !important;
     border-radius: 10px !important;
-    padding: 9px 18px !important;
-    font-size: 0.9rem;
+    padding: 8px 16px !important;
+    font-size: 0.88rem;
     font-family: 'Outfit', sans-serif;
     transition: all 0.2s ease;
     white-space: nowrap !important;
@@ -57,6 +57,8 @@
     border-radius: 50% !important;
     transition: all 0.2s ease;
     flex-shrink: 0;
+    width: 38px;
+    height: 38px;
 }
 
 .btn-bell:hover {
@@ -94,8 +96,149 @@
     animation: statusPulse 2s infinite;
 }
 
+.header-filenumber-badge {
+    background-color: #eff6ff !important;
+    border: 1px solid #bfdbfe !important;
+    color: #1e40af !important;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: 0.2px;
+}
+
+.header-filenumber-badge .file-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #2563eb;
+    border-radius: 50%;
+    display: inline-block;
+}
+
 @keyframes statusPulse {
     0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.4); }
     70% { transform: scale(1); box-shadow: 0 0 0 5px rgba(217, 119, 6, 0); }
     100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
+}
+
+/* Customer Profile Dropdown */
+.customer-profile-dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-customer-profile-trigger {
+    background-color: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #1e293b;
+    font-family: 'Outfit', sans-serif;
+}
+
+.btn-customer-profile-trigger:hover,
+.btn-customer-profile-trigger.active {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.customer-avatar-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1b2e6b 0%, #3b82f6 100%);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(27, 46, 107, 0.2);
+}
+
+.customer-avatar-circle-lg {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1b2e6b 0%, #3b82f6 100%);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(27, 46, 107, 0.25);
+}
+
+.customer-user-info {
+    line-height: 1.15;
+    max-width: 120px;
+}
+
+.customer-user-name {
+    font-size: 0.84rem;
+    color: #1e293b;
+}
+
+.customer-user-role {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+}
+
+.customer-profile-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 240px;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    z-index: 1060;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+    animation: fadeInMenu 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.badge-filenumber-sub {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.customer-menu-item {
+    font-size: 0.88rem;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.customer-logout-item:hover {
+    background-color: #fef2f2 !important;
+    color: #dc2626 !important;
+}
+
+@keyframes fadeInMenu {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-chevron-icon {
+    transition: transform 0.2s ease-in-out;
+}
+
+.rotate-180 {
+    transform: rotate(180deg);
+}
+
+@media (max-width: 768px) {
+    .customer-header {
+        height: auto;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
 }

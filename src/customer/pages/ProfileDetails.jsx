@@ -37,6 +37,48 @@ const ProfileDetails = () => {
         { id: 1, firstName: "", lastName: "", relationship: "", ssnItin: "", dob: "", visaType: "" }
     ]);
 
+    // Date Format Helpers (M/D/Y <-> ISO YYYY-MM-DD)
+    const formatToMDY = (dateStr) => {
+        if (!dateStr) return "";
+        const clean = String(dateStr).split("T")[0].trim();
+        if (clean.includes("-")) {
+            const parts = clean.split("-");
+            if (parts.length === 3) {
+                const [year, month, day] = parts;
+                if (year.length === 4) {
+                    return `${month.padStart(2, "0")}/${day.padStart(2, "0")}/${year}`;
+                }
+            }
+        }
+        return clean;
+    };
+
+    const formatToAPIDate = (dateStr) => {
+        if (!dateStr) return "";
+        const clean = String(dateStr).trim();
+        if (clean.includes("/")) {
+            const parts = clean.split("/");
+            if (parts.length === 3) {
+                const [month, day, year] = parts;
+                if (year.length === 4) {
+                    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+                }
+            }
+        }
+        return clean;
+    };
+
+    const handleDateMaskInput = (value) => {
+        const digits = value.replace(/\D/g, "").slice(0, 8);
+        if (digits.length <= 2) {
+            return digits;
+        } else if (digits.length <= 4) {
+            return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+        } else {
+            return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4, 8)}`;
+        }
+    };
+
     useEffect(() => {
         const fetchProfileData = async () => {
             const userInfoStr = localStorage.getItem("userInfo");
@@ -75,7 +117,7 @@ const ProfileDetails = () => {
                         lastName: t.last_name || "",
                         ssnItin: t.ssnitin || t.itin || "",
                         occupation: t.occupation || "",
-                        dob: t.dob ? t.dob.split("T")[0] : "",
+                        dob: formatToMDY(t.dob),
                         email: t.email || "",
                         mobileCode: t.phoneext || "+91",
                         mobilePhone: t.phone || "",
@@ -94,7 +136,7 @@ const ProfileDetails = () => {
                             lastName: s.last_name || "",
                             ssnItin: s.ssnitin || s.itin || "",
                             occupation: s.occupation || "",
-                            dob: s.dob ? s.dob.split("T")[0] : "",
+                            dob: formatToMDY(s.dob),
                             email: s.email || "",
                             mobileCode: s.phoneext || "+1",
                             mobilePhone: s.phone || ""
@@ -113,7 +155,7 @@ const ProfileDetails = () => {
                             lastName: d.last_name || "",
                             relationship: d.relation_ship || "Son",
                             ssnItin: d.ssnitin || d.itin || "",
-                            dob: d.dob ? d.dob.split("T")[0] : "",
+                            dob: formatToMDY(d.dob),
                             visaType: d.visa_type || ""
                         })));
                     }
@@ -129,17 +171,20 @@ const ProfileDetails = () => {
 
     const handleTaxpayerChange = (e) => {
         const { name, value } = e.target;
-        setTaxpayer(prev => ({ ...prev, [name]: value }));
+        const formattedValue = name === "dob" ? handleDateMaskInput(value) : value;
+        setTaxpayer(prev => ({ ...prev, [name]: formattedValue }));
     };
 
     const handleSpouseChange = (e) => {
         const { name, value } = e.target;
-        setSpouse(prev => ({ ...prev, [name]: value }));
+        const formattedValue = name === "dob" ? handleDateMaskInput(value) : value;
+        setSpouse(prev => ({ ...prev, [name]: formattedValue }));
     };
 
     const handleDependentChange = (id, field, value) => {
+        const formattedValue = field === "dob" ? handleDateMaskInput(value) : value;
         setDependents(prev =>
-            prev.map(dep => dep.id === id ? { ...dep, [field]: value } : dep)
+            prev.map(dep => dep.id === id ? { ...dep, [field]: formattedValue } : dep)
         );
     };
 
@@ -174,7 +219,7 @@ const ProfileDetails = () => {
                     last_name: taxpayer.lastName,
                     ssnitin: taxpayer.ssnItin,
                     occupation: taxpayer.occupation,
-                    dob: taxpayer.dob,
+                    dob: formatToAPIDate(taxpayer.dob),
                     email: taxpayer.email,
                     phoneext: taxpayer.mobileCode,
                     phone: taxpayer.mobilePhone,
@@ -188,7 +233,7 @@ const ProfileDetails = () => {
                     user_id,
                     first_name: spouse.firstName,
                     last_name: spouse.lastName,
-                    dob: spouse.dob,
+                    dob: formatToAPIDate(spouse.dob),
                     occupation: spouse.occupation,
                     ssn: spouse.ssnItin,
                     visa_type: spouse.visaType || ""
@@ -199,7 +244,7 @@ const ProfileDetails = () => {
                     d_user_id: client_id,
                     first_name: dep.firstName,
                     last_name: dep.lastName,
-                    dob: dep.dob,
+                    dob: formatToAPIDate(dep.dob),
                     occupation: dep.occupation || "",
                     ssn: dep.ssnItin,
                     itin: dep.ssnItin,
@@ -367,13 +412,15 @@ const ProfileDetails = () => {
 
                                     <div className="profile-form-row">
                                         <div className="profile-field">
-                                            <label className="profile-label">Date Of Birth</label>
+                                            <label className="profile-label">Date Of Birth (MM/DD/YYYY)</label>
                                             <input
-                                                type="date"
+                                                type="text"
                                                 name="dob"
                                                 value={taxpayer.dob}
                                                 onChange={handleTaxpayerChange}
                                                 className="profile-input"
+                                                placeholder="MM/DD/YYYY"
+                                                maxLength={10}
                                             />
                                         </div>
                                         <div className="profile-field">
@@ -469,8 +516,8 @@ const ProfileDetails = () => {
                                     </div>
                                     <div className="profile-form-row">
                                         <div className="profile-field">
-                                            <label className="profile-label">Date Of Birth</label>
-                                            <input type="date" name="dob" value={spouse.dob} onChange={handleSpouseChange} className="profile-input" />
+                                            <label className="profile-label">Date Of Birth (MM/DD/YYYY)</label>
+                                            <input type="text" name="dob" value={spouse.dob} onChange={handleSpouseChange} className="profile-input" placeholder="MM/DD/YYYY" maxLength={10} />
                                         </div>
                                         <div className="profile-field">
                                             <label className="profile-label">Email</label>
@@ -547,8 +594,8 @@ const ProfileDetails = () => {
                                                             <input type="text" value={dep.ssnItin || ""} onChange={(e) => handleDependentChange(dep.id, "ssnItin", e.target.value)} className="profile-input" placeholder="Enter SSN/ITIN" />
                                                         </div>
                                                         <div className="profile-field">
-                                                            <label className="profile-label">Date Of Birth</label>
-                                                            <input type="date" value={dep.dob || ""} onChange={(e) => handleDependentChange(dep.id, "dob", e.target.value)} className="profile-input" />
+                                                            <label className="profile-label">Date Of Birth (MM/DD/YYYY)</label>
+                                                            <input type="text" value={dep.dob || ""} onChange={(e) => handleDependentChange(dep.id, "dob", e.target.value)} className="profile-input" placeholder="MM/DD/YYYY" maxLength={10} />
                                                         </div>
                                                         <div className="profile-field">
                                                             <label className="profile-label">Visa Type</label>

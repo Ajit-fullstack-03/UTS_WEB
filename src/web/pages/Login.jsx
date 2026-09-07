@@ -35,7 +35,7 @@ const Login = () => {
                 } else if (response.data.uinfo.user_type_id == 2) {
                     navigate("/customer");
                 } else if (response.data.uinfo.user_type_id == 3) {
-                    alert("Analyst Not design.");
+                    navigate("/analyst");
                 }
             } else {
                 Swal.fire({

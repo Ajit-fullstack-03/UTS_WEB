@@ -3,11 +3,16 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { adminServices } from "../services/AdminServices";
 import { getStoredTaxYear } from "../../utils/taxYear";
+import { isAnalystUser, getRolePrefix } from "../../utils/userRole";
 import "./sidebar.css";
 
 const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
+
+    const isAnalyst = isAnalystUser();
+    const prefix = getRolePrefix();
+
     const [counts, setCounts] = useState({
         all: 0,
         to_be_assigned: 0,
@@ -90,20 +95,24 @@ const Sidebar = () => {
         };
     }, [fetchCounts, location.pathname]);
 
-    const sidebarItems = [
-        { id: "all", path: "/admin/all-records", label: "All Records", count: counts.all },
-        { id: "assigned_file_number", path: "/admin/assigned-file-number", label: "Assigned File Number", count: null },
-        { id: "to_be_assigned", path: "/admin/to-be-assigned", label: "To Be Assigned", count: counts.to_be_assigned },
-        { id: "basic_info_pending", path: "/admin/basic-info-pending", label: "Basic Info Pending", count: counts.basic_info_pending },
-        { id: "interview_pending", path: "/admin/interview-pending", label: "Interview Pending", count: counts.interview_pending },
-        { id: "docs_upload_pending", path: "/admin/docs-upload-pending", label: "Documents Upload Pending", count: counts.docs_upload_pending },
-        { id: "other_docs_pending", path: "/admin/other-docs-pending", label: "Other Docs Pending", count: counts.other_docs_pending },
-        { id: "prep_pending", path: "/admin/prep-pending", label: "Preparation Pending", count: counts.prep_pending },
-        { id: "pre_synopsys_pending", path: "/admin/pre-synopsys-pending", label: "Pre-Synopsys Pending", count: counts.pre_synopsys_pending },
-        { id: "synopsys_pending", path: "/admin/synopsys-pending", label: "Synopsys Pending", count: counts.synopsys_pending },
-        { id: "payment_pending", path: "/admin/payment-pending", label: "Payment Pending", count: counts.payment_pending },
-        { id: "review_upload_pending", path: "/admin/review-upload-pending", label: "Review Upload Pending", count: counts.review_upload_pending }
+    const allSidebarItems = [
+        { id: "all", path: `${prefix}/all-records`, label: "All Records", count: counts.all },
+        { id: "assigned_file_number", path: `${prefix}/assigned-file-number`, label: "Assigned File Number", count: null },
+        { id: "to_be_assigned", path: `${prefix}/to-be-assigned`, label: "To Be Assigned", count: counts.to_be_assigned },
+        { id: "basic_info_pending", path: `${prefix}/basic-info-pending`, label: "Basic Info Pending", count: counts.basic_info_pending },
+        { id: "interview_pending", path: `${prefix}/interview-pending`, label: "Interview Pending", count: counts.interview_pending },
+        { id: "docs_upload_pending", path: `${prefix}/docs-upload-pending`, label: "Documents Upload Pending", count: counts.docs_upload_pending },
+        { id: "other_docs_pending", path: `${prefix}/other-docs-pending`, label: "Other Docs Pending", count: counts.other_docs_pending },
+        { id: "prep_pending", path: `${prefix}/prep-pending`, label: "Preparation Pending", count: counts.prep_pending },
+        { id: "pre_synopsys_pending", path: `${prefix}/pre-synopsys-pending`, label: "Pre-Synopsys Pending", count: counts.pre_synopsys_pending },
+        { id: "synopsys_pending", path: `${prefix}/synopsys-pending`, label: "Synopsys Pending", count: counts.synopsys_pending },
+        { id: "payment_pending", path: `${prefix}/payment-pending`, label: "Payment Pending", count: counts.payment_pending },
+        { id: "review_upload_pending", path: `${prefix}/review-upload-pending`, label: "Review Upload Pending", count: counts.review_upload_pending }
     ];
+
+    const sidebarItems = isAnalyst
+        ? allSidebarItems.filter((item) => item.id !== "all")
+        : allSidebarItems;
 
     const handleNavigation = (path) => {
         navigate(path);
@@ -111,9 +120,10 @@ const Sidebar = () => {
 
     const handleLogout = (e) => {
         e.preventDefault();
+        const roleLabel = isAnalyst ? "analyst" : "admin";
         Swal.fire({
             title: "Logout?",
-            text: "Are you sure you want to log out of the admin panel?",
+            text: `Are you sure you want to log out of the ${roleLabel} panel?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#dc3545",
@@ -144,10 +154,15 @@ const Sidebar = () => {
                     {sidebarItems.map((item) => {
                         const isActive =
                             location.pathname === item.path ||
-                            (item.path === "/admin/all-records" &&
-                                (location.pathname === "/admin" ||
-                                    location.pathname === "/admin/" ||
-                                    location.pathname === "/admin/dashboard"));
+                            (item.path === `${prefix}/all-records` &&
+                                (location.pathname === prefix ||
+                                    location.pathname === `${prefix}/` ||
+                                    location.pathname === `${prefix}/dashboard`)) ||
+                            (isAnalyst &&
+                                item.path === `${prefix}/assigned-file-number` &&
+                                (location.pathname === prefix ||
+                                    location.pathname === `${prefix}/` ||
+                                    location.pathname === `${prefix}/dashboard`));
                         return (
                             <li key={item.id}>
                                 <div

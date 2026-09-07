@@ -51,6 +51,7 @@ const CustomerDashboard = () => {
     useEffect(() => {
         const updateGreeting = () => {
             let name = "Somya";
+            let phoneext = "";
             try {
                 const userInfoStr = localStorage.getItem("userInfo");
                 if (userInfoStr) {
@@ -58,12 +59,78 @@ const CustomerDashboard = () => {
                     if (userInfo.user_name) {
                         name = userInfo.user_name.split(" ")[0];
                     }
+                    if (userInfo.phoneext) {
+                        phoneext = userInfo.phoneext;
+                    }
                 }
             } catch (e) {
                 console.error("Failed to parse userInfo from localStorage", e);
             }
 
-            const hour = new Date().getHours();
+            // Map phoneext to the user's timezone
+            let targetTimeZone = "Asia/Kolkata";
+            const ext = String(phoneext || "").toUpperCase().trim();
+
+            if (ext === "INDIA" || ext === "91" || ext === "+91" || ext === "IND") {
+                targetTimeZone = "Asia/Kolkata";
+            } else if (
+                ext === "USA" ||
+                ext === "1" ||
+                ext === "+1" ||
+                ext === "US" ||
+                ext === "UNITED STATES" ||
+                ext === "AMERICA"
+            ) {
+                targetTimeZone = "America/New_York";
+            } else if (
+                ext === "UNITED KINGDOM" ||
+                ext === "UK" ||
+                ext === "44" ||
+                ext === "+44" ||
+                ext === "GB"
+            ) {
+                targetTimeZone = "Europe/London";
+            } else if (ext === "CANADA" || ext === "CA") {
+                targetTimeZone = "America/Toronto";
+            } else if (
+                ext === "AUSTRALIA" ||
+                ext === "61" ||
+                ext === "+61" ||
+                ext === "AUS"
+            ) {
+                targetTimeZone = "Australia/Sydney";
+            } else if (
+                ext === "UAE" ||
+                ext === "DUBAI" ||
+                ext === "971" ||
+                ext === "+971"
+            ) {
+                targetTimeZone = "Asia/Dubai";
+            } else {
+                try {
+                    targetTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Kolkata";
+                } catch (err) {
+                    targetTimeZone = "Asia/Kolkata";
+                }
+            }
+
+            // Get the current hour in the target country's timezone
+            let hour = new Date().getHours();
+            try {
+                const formatter = new Intl.DateTimeFormat("en-US", {
+                    timeZone: targetTimeZone,
+                    hour: "numeric",
+                    hour12: false
+                });
+                const formattedHour = formatter.format(new Date());
+                const parsedHour = parseInt(formattedHour, 10);
+                if (!isNaN(parsedHour)) {
+                    hour = parsedHour;
+                }
+            } catch (err) {
+                console.error("Error calculating timezone hour:", err);
+            }
+
             let greet = "Good Morning";
             if (hour >= 12 && hour < 17) {
                 greet = "Good Afternoon";

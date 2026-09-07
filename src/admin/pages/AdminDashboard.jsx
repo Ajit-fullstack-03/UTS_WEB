@@ -205,12 +205,8 @@ const AdminDashboard = () => {
     const renderTableRecordsView = () => {
         return (
             <div className="card shadow-sm border-0 rounded-3 p-4">
-                {/* Search and Filters Banner */}
-                <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-                    <button className="btn btn-filter-adjust d-flex align-items-center gap-2">
-                        <FiFilter />
-                        <span>Filter By</span>
-                    </button>
+                {/* Search Banner */}
+                <div className="d-flex justify-content-end align-items-center mb-4 flex-wrap gap-3">
                     <div className="search-bar-wrapper position-relative">
                         <FiSearch className="search-bar-icon" />
                         <input

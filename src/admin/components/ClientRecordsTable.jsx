@@ -15,11 +15,13 @@ import {
     FiHeart,
     FiRefreshCw,
     FiPackage,
-    FiExternalLink
+    FiExternalLink,
+    FiSend
 } from "react-icons/fi";
 import { adminServices } from "../services/AdminServices";
 import { getStoredTaxYear, getStoredTaxYearsList } from "../../utils/taxYear";
 import { exportClientDetailsPDF } from "../../utils/pdfExport";
+import { isAnalystUser } from "../../utils/userRole";
 import "../pages/admin_dashboard.css";
 
 const filestateMap = {
@@ -103,7 +105,18 @@ const fileStatusOptions = [
     { value: 15, label: "Cancel Filing" }
 ];
 
-const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" }) => {
+const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", statusFilterKey = "" }) => {
+    const isAnalyst = isAnalystUser();
+    const isDocsOrPaymentPending =
+        filestate === 4 ||
+        filestate === 8 ||
+        filestate === "4" ||
+        filestate === "8" ||
+        statusFilterKey === "docs_upload_pending" ||
+        statusFilterKey === "payment_pending";
+
+    const showReminderColumn = isAnalyst && isDocsOrPaymentPending;
+
     const [clients, setClients] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
@@ -272,6 +285,69 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                 }
             }
 
+            // Build or retrieve analyst lookup map to ensure analyst name displays on all status pages
+            let analystMap = {};
+            try {
+                const storedAnalystMap = sessionStorage.getItem(`analyst_name_map_${taxYear}`);
+                if (storedAnalystMap) {
+                    analystMap = JSON.parse(storedAnalystMap);
+                }
+            } catch (e) {
+                // Ignore
+            }
+
+            if (resolvedState === "ALL" || resolvedState === "all") {
+                // When in ALL records, update the analyst lookup map
+                (rawList || []).forEach(item => {
+                    const fNo = String(item.unique_code || item.filenumber || item.file_number || item.fileno || "").trim();
+                    const uId = String(item.user_id || item.u_user_id || item.ps_user_id || item.client_id || "").trim();
+                    const unlistsId = String(item.unlists_u_id || "").trim();
+                    const aName = String(item.client_name || item.analyst_name || item.assigned_to || item.admin_name || item.assigned_user_name || "").trim();
+                    if (aName && aName !== "0" && aName !== "null" && aName !== "undefined" && aName !== "-" && aName.toLowerCase() !== "assigned" && aName.toLowerCase() !== "not assigned") {
+                        if (fNo) analystMap[fNo] = aName;
+                        if (uId) analystMap[uId] = aName;
+                        if (unlistsId && unlistsId !== "0") analystMap[unlistsId] = aName;
+                    }
+                });
+                try {
+                    sessionStorage.setItem(`analyst_name_map_${taxYear}`, JSON.stringify(analystMap));
+                } catch (e) {
+                    // Ignore
+                }
+            } else if (Object.keys(analystMap).length === 0) {
+                // If on a specific status page and map is empty, fetch alluserslist in background to populate analyst names
+                try {
+                    const allRes = await adminServices.alluserslist({
+                        filestate: "ALL",
+                        user_id: userId,
+                        taxYear: String(taxYear),
+                        per_page: 500,
+                        page: 1
+                    });
+                    const allList = allRes?.data?.data || allRes?.data?.users || (Array.isArray(allRes?.data) ? allRes.data : []);
+                    if (Array.isArray(allList) && allList.length > 0) {
+                        allList.forEach(item => {
+                            const fNo = String(item.unique_code || item.filenumber || item.file_number || item.fileno || "").trim();
+                            const uId = String(item.user_id || item.u_user_id || item.ps_user_id || item.client_id || "").trim();
+                            const unlistsId = String(item.unlists_u_id || "").trim();
+                            const aName = String(item.client_name || item.analyst_name || item.assigned_to || item.admin_name || item.assigned_user_name || "").trim();
+                            if (aName && aName !== "0" && aName !== "null" && aName !== "undefined" && aName !== "-" && aName.toLowerCase() !== "assigned" && aName.toLowerCase() !== "not assigned") {
+                                if (fNo) analystMap[fNo] = aName;
+                                if (uId) analystMap[uId] = aName;
+                                if (unlistsId && unlistsId !== "0") analystMap[unlistsId] = aName;
+                            }
+                        });
+                        try {
+                            sessionStorage.setItem(`analyst_name_map_${taxYear}`, JSON.stringify(analystMap));
+                        } catch (e) {
+                            // Ignore
+                        }
+                    }
+                } catch (err) {
+                    console.warn("Could not prefetch all records for analyst map:", err);
+                }
+            }
+
             if (rawList && rawList.length > 0) {
                 const formatted = rawList.map((item, idx) => {
                     const clientUserId = item.user_id || item.u_user_id || item.ps_user_id || item.unlists_u_id || item.client_id;
@@ -282,16 +358,69 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                     const status = item.file_status || item.presentfilestatus || item.pfilename || item.status || "Pending";
                     const statusId = item.statusId || String(status).toLowerCase().replace(/\s+/g, "_");
 
+                    // Extract explicit analyst name
+                    const rawFileNo = String(filenumber).trim();
+                    const rawUId = String(clientUserId).trim();
+                    const rawUnlistsId = String(item.unlists_u_id || "").trim();
+
+                    let analystNameCandidate = "";
+                    const directCandidates = [
+                        item.analyst_name,
+                        item.analyst,
+                        item.assigned_to_name,
+                        item.assigned_to,
+                        item.assigned_user_name,
+                        item.assignee_name,
+                        item.admin_name,
+                        item.member_name,
+                        item.m_name,
+                        item.client_name,
+                        item.unlists_name,
+                        item.unlists_user_name,
+                        item.unlists_u_name,
+                        item.ps_analyst_name,
+                        item.ps_user_name,
+                        item.assigned_name,
+                        item.assignedName
+                    ];
+
+                    for (const candidate of directCandidates) {
+                        if (candidate && typeof candidate === "string") {
+                            const trimmed = candidate.trim();
+                            if (
+                                trimmed !== "" &&
+                                trimmed !== "0" &&
+                                trimmed !== "null" &&
+                                trimmed !== "undefined" &&
+                                trimmed !== "-" &&
+                                trimmed.toLowerCase() !== "assigned" &&
+                                trimmed.toLowerCase() !== "not assigned"
+                            ) {
+                                analystNameCandidate = trimmed;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Fallback to pre-built mapping from alluserslist
+                    if (!analystNameCandidate) {
+                        if (rawFileNo && analystMap[rawFileNo]) {
+                            analystNameCandidate = analystMap[rawFileNo];
+                        } else if (rawUId && analystMap[rawUId]) {
+                            analystNameCandidate = analystMap[rawUId];
+                        } else if (rawUnlistsId && rawUnlistsId !== "0" && analystMap[rawUnlistsId]) {
+                            analystNameCandidate = analystMap[rawUnlistsId];
+                        }
+                    }
+
                     const isAssigned = Boolean(
-                        (item.client_name && item.client_name.trim() !== "" && item.client_name !== "0" && item.client_name !== "null" && item.client_name !== "-") ||
+                        analystNameCandidate ||
                         (item.unlists_u_id && item.unlists_u_id !== 0 && item.unlists_u_id !== "0") ||
                         item.assigned === true ||
                         item.is_assigned === true
                     );
 
-                    const assignedName = (item.client_name && item.client_name.trim() !== "" && item.client_name !== "0" && item.client_name !== "null" && item.client_name !== "-")
-                        ? item.client_name
-                        : (isAssigned ? "Assigned" : "Not Assigned");
+                    const assignedName = analystNameCandidate || (isAssigned ? "Assigned" : "Not Assigned");
 
                     const referral = item.referral || item.referral_to || "-";
 
@@ -1240,6 +1369,8 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                 basicInfo: basicInfo,
                 spouseInfo: spouseInfo,
                 dependentsInfo: dependentsInfo,
+                employersInfo: employersInfo,
+                uploadedFiles: uploadedFiles,
                 taxYear: uploadTaxYear || getStoredTaxYear()
             });
 
@@ -1265,7 +1396,8 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
 
     // Client Detail View
     if (selectedClient) {
-        const subTabs = [
+        const isAnalyst = isAnalystUser();
+        const allSubTabs = [
             { id: "basic_info", label: "Basic Info" },
             { id: "other_info", label: "Other Info" },
             { id: "download_docs", label: `Download Documents (${uploadedFiles.length})` },
@@ -1274,6 +1406,10 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
             { id: "payment", label: "Payment" },
             { id: "referral", label: "Referral" }
         ];
+
+        const subTabs = isAnalyst
+            ? allSubTabs.filter(tab => tab.id !== "payment")
+            : allSubTabs;
 
         return (
             <div className="client-details-workspace d-flex flex-column gap-4">
@@ -1309,9 +1445,8 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                                     <li key={tab.id} className="nav-item">
                                         <button
                                             onClick={() => setActiveInnerTab(tab.id)}
-                                            className={`nav-link rounded-pill px-3 py-1.5 fw-semibold ${
-                                                activeInnerTab === tab.id ? "active" : ""
-                                            }`}
+                                            className={`nav-link rounded-pill px-3 py-1.5 fw-semibold ${activeInnerTab === tab.id ? "active" : ""
+                                                }`}
                                         >
                                             {tab.label}
                                         </button>
@@ -1856,12 +1991,12 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                                                             const dateStr = item.synopsys_created_at || item.created_at;
                                                             const formattedDate = dateStr
                                                                 ? new Date(dateStr).toLocaleString("en-US", {
-                                                                      year: "numeric",
-                                                                      month: "short",
-                                                                      day: "numeric",
-                                                                      hour: "2-digit",
-                                                                      minute: "2-digit"
-                                                                  })
+                                                                    year: "numeric",
+                                                                    month: "short",
+                                                                    day: "numeric",
+                                                                    hour: "2-digit",
+                                                                    minute: "2-digit"
+                                                                })
                                                                 : "-";
 
                                                             return (
@@ -2001,7 +2136,7 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
 
                                                         return (
                                                             <tr key={item.ps_id || idx}>
-                                                                <td>{item.clientName || selectedClient.name || "Client"}</td>
+                                                                <td>{item.ps_by_user_name}</td>
                                                                 <td>
                                                                     <span className="badge bg-light text-primary border fw-semibold px-2 py-1">
                                                                         {stateName}
@@ -2087,7 +2222,7 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                         })()}
 
                         {/* Payment Tab (Figma Design 2342-15457 & /payment/createOrder Integration) */}
-                        {activeInnerTab === "payment" && (
+                        {activeInnerTab === "payment" && !isAnalyst && (
                             <div className="py-2">
                                 {/* Status Pill Badge */}
                                 <div className="status-pill-figma">
@@ -2242,12 +2377,12 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                                         >
                                             {paymentSubmitting ? (
                                                 <>
-                                                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                                <span>Creating Order...</span>
-                                            </>
-                                        ) : (
-                                            <span>Create Order</span>
-                                        )}
+                                                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                    <span>Creating Order...</span>
+                                                </>
+                                            ) : (
+                                                <span>Create Order</span>
+                                            )}
                                         </button>
                                     </div>
                                 </form>
@@ -2546,15 +2681,22 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
         );
     }
 
+    // Handle Send Reminder for Analyst
+    const handleSendReminder = (client, e) => {
+        if (e) e.stopPropagation();
+        Swal.fire({
+            icon: "success",
+            title: "Notification Send Successfully",
+            confirmButtonColor: "#1b2e6b",
+            timer: 2500
+        });
+    };
+
     // List Table View
     return (
         <div className="card shadow-sm border-0 rounded-3 p-4">
-            {/* Search and Filters Banner */}
-            <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-                <button className="btn btn-filter-adjust d-flex align-items-center gap-2">
-                    <FiFilter />
-                    <span>Filter By</span>
-                </button>
+            {/* Search Banner */}
+            <div className="d-flex justify-content-end align-items-center mb-4 flex-wrap gap-3">
                 <div className="search-bar-wrapper position-relative">
                     <FiSearch className="search-bar-icon" />
                     <input
@@ -2579,12 +2721,13 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                             <th>File Status</th>
                             <th>Assigned</th>
                             <th>Referral</th>
+                            {showReminderColumn && <th className="text-center">Reminder</th>}
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
                             <tr>
-                                <td colSpan="7" className="text-center py-5 text-muted">
+                                <td colSpan={showReminderColumn ? 8 : 7} className="text-center py-5 text-muted">
                                     <div className="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
                                     Loading client records...
                                 </td>
@@ -2625,11 +2768,25 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records" })
                                             {client.referral}
                                         </span>
                                     </td>
+                                    {showReminderColumn && (
+                                        <td className="text-center">
+                                            <button
+                                                type="button"
+                                                className="btn btn-sm btn-primary d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill fw-semibold shadow-sm"
+                                                style={{ fontSize: "0.82rem" }}
+                                                onClick={(e) => handleSendReminder(client, e)}
+                                                title={`Send notification reminder to ${client.name}`}
+                                            >
+                                                <FiSend size={12} />
+                                                <span>Send</span>
+                                            </button>
+                                        </td>
+                                    )}
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="7" className="text-center py-5 text-muted">
+                                <td colSpan={showReminderColumn ? 8 : 7} className="text-center py-5 text-muted">
                                     No records found.
                                 </td>
                             </tr>

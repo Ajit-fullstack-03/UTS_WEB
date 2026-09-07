@@ -10,6 +10,8 @@ export const exportClientDetailsPDF = ({
     basicInfo = {},
     spouseInfo = null,
     dependentsInfo = [],
+    employersInfo = [],
+    uploadedFiles = [],
     taxYear = ""
 }) => {
     try {
@@ -339,7 +341,149 @@ export const exportClientDetailsPDF = ({
             }
         });
 
-        // 6. Page Numbers and Footer on all pages
+        currentY = doc.lastAutoTable.finalY + 14;
+
+        // 6. Section: Employer / Other Details (if available)
+        if (employersInfo && employersInfo.length > 0) {
+            if (currentY > 620) {
+                doc.addPage();
+                currentY = 40;
+            }
+
+            const empRows = employersInfo.map((emp, idx) => [
+                idx + 1,
+                emp.employerName || "-",
+                emp.ein || "-",
+                emp.designation || "-",
+                `${emp.address ? emp.address + ", " : ""}${emp.city ? emp.city + ", " : ""}${emp.state || ""} ${emp.zip || ""}`.trim().replace(/^,\s*|,\s*$/g, "") || "-",
+                emp.phone || "-"
+            ]);
+
+            autoTable(doc, {
+                startY: currentY,
+                margin: { left: 36, right: 36 },
+                theme: "grid",
+                head: [
+                    [
+                        {
+                            content: `4. EMPLOYER & OTHER INFORMATION (${employersInfo.length})`,
+                            colSpan: 6,
+                            styles: {
+                                fillColor: [40, 60, 120],
+                                textColor: [255, 255, 255],
+                                fontStyle: "bold",
+                                fontSize: 9.5
+                            }
+                        }
+                    ],
+                    [
+                        "#",
+                        "Employer Name",
+                        "EIN / Tax ID",
+                        "Designation",
+                        "Address",
+                        "Phone"
+                    ].map(header => ({
+                        content: header,
+                        styles: {
+                            fillColor: [238, 242, 255],
+                            textColor: primaryColor,
+                            fontStyle: "bold",
+                            fontSize: 8
+                        }
+                    }))
+                ],
+                body: empRows,
+                styles: {
+                    fontSize: 8,
+                    cellPadding: 4.5,
+                    lineColor: [226, 232, 240],
+                    lineWidth: 0.5
+                },
+                alternateRowStyles: {
+                    fillColor: lightBgColor
+                }
+            });
+
+            currentY = doc.lastAutoTable.finalY + 14;
+        }
+
+        // 7. Section: Uploaded Document Details (Requested: File Name, Document Type, Country, Tax Year, Uploaded Date)
+        if (currentY > 620) {
+            doc.addPage();
+            currentY = 40;
+        }
+
+        const sectionNum = (employersInfo && employersInfo.length > 0) ? 5 : 4;
+        const docRows = uploadedFiles && uploadedFiles.length > 0
+            ? uploadedFiles.map((f, idx) => [
+                idx + 1,
+                f.name || f.upload_file_name || "-",
+                f.type || f.doctype || f.doc_type || "Other Document",
+                f.country || "-",
+                f.year || f.tax_year || f.current_year || activeTaxYear || "-",
+                f.uploaded || f.uploaded_date || f.created_at || "-"
+            ])
+            : [
+                [{ content: "No documents uploaded for this client.", colSpan: 6, styles: { fontStyle: "italic", halign: "center", textColor: [100, 116, 139] } }]
+            ];
+
+        autoTable(doc, {
+            startY: currentY,
+            margin: { left: 36, right: 36 },
+            theme: "grid",
+            head: [
+                [
+                    {
+                        content: `${sectionNum}. UPLOADED DOCUMENTS DETAILS (${uploadedFiles ? uploadedFiles.length : 0})`,
+                        colSpan: 6,
+                        styles: {
+                            fillColor: [40, 60, 120],
+                            textColor: [255, 255, 255],
+                            fontStyle: "bold",
+                            fontSize: 9.5
+                        }
+                    }
+                ],
+                [
+                    "#",
+                    "File Name",
+                    "Document Type",
+                    "Country",
+                    "Tax Year",
+                    "Uploaded Date"
+                ].map(header => ({
+                    content: header,
+                    styles: {
+                        fillColor: [238, 242, 255],
+                        textColor: primaryColor,
+                        fontStyle: "bold",
+                        fontSize: 8
+                    }
+                }))
+            ],
+            body: docRows,
+            columnStyles: {
+                0: { cellWidth: 24, halign: "center" },
+                1: { cellWidth: 160 },
+                2: { cellWidth: 120 },
+                3: { cellWidth: 75 },
+                4: { cellWidth: 60, halign: "center" },
+                5: { cellWidth: 84, halign: "center" }
+            },
+            styles: {
+                fontSize: 8,
+                cellPadding: 4.5,
+                lineColor: [226, 232, 240],
+                lineWidth: 0.5,
+                overflow: "linebreak"
+            },
+            alternateRowStyles: {
+                fillColor: lightBgColor
+            }
+        });
+
+        // 8. Page Numbers and Footer on all pages
         const totalPages = doc.internal.getNumberOfPages();
         for (let i = 1; i <= totalPages; i++) {
             doc.setPage(i);

@@ -20,21 +20,28 @@ import CallUs from "../pages/CallUs";
 import AdminComments from "../pages/AdminComments";
 import AdminEmails from "../pages/AdminEmails";
 import AdminCareers from "../pages/AdminCareers";
+import AdminSettings from "../pages/AdminSettings";
+
+import { isAnalystUser } from "../../utils/userRole";
 
 const AdminRoutes = () => {
+    const isAnalyst = isAnalystUser();
+    const defaultLanding = isAnalyst ? "assigned-file-number" : "all-records";
+
     return (
         <Routes>
             <Route element={<AdminLayout />}>
-                <Route index element={<Navigate to="all-records" replace />} />
-                <Route path="dashboard" element={<Navigate to="../all-records" replace />} />
+                <Route index element={<Navigate to={defaultLanding} replace />} />
+                <Route path="dashboard" element={<Navigate to={`../${defaultLanding}`} replace />} />
                 <Route path="login-history" element={<LoginHistory />} />
-                <Route path="payments" element={<Payments />} />
+                <Route path="payments" element={isAnalyst ? <Navigate to="../assigned-file-number" replace /> : <Payments />} />
                 <Route path="referrals" element={<AdminReferrals />} />
                 <Route path="comments" element={<AdminComments />} />
                 <Route path="emails" element={<AdminEmails />} />
                 <Route path="call-us" element={<CallUs />} />
                 <Route path="careers" element={<AdminCareers />} />
-                <Route path="all-records" element={<AllRecords />} />
+                <Route path="settings" element={isAnalyst ? <Navigate to="../assigned-file-number" replace /> : <AdminSettings />} />
+                <Route path="all-records" element={isAnalyst ? <Navigate to="../assigned-file-number" replace /> : <AllRecords />} />
                 <Route path="assigned-file-number" element={<AssignedFileNumber />} />
                 <Route path="to-be-assigned" element={<ToBeAssigned />} />
                 <Route path="basic-info-pending" element={<BasicInfoPending />} />
@@ -52,4 +59,3 @@ const AdminRoutes = () => {
 };
 
 export default AdminRoutes;
-

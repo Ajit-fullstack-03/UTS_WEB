@@ -57,16 +57,21 @@ const AdminComments = () => {
                     time: parts[1] || ""
                 };
             }
-            const month = String(d.getMonth() + 1).padStart(2, "0");
-            const day = String(d.getDate()).padStart(2, "0");
-            const year = d.getFullYear();
-            const hours = String(d.getHours()).padStart(2, "0");
-            const minutes = String(d.getMinutes()).padStart(2, "0");
-            const seconds = String(d.getSeconds()).padStart(2, "0");
+            const dateFormatted = d.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric"
+            });
+            const timeFormatted = d.toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: true
+            });
 
             return {
-                date: `${month}-${day}-${year}`,
-                time: `${hours}:${minutes}:${seconds}`
+                date: dateFormatted,
+                time: timeFormatted
             };
         } catch {
             return { date: dateStr, time: "" };

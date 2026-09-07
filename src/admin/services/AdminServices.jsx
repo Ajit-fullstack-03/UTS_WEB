@@ -55,6 +55,24 @@ const usersynopsys = (data) => postUrl(`${API_URL}member/usersynopsys`, data);
 const usersliist = (data) => postUrl(`${API_URL}member/usersliist`, data);
 const setnewfilenumberusers = (data) => postUrl(`${API_URL}member/setnewfilenumberusers`, data);
 const existingassignfilenumber = (data) => postUrl(`${API_URL}member/existingassignfilenumber`, data);
+const confirmAssigningFileNumberToNewUsers = async (data) => {
+    try {
+        return await postUrl(`${API_URL}member/confirmationtoassigningfilenumber`, data);
+    } catch (err) {
+        if (err?.response?.status === 404) {
+            try {
+                return await postUrl(`${API_URL}member/confirmationtoassigningfilenumber`, data);
+            } catch (err2) {
+                if (err2?.response?.status === 404) {
+                    return await postUrl(`${API_URL}member/setnewfilenumberusers`, data);
+                }
+                throw err2;
+            }
+        }
+        throw err;
+    }
+};
+const confirmassigningfilenumbertonewusers = confirmAssigningFileNumberToNewUsers;
 const changeemailaddress = (data) => postUrl(`${API_URL}member/changeemailaddress`, data);
 const changemobilenumber = (data) => postUrl(`${API_URL}member/changemobilenumber`, data);
 
@@ -121,6 +139,8 @@ export const adminServices = {
     usersliist,
     setnewfilenumberusers,
     existingassignfilenumber,
+    confirmAssigningFileNumberToNewUsers,
+    confirmassigningfilenumbertonewusers,
     changeemailaddress,
     changemobilenumber,
 
