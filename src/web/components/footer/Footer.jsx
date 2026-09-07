@@ -93,7 +93,7 @@ const Footer = () => {
                                         <path d="M3 7l9 6 9-6" stroke="#1B2E6B" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
                                     </svg>
                                 </span>
-                                <a href="mailto:support@figma.com">support@figma.com</a>
+                                <a href="mailto:hello@umpirtaxsolutions.com">hello@umpirtaxsolutions.com</a>
                             </li>
 
                             <li>
@@ -105,7 +105,7 @@ const Footer = () => {
                                         />
                                     </svg>
                                 </span>
-                                <a href="tel:+18008543680">+1 800 854-36-80</a>
+                                <a href="tel:+918186051040">+91 81860-51040</a>
                             </li>
 
                             <li>
@@ -117,7 +117,7 @@ const Footer = () => {
                                         />
                                     </svg>
                                 </span>
-                                <a href="tel:+18008543680">+1 800 854-36-80</a>
+                                <a href="tel:+15156864275">+1 (515) 686-4275</a>
                             </li>
 
                             <li>
@@ -128,6 +128,15 @@ const Footer = () => {
                                     </svg>
                                 </span>
                                 <span className="ftr-contact-address">9500 Grove Crest Ln Charlotte NC 28262</span>
+                            </li>
+                            <li>
+                                <span className="ftr-contact-icon">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 21s7-6.2 7-11.5A7 7 0 005 9.5C5 14.8 12 21 12 21z" stroke="#1B2E6B" strokeWidth="1.6" fill="none" />
+                                        <circle cx="12" cy="9.5" r="2.3" stroke="#1B2E6B" strokeWidth="1.6" fill="none" />
+                                    </svg>
+                                </span>
+                                <span className="ftr-contact-address">4-7-18/B Raghavendra Nagar, Nacharam Hyd 500076</span>
                             </li>
                         </ul>
                     </div>
