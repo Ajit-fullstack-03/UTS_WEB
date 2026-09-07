@@ -1,78 +1,122 @@
 import React, { useState, useEffect } from "react";
 import "./services.css";
 import backusa from "../../assets/image/USA_service_BG.png";
-import img1 from "../../assets/image/Tax_filling_1.png";
-import img2 from "../../assets/image/Tax_filling_2.png";
-import img3 from "../../assets/image/Tax_filling_3.png";
-import img4 from "../../assets/image/Tax_filling_4.png";
-
+import img1 from "../../assets/image/Book_keeping_1.png";
+import img2 from "../../assets/image/Book_keeping_2.png";
+import img3 from "../../assets/image/Book_keeping_3.png";
+import img4 from "../../assets/image/Book_keeping_4.png";
+import img5 from "../../assets/image/Book_keeping_5.png";
+import img6 from "../../assets/image/Book_keeping_6.png";
+import img7 from "../../assets/image/Book_keeping_7.png";
 
 /* ─── FAQ data ─── */
 const faqs = [
-    { id: 1, question: "What is Umpire Tax Solution?", answer: "Umpire Tax Solution is a modern tax service platform offering accurate preparation, filing support, and practical tax guidance for individuals, freelancers, and growing businesses." },
-    { id: 2, question: "Who can use Umpire Tax Solution?", answer: "Individuals, freelancers, and growing businesses looking for accurate, reliable, and hassle-free tax preparation and filing support can use Umpire Tax Solution." },
-    { id: 3, question: "How easy is it to get started?", answer: "Getting started takes just a few minutes — create your account, upload your documents securely, and our team takes care of the rest." },
-    { id: 4, question: "Are there any hidden fees?", answer: "No. Our pricing is transparent and shown upfront before you file, with no hidden charges added later." },
-    { id: 5, question: "How does customer support work?", answer: "Our support team is available via phone and chat to answer questions and guide you through every step of the filing process." },
+    { id: 1, question: "What bookkeeping services do you offer?", answer: "We offer a full range of bookkeeping services including monthly bookkeeping, bank reconciliation, accounts payable and receivable management, payroll processing, and QuickBooks setup and maintenance." },
+    { id: 2, question: "Do you work with QuickBooks?", answer: "Yes. We are experienced QuickBooks Pro Advisors and can set up, clean up, and maintain your QuickBooks Online or Desktop account, as well as provide ongoing training for your team." },
+    { id: 3, question: "How often will my books be updated?", answer: "We offer weekly, bi-weekly, or monthly bookkeeping cycles depending on your transaction volume and business needs. Real-time dashboards are available for premium plans." },
+    { id: 4, question: "Can you handle payroll bookkeeping?", answer: "Yes. We process payroll, record payroll journal entries, and reconcile payroll accounts to ensure your books remain accurate and compliant with payroll tax requirements." },
+    { id: 5, question: "How does customer support work?", answer: "Our support team is available via phone and chat to answer questions and guide you through every step of the bookkeeping process." },
 ];
 
-/* ─── Service steps data ─── */
+/* ─── Service cards data ─── */
 const services = [
     {
         id: 1,
-        title: "Individual Tax Returns",
-        description: "Filing personal taxes requires balancing full accuracy with maximizing your eligible refunds. We guide you through complex tax codes, income structures, and deduction opportunities to keep your personal finances compliant and optimized.",
+        title: "Monthly Bookkeeping",
+        description: "Consistent, accurate monthly bookkeeping is the foundation of a healthy business. We categorize transactions, maintain your general ledger, and deliver clean financial statements every month.",
         bullets: [
-            "Return preparation for salaried, self-employed, and NRI individuals",
-            "Deduction optimization to reduce your total tax liability",
-            "Handling capital gains, rental, investment, and foreign income",
-            "Guidance on tax authority inquiries and notices",
+            "Transaction categorization and general ledger maintenance",
+            "Monthly profit & loss and balance sheet preparation",
+            "Expense tracking and vendor management",
+            "Custom financial reporting tailored to your business",
         ],
         image: img1,
-        imageAlt: "Individual tax returns — professional reviewing documents",
+        imageAlt: "Monthly bookkeeping — professional reviewing financial records",
         flip: false,
     },
     {
         id: 2,
-        title: "Business Tax Returns",
-        description: "Managing corporate tax requirements demands precision to avoid penalties and protect your bottom line. We provide strategic return preparation for companies of all sizes, aligning your financial reporting with statutory mandates.",
+        title: "Transaction Streamlining",
+        description: "Disorganized transactions slow your business down. We streamline your financial workflows, import and categorize bank feeds, and create consistent, repeatable processes that save time and reduce errors.",
         bullets: [
-            "Return filing for Private Limited, LLP, Partnership, and OPC entities",
-            "Tax computation aligned with balance sheet and P&L statements",
-            "Strategic use of loss carry-forwards, depreciation, and exemptions",
-            "Year-round support for corporate tax deadlines and regulations",
+            "Bank feed import and automated transaction matching",
+            "Custom chart of accounts aligned to your industry",
+            "Workflow documentation and process optimization",
+            "Integration with major accounting and POS platforms",
         ],
         image: img2,
-        imageAlt: "Business tax returns — team reviewing finances",
+        imageAlt: "Transaction streamlining — digital financial workflow",
         flip: true,
     },
     {
         id: 3,
-        title: "Federal & State Tax Filing",
-        description: "For entities or individuals dealing with multi-tiered tax jurisdictions, navigating federal and state-level compliance is essential. We handle the split obligations to ensure total coverage.",
+        title: "Bank & Credit Card Reconciliation",
+        description: "Unreconciled accounts create hidden risks. We reconcile all your bank and credit card accounts monthly, identifying discrepancies, duplicate charges, and unauthorized transactions before they become problems.",
         bullets: [
-            "Dual submission of both Federal and State returns",
-            "Multi-state income allocation to prevent double taxation",
-            "Cross-border income, foreign reporting, and expat filings",
-            "Identification of state-specific tax incentives and credits",
+            "Full monthly reconciliation of all bank accounts",
+            "Credit card statement matching and variance analysis",
+            "Identification of duplicate or fraudulent charges",
+            "Reconciliation reports for audit readiness",
         ],
         image: img3,
-        imageAlt: "Federal & state tax filing — legal documents and forms",
+        imageAlt: "Bank reconciliation — reviewing bank statements",
         flip: false,
     },
     {
         id: 4,
-        title: "Tax Amendments",
-        description: "Errors, missed deductions, or newly received financial documents shouldn't compromise your tax record. We assist in filing formal amended returns to correct past filings and recover unclaimed refunds.",
+        title: "Accounts Payable/Receivable",
+        description: "Managing cash flow requires tight control over what you owe and what you're owed. We track vendor invoices, customer billing cycles, and aging reports to keep your business cash-flow positive.",
         bullets: [
-            "In-depth evaluation of past returns for errors or missed deductions",
-            "Preparation and submission of official amended returns",
-            "Recovery of unclaimed refunds and overpaid taxes",
-            "Discrepancy resolution with official tax portal records",
+            "Vendor invoice tracking and payment scheduling",
+            "Customer invoicing and follow-up for collections",
+            "Aging reports for payables and receivables",
+            "Cash flow forecasting based on AP/AR data",
         ],
         image: img4,
-        imageAlt: "Tax amendments — reviewing and correcting tax documents",
+        imageAlt: "Accounts payable and receivable management",
         flip: true,
+    },
+    {
+        id: 5,
+        title: "Financial Services",
+        description: "Beyond bookkeeping, we offer comprehensive financial services including budgeting, forecasting, and advisory support to help you make confident data-driven decisions for your business.",
+        bullets: [
+            "Annual budget preparation and variance analysis",
+            "Cash flow forecasting and scenario modeling",
+            "KPI dashboards and management reporting",
+            "CFO advisory support for growing businesses",
+        ],
+        image: img5,
+        imageAlt: "Financial services — business advisory and planning",
+        flip: false,
+    },
+    {
+        id: 6,
+        title: "QuickBooks Bookkeeping",
+        description: "As certified QuickBooks Pro Advisors, we set up, maintain, and optimize your QuickBooks environment — ensuring your accounting software works hard for your business.",
+        bullets: [
+            "QuickBooks Online and Desktop setup and migration",
+            "Chart of accounts customization and cleanup",
+            "Bank feed connection and automation rules",
+            "Staff training and ongoing QuickBooks support",
+        ],
+        image: img6,
+        imageAlt: "QuickBooks bookkeeping — accounting software management",
+        flip: true,
+    },
+    {
+        id: 7,
+        title: "Payroll Bookkeeping",
+        description: "Payroll errors lead to unhappy employees and IRS penalties. We process payroll accurately, record all payroll entries, and keep your payroll accounts reconciled and compliant.",
+        bullets: [
+            "Payroll processing and direct deposit management",
+            "Payroll journal entry recording and ledger posting",
+            "Payroll tax liability tracking and remittance",
+            "W-2 and 1099 preparation support at year-end",
+        ],
+        image: img7,
+        imageAlt: "Payroll bookkeeping — salary and payroll management",
+        flip: false,
     },
 ];
 
@@ -84,8 +128,8 @@ const ChevronIcon = ({ open }) => (
     </svg>
 );
 
-/* ─── Main Page ─── */
-const Services = () => {
+/* ─── Page ─── */
+const Bookkeeping = () => {
     const [openId, setOpenId] = useState(1);
     const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -101,7 +145,6 @@ const Services = () => {
         <>
             {/* ══════════════════════ HERO ══════════════════════ */}
             <section className="srv-hero-wrapper" style={{ backgroundImage: `url(${backusa})` }}>
-                {/* Topbar */}
                 <div className="hero-topbar">
                     <div className="hero-topbar-inner">
                         <div className="hero-topbar-item">
@@ -131,44 +174,37 @@ const Services = () => {
                     </div>
                 </div>
 
-                {/* Hero main */}
                 <div className="srv-hero-main">
                     <div className="srv-hero-content">
                         <div className="srv-hero-badge">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2l7 3v6c0 5-3.4 8.6-7 11-3.6-2.4-7-6-7-11V5l7-3z" stroke="#1B2E6B" strokeWidth="1.6" strokeLinejoin="round" fill="none" /><path d="M9 12l2 2 4-4" stroke="#1B2E6B" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
-                            <span>Our Services</span>
+                            <span>Bookkeeping Services</span>
                         </div>
                         <h1 className="srv-hero-heading">
-                            Complete Tax &amp; <br />
-                            <span className="srv-hero-heading-accent">Compliance Solutions</span>
+                            Complete &amp; Accurate <br />
+                            <span className="srv-hero-heading-accent">Bookkeeping Solutions</span>
                         </h1>
                         <p className="srv-hero-desc">
-                            Filing taxes for individuals, businesses and cross-border clients across the USA &amp; India — accurate, fast, and fully compliant.
+                            From monthly ledger maintenance to payroll and QuickBooks management — we keep your books clean, current, and audit-ready all year long.
                         </p>
                         <a href="/contact" className="srv-hero-btn">Get Started</a>
                     </div>
+                   
                 </div>
             </section>
 
-            {/* ══════════════════════ US TAX FILING — STICKY STACK ══════════════════════ */}
+            {/* ══════════════════════ STICKY CARDS ══════════════════════ */}
             <section className="srv-steps-wrapper">
-                {/* Section label */}
                 <div className="srv-steps-header">
-                    <h2 className="srv-steps-title">US Tax Filing</h2>
+                    <h2 className="srv-steps-title">Bookkeeping Services</h2>
                 </div>
-
-                {/* Sticky stacking cards — exact rs-card mechanics */}
                 <div className="srv-steps-stack">
                     {services.map((svc, index) => (
                         <div
                             key={svc.id}
                             className={`srv-card ${svc.flip ? "srv-card--flip" : ""}`}
-                            style={{
-                                "--card-index": index + 1,
-                                zIndex: index + 1,
-                            }}
+                            style={{ "--card-index": index + 1, zIndex: index + 1 }}
                         >
-                            {/* Content side */}
                             <div className="srv-card-content">
                                 <h3 className="srv-card-title">{svc.title}</h3>
                                 <p className="srv-card-desc">{svc.description}</p>
@@ -182,8 +218,6 @@ const Services = () => {
                                     ))}
                                 </ul>
                             </div>
-
-                            {/* Image side */}
                             <div className="srv-card-visual">
                                 <div className="srv-card-img-frame">
                                     <img src={svc.image} alt={svc.imageAlt} className="srv-card-img" />
@@ -202,25 +236,19 @@ const Services = () => {
                             <div className="srv-faq-badge">FAQ</div>
                             <h2 className="srv-faq-heading">Frequently Asked Questions</h2>
                             <p className="srv-faq-desc">
-                                Umpire Tax Solution helps individuals and businesses prepare accurate returns, stay compliant, and navigate tax season with confidence through reliable guidance.
+                                Everything you need to know about our bookkeeping, reconciliation, QuickBooks, and payroll services.
                             </p>
                             <button className="srv-faq-more" type="button">
                                 Check More
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H9M17 7V15" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
                             </button>
                         </div>
-
                         <div className="srv-faq-accordion">
                             {faqs.map(faq => {
                                 const isOpen = openId === faq.id;
                                 return (
                                     <div key={faq.id} className={`srv-faq-item ${isOpen ? "srv-faq-item--open" : ""}`}>
-                                        <button
-                                            className="srv-faq-item-header"
-                                            type="button"
-                                            onClick={() => setOpenId(prev => prev === faq.id ? null : faq.id)}
-                                            aria-expanded={isOpen}
-                                        >
+                                        <button className="srv-faq-item-header" type="button" onClick={() => setOpenId(prev => prev === faq.id ? null : faq.id)} aria-expanded={isOpen}>
                                             <span className="srv-faq-question">{faq.question}</span>
                                             <ChevronIcon open={isOpen} />
                                         </button>
@@ -232,8 +260,6 @@ const Services = () => {
                             })}
                         </div>
                     </div>
-
-                    {/* Contact bar */}
                     <div className="srv-faq-bar">
                         <div className="srv-faq-bar-left">
                             <span className="srv-faq-bar-icon">
@@ -249,16 +275,11 @@ const Services = () => {
                 </div>
             </section>
 
-            {/* Scroll to top */}
-            <button
-                className={`scroll-to-top-btn ${showScrollTop ? "scroll-to-top-btn--visible" : ""}`}
-                onClick={scrollToTop}
-                aria-label="Scroll to top"
-            >
+            <button className={`scroll-to-top-btn ${showScrollTop ? "scroll-to-top-btn--visible" : ""}`} onClick={scrollToTop} aria-label="Scroll to top">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </button>
         </>
     );
 };
 
-export default Services;
+export default Bookkeeping;

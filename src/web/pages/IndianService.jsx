@@ -1,77 +1,77 @@
 import React, { useState, useEffect } from "react";
 import "./services.css";
-import backusa from "../../assets/image/USA_service_BG.png";
-import img1 from "../../assets/image/Tax_filling_1.png";
-import img2 from "../../assets/image/Tax_filling_2.png";
-import img3 from "../../assets/image/Tax_filling_3.png";
-import img4 from "../../assets/image/Tax_filling_4.png";
-
+import heroBg from "../../assets/image/sector_12.png";
+import serviceHeroImg from "../../assets/image/srtcor_9.png";
+import img1 from "../../assets/image/srf1.png";
+import img2 from "../../assets/image/srf2.png";
+import img3 from "../../assets/image/srf3.png";
+import img4 from "../../assets/image/srf4.png";
 
 /* ─── FAQ data ─── */
 const faqs = [
-    { id: 1, question: "What is Umpire Tax Solution?", answer: "Umpire Tax Solution is a modern tax service platform offering accurate preparation, filing support, and practical tax guidance for individuals, freelancers, and growing businesses." },
-    { id: 2, question: "Who can use Umpire Tax Solution?", answer: "Individuals, freelancers, and growing businesses looking for accurate, reliable, and hassle-free tax preparation and filing support can use Umpire Tax Solution." },
+    { id: 1, question: "What is Umpire Tax Solution?", answer: "Umpire Tax Solution is a modern tax service platform offering accurate preparation, filing support, and practical tax guidance for individuals, freelancers, and growing businesses across India." },
+    { id: 2, question: "Who can use Umpire Tax Solution?", answer: "Individuals, freelancers, NRIs, and growing businesses in India looking for accurate, reliable, and hassle-free tax preparation and filing support can use Umpire Tax Solution." },
     { id: 3, question: "How easy is it to get started?", answer: "Getting started takes just a few minutes — create your account, upload your documents securely, and our team takes care of the rest." },
     { id: 4, question: "Are there any hidden fees?", answer: "No. Our pricing is transparent and shown upfront before you file, with no hidden charges added later." },
     { id: 5, question: "How does customer support work?", answer: "Our support team is available via phone and chat to answer questions and guide you through every step of the filing process." },
 ];
 
-/* ─── Service steps data ─── */
+/* ─── Service cards ─── */
 const services = [
     {
         id: 1,
         title: "Individual Tax Returns",
-        description: "Filing personal taxes requires balancing full accuracy with maximizing your eligible refunds. We guide you through complex tax codes, income structures, and deduction opportunities to keep your personal finances compliant and optimized.",
+        description: "Filing personal taxes in India requires balancing full accuracy with maximizing your eligible refunds. We guide you through the Income Tax Act provisions, ITR forms, and deduction opportunities to keep your personal finances compliant and optimized.",
         bullets: [
-            "Return preparation for salaried, self-employed, and NRI individuals",
-            "Deduction optimization to reduce your total tax liability",
+            "ITR filing for salaried, self-employed, and NRI individuals",
+            "Deduction optimization under Sections 80C, 80D, and more",
             "Handling capital gains, rental, investment, and foreign income",
-            "Guidance on tax authority inquiries and notices",
+            "Guidance on income tax notices and assessment proceedings",
         ],
         image: img1,
-        imageAlt: "Individual tax returns — professional reviewing documents",
+        imageAlt: "Individual tax returns India — professional reviewing documents",
         flip: false,
     },
     {
         id: 2,
         title: "Business Tax Returns",
-        description: "Managing corporate tax requirements demands precision to avoid penalties and protect your bottom line. We provide strategic return preparation for companies of all sizes, aligning your financial reporting with statutory mandates.",
+        description: "Managing corporate tax requirements in India demands precision to avoid penalties and protect your bottom line. We provide strategic return preparation for companies of all sizes, aligning your financial reporting with statutory mandates under the Companies Act and Income Tax Act.",
         bullets: [
-            "Return filing for Private Limited, LLP, Partnership, and OPC entities",
+            "ITR filing for Private Limited, LLP, Partnership, and OPC entities",
             "Tax computation aligned with balance sheet and P&L statements",
             "Strategic use of loss carry-forwards, depreciation, and exemptions",
             "Year-round support for corporate tax deadlines and regulations",
         ],
         image: img2,
-        imageAlt: "Business tax returns — team reviewing finances",
+        imageAlt: "Business tax returns India — team reviewing finances",
         flip: true,
     },
     {
         id: 3,
-        title: "Federal & State Tax Filing",
-        description: "For entities or individuals dealing with multi-tiered tax jurisdictions, navigating federal and state-level compliance is essential. We handle the split obligations to ensure total coverage.",
+        title: "GST Filing & Compliance",
+        description: "Goods and Services Tax compliance is critical for every Indian business. We manage your monthly and annual GST filings, input tax credit reconciliation, and GST audits to ensure you remain compliant with GST laws.",
         bullets: [
-            "Dual submission of both Federal and State returns",
-            "Multi-state income allocation to prevent double taxation",
-            "Cross-border income, foreign reporting, and expat filings",
-            "Identification of state-specific tax incentives and credits",
+            "GSTR-1, GSTR-3B, GSTR-9 filing and reconciliation",
+            "Input Tax Credit (ITC) matching and optimization",
+            "GST registration, amendments, and cancellation support",
+            "GST audit assistance and departmental query resolution",
         ],
         image: img3,
-        imageAlt: "Federal & state tax filing — legal documents and forms",
+        imageAlt: "GST filing and compliance — India tax documentation",
         flip: false,
     },
     {
         id: 4,
-        title: "Tax Amendments",
-        description: "Errors, missed deductions, or newly received financial documents shouldn't compromise your tax record. We assist in filing formal amended returns to correct past filings and recover unclaimed refunds.",
+        title: "Tax Amendments & Notices",
+        description: "Errors, missed deductions, or income tax notices shouldn't compromise your tax record. We assist in filing revised returns, responding to notices, and resolving disputes with the Income Tax Department.",
         bullets: [
             "In-depth evaluation of past returns for errors or missed deductions",
-            "Preparation and submission of official amended returns",
-            "Recovery of unclaimed refunds and overpaid taxes",
-            "Discrepancy resolution with official tax portal records",
+            "Preparation and submission of revised ITR filings",
+            "Response drafting for income tax notices under Sections 139, 143, 148",
+            "Discrepancy resolution with the Income Tax portal and AO",
         ],
         image: img4,
-        imageAlt: "Tax amendments — reviewing and correcting tax documents",
+        imageAlt: "Tax amendments India — reviewing and correcting tax documents",
         flip: true,
     },
 ];
@@ -84,8 +84,8 @@ const ChevronIcon = ({ open }) => (
     </svg>
 );
 
-/* ─── Main Page ─── */
-const Services = () => {
+/* ─── Page ─── */
+const IndianService = () => {
     const [openId, setOpenId] = useState(1);
     const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -100,7 +100,7 @@ const Services = () => {
     return (
         <>
             {/* ══════════════════════ HERO ══════════════════════ */}
-            <section className="srv-hero-wrapper" style={{ backgroundImage: `url(${backusa})` }}>
+            <section className="srv-hero-wrapper" style={{ backgroundImage: `url(${heroBg})` }}>
                 {/* Topbar */}
                 <div className="hero-topbar">
                     <div className="hero-topbar-inner">
@@ -136,39 +136,38 @@ const Services = () => {
                     <div className="srv-hero-content">
                         <div className="srv-hero-badge">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2l7 3v6c0 5-3.4 8.6-7 11-3.6-2.4-7-6-7-11V5l7-3z" stroke="#1B2E6B" strokeWidth="1.6" strokeLinejoin="round" fill="none" /><path d="M9 12l2 2 4-4" stroke="#1B2E6B" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
-                            <span>Our Services</span>
+                            <span>Indian Tax Service</span>
                         </div>
                         <h1 className="srv-hero-heading">
-                            Complete Tax &amp; <br />
+                            Complete Indian Tax &amp; <br />
                             <span className="srv-hero-heading-accent">Compliance Solutions</span>
                         </h1>
                         <p className="srv-hero-desc">
-                            Filing taxes for individuals, businesses and cross-border clients across the USA &amp; India — accurate, fast, and fully compliant.
+                            Expert ITR filing, GST compliance, and tax advisory for individuals, businesses, and NRIs across India — accurate, fast, and fully compliant with Indian tax laws.
                         </p>
                         <a href="/contact" className="srv-hero-btn">Get Started</a>
+                    </div>
+
+                    <div className="srv-hero-visual">
+                        <div className="srv-hero-img-frame">
+                            <img src={serviceHeroImg} alt="Indian tax compliance professionals" className="srv-hero-img" />
+                        </div>
                     </div>
                 </div>
             </section>
 
-            {/* ══════════════════════ US TAX FILING — STICKY STACK ══════════════════════ */}
+            {/* ══════════════════════ STICKY STACK ══════════════════════ */}
             <section className="srv-steps-wrapper">
-                {/* Section label */}
                 <div className="srv-steps-header">
-                    <h2 className="srv-steps-title">US Tax Filing</h2>
+                    <h2 className="srv-steps-title">Indian Tax Service</h2>
                 </div>
-
-                {/* Sticky stacking cards — exact rs-card mechanics */}
                 <div className="srv-steps-stack">
                     {services.map((svc, index) => (
                         <div
                             key={svc.id}
                             className={`srv-card ${svc.flip ? "srv-card--flip" : ""}`}
-                            style={{
-                                "--card-index": index + 1,
-                                zIndex: index + 1,
-                            }}
+                            style={{ "--card-index": index + 1, zIndex: index + 1 }}
                         >
-                            {/* Content side */}
                             <div className="srv-card-content">
                                 <h3 className="srv-card-title">{svc.title}</h3>
                                 <p className="srv-card-desc">{svc.description}</p>
@@ -182,8 +181,6 @@ const Services = () => {
                                     ))}
                                 </ul>
                             </div>
-
-                            {/* Image side */}
                             <div className="srv-card-visual">
                                 <div className="srv-card-img-frame">
                                     <img src={svc.image} alt={svc.imageAlt} className="srv-card-img" />
@@ -202,7 +199,7 @@ const Services = () => {
                             <div className="srv-faq-badge">FAQ</div>
                             <h2 className="srv-faq-heading">Frequently Asked Questions</h2>
                             <p className="srv-faq-desc">
-                                Umpire Tax Solution helps individuals and businesses prepare accurate returns, stay compliant, and navigate tax season with confidence through reliable guidance.
+                                Umpire Tax Solution helps individuals and businesses prepare accurate returns, stay GST compliant, and navigate Indian tax season with confidence.
                             </p>
                             <button className="srv-faq-more" type="button">
                                 Check More
@@ -241,9 +238,9 @@ const Services = () => {
                             </span>
                             <span className="srv-faq-bar-text">Need help with your Financial &amp; Tax services?</span>
                         </div>
-                        <a href="tel:+15156864275" className="srv-faq-bar-btn">
+                        <a href="tel:+918186051040" className="srv-faq-bar-btn">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z" fill="#1B2E6B" /></svg>
-                            +1 (515) 686-4275
+                            +91 81860-51040
                         </a>
                     </div>
                 </div>
@@ -261,4 +258,4 @@ const Services = () => {
     );
 };
 
-export default Services;
+export default IndianService;

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./career.css";
 import careerHeroImage from "../../assets/image/hero_track.png";
 import heroBg from "../../assets/image/BACKGROUD.jpeg";
+import rocket from "../../assets/image/boxicons_rocket.png";
+import apply from "../../assets/image/apply.png";
 
 const faqs = [
     { id: 1, question: "What is Umpire Tax Solution?", answer: "Umpire Tax Solution is a modern tax service platform offering accurate preparation, filing support, and practical tax guidance for individuals, freelancers, and growing businesses." },
@@ -44,20 +46,20 @@ const Career = () => {
     return (
         <>
             {/* ── Top Contact Bar ──────────────────────────────────────── */}
-            <div className="cr-topbar">
-                <div className="cr-topbar-inner">
-                    <div className="cr-topbar-item">
-                        <span className="cr-topbar-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z" fill="currentColor" /></svg></span>
-                        <span className="cr-topbar-flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" width="22" height="12" style={{ borderRadius: "2px", display: "block" }}><rect width="7410" height="3900" fill="#B22234" /><rect y="300" width="7410" height="300" fill="white" /><rect y="900" width="7410" height="300" fill="white" /><rect y="1500" width="7410" height="300" fill="white" /><rect y="2100" width="7410" height="300" fill="white" /><rect y="2700" width="7410" height="300" fill="white" /><rect y="3300" width="7410" height="300" fill="white" /><rect width="2964" height="2100" fill="#3C3B6E" /></svg></span>
+            <div className="ct-topbar cr-topbar">
+                <div className="ct-topbar-inner cr-topbar-inner">
+                    <div className="ct-topbar-item cr-topbar-item">
+                        <span className="ct-topbar-icon cr-topbar-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z" fill="currentColor" /></svg></span>
+                        <span className="ct-topbar-flag cr-topbar-flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" width="22" height="12" style={{ borderRadius: "2px", display: "block" }}><rect width="7410" height="3900" fill="#B22234" /><rect y="300" width="7410" height="300" fill="white" /><rect y="900" width="7410" height="300" fill="white" /><rect y="1500" width="7410" height="300" fill="white" /><rect y="2100" width="7410" height="300" fill="white" /><rect y="2700" width="7410" height="300" fill="white" /><rect y="3300" width="7410" height="300" fill="white" /><rect width="2964" height="2100" fill="#3C3B6E" /></svg></span>
                         <span>+1 (515) 686-4275</span>
                     </div>
-                    <div className="cr-topbar-item">
-                        <span className="cr-topbar-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z" fill="currentColor" /></svg></span>
-                        <span className="cr-topbar-flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="22" height="12" style={{ borderRadius: "2px", display: "block" }}><rect width="900" height="200" fill="#FF9933" /><rect y="200" width="900" height="200" fill="#FFFFFF" /><rect y="400" width="900" height="200" fill="#138808" /><circle cx="450" cy="300" r="60" fill="none" stroke="#000080" strokeWidth="6" /><circle cx="450" cy="300" r="8" fill="#000080" /></svg></span>
+                    <div className="ct-topbar-item cr-topbar-item">
+                        <span className="ct-topbar-icon cr-topbar-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z" fill="currentColor" /></svg></span>
+                        <span className="ct-topbar-flag cr-topbar-flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="22" height="12" style={{ borderRadius: "2px", display: "block" }}><rect width="900" height="200" fill="#FF9933" /><rect y="200" width="900" height="200" fill="#FFFFFF" /><rect y="400" width="900" height="200" fill="#138808" /><circle cx="450" cy="300" r="60" fill="none" stroke="#000080" strokeWidth="6" /><circle cx="450" cy="300" r="8" fill="#000080" /></svg></span>
                         <span>+91 81860-51040</span>
                     </div>
-                    <div className="cr-topbar-item">
-                        <span className="cr-topbar-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M2 6a2 2 0 012-2h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm2 0l8 6 8-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></span>
+                    <div className="ct-topbar-item cr-topbar-item">
+                        <span className="ct-topbar-icon cr-topbar-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M2 6a2 2 0 012-2h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm2 0l8 6 8-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></span>
                         <span>hello@umpirtaxsolutions.com</span>
                     </div>
                 </div>
@@ -77,19 +79,15 @@ const Career = () => {
 
                             {/* Floating rocket icon — top right, bobs up/down */}
                             <div className="cr-hero-float cr-hero-float--rocket">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 2C12 2 19 4 19 12C19 16.4 16.4 19 12 21C7.6 19 5 16.4 5 12C5 4 12 2 12 2Z" stroke="#1B2E6B" strokeWidth="1.6" fill="none" strokeLinejoin="round" />
-                                    <circle cx="12" cy="12" r="2.5" fill="#1B2E6B" />
-                                    <path d="M5 19L3 21M19 19L21 21" stroke="#1B2E6B" strokeWidth="1.6" strokeLinecap="round" />
-                                </svg>
+                                <img src={rocket} height={20} width={20}/>
                             </div>
 
                             {/* Floating "100% Client First" pill — bottom left, bobs up/down (delayed) */}
                             <div className="cr-hero-float cr-hero-float--pill">
                                 <span className="cr-hero-pill-avatar">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                        <circle cx="12" cy="8" r="4" fill="#1B2E6B" />
-                                        <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="#1B2E6B" />
+                                        <circle cx="12" cy="8" r="4" fill="#305EFF" />
+                                        <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="#305EFF" />
                                     </svg>
                                 </span>
                                 <span className="cr-hero-pill-text">100% Client First</span>
@@ -154,7 +152,7 @@ const Career = () => {
                 <div className="cr-form-inner">
                     <div className="cr-form-header">
                         <div className="cr-form-eyebrow">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 12h6M9 8h6M9 16h4M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" stroke="#1B2E6B" strokeWidth="1.8" strokeLinecap="round" fill="none" /></svg>
+                            <img src={apply} height={13} width={13}/>
                             Apply
                         </div>
                         <h2 className="cr-form-title">Forward your CV. We read every one.</h2>
