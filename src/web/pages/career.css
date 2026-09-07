@@ -6,28 +6,29 @@
    ================================================================ */
 
 /* ─── Top Contact Bar ─────────────────────────────────────────── */
-.cr-topbar {
-       top: 2;
+.cr-topbar,
+.ct-topbar {
     left: 0;
-    z-index: 999999999;
     font-family: 'Inter', sans-serif;
     backdrop-filter: blur(6px);
     background-color: #1E3A8ACC;
     padding: 14px 37px;
     max-width: 79%;
-    border-radius: 0px 0px 31px;
+    border-radius: 0px 0px 31px 0px;
     position: fixed;
-    z-index: 999999999;
+    z-index: 100;
 }
 
-.cr-topbar-inner {
+.cr-topbar-inner,
+.ct-topbar-inner {
     display: flex;
     align-items: center;
     gap: 28px;
     flex-wrap: wrap;
 }
 
-.cr-topbar-item {
+.cr-topbar-item,
+.ct-topbar-item {
     display: flex;
     align-items: center;
     gap: 7px;
@@ -38,13 +39,15 @@
     white-space: nowrap;
 }
 
-.cr-topbar-icon {
+.cr-topbar-icon,
+.ct-topbar-icon {
     display: flex;
     align-items: center;
     opacity: 0.85;
 }
 
-.cr-topbar-flag {
+.cr-topbar-flag,
+.ct-topbar-flag {
     display: flex;
     align-items: center;
 }
@@ -163,7 +166,6 @@
     width: 32px;
     height: 32px;
     background: #EEF2FF;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -394,16 +396,16 @@
 }
 
 .cr-form-eyebrow {
-    display: inline-flex;
+   display: inline-flex;
     align-items: center;
     gap: 7px;
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.25);
+    background: white;
+    border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 50px;
     padding: 6px 16px;
     font-size: 12.5px;
     font-weight: 500;
-    color: #fff;
+    color: #13214b;
     margin-bottom: 18px;
 }
 

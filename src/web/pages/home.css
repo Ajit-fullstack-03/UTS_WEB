@@ -22,7 +22,7 @@ body {
     max-width: 79%;
     border-radius: 0px 0px 31px;
     position: fixed;
-    z-index: 999999999;
+    z-index: 100;
 }
 
 .hero-topbar-inner {

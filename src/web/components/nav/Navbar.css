@@ -14,7 +14,7 @@
     position: sticky;
     top: 0;
     left: 0;
-    z-index: 999;
+    z-index: 9999;
 }
 
 .navbar-container {
@@ -42,7 +42,7 @@
     gap: 42px;
 }
 
-.desktop-menu a {
+.desktop-menu > a {
     text-decoration: none;
     color: #2c2c2c;
     font-family: "Inter", sans-serif;
@@ -51,8 +51,8 @@
     transition: .3s;
 }
 
-.desktop-menu a:hover,
-.desktop-menu a.active {
+.desktop-menu > a:hover,
+.desktop-menu > a.active {
     color: #2446A6;
 }
 
@@ -98,6 +98,229 @@
 
 .nav-btn-primary:hover {
     background: #17388d;
+}
+
+/* ════════════════════════════════════
+   Services Dropdown
+════════════════════════════════════ */
+
+.nav-services-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.nav-services-trigger {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration: none;
+    color: #2c2c2c;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color .3s;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.nav-services-trigger:hover,
+.nav-services-wrapper--open .nav-services-trigger {
+    color: #2446A6;
+}
+
+.nav-services-chevron {
+    font-size: 14px;
+    transition: transform .3s ease;
+    color: inherit;
+}
+
+.nav-services-wrapper--open .nav-services-chevron {
+    transform: rotate(180deg);
+}
+
+/* Dropdown panel — Glassmorphism */
+.nav-services-dropdown {
+    position: absolute;
+    top: calc(100% + 18px);
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 9999999999999;
+
+    display: flex;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 8px 40px rgba(36, 70, 166, 0.12), 0 1.5px 8px rgba(0,0,0,0.05);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    overflow: hidden;
+    width: fit-content;
+    transition: opacity .22s ease, transform .22s ease, visibility .22s, width .25s ease;
+}
+
+.nav-services-dropdown--open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Dropdown arrow tip */
+.nav-services-dropdown::before {
+    display: none;
+}
+
+/* Left panel — region selector (glassmorphism) */
+.nav-sd-left {
+    width: 185px;
+    background: rgba(210, 225, 255, 0.2);
+    padding: 8px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
+    border-right: none;
+    box-sizing: border-box;
+}
+
+.nav-services-dropdown--expanded .nav-sd-left {
+    border-right: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.nav-sd-region {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+    font-family: "Inter", sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #444;
+    width: 100%;
+    text-align: left;
+    box-sizing: border-box;
+}
+
+.nav-sd-region:hover {
+    background: rgba(255, 255, 255, 0.55);
+    color: #2446A6;
+}
+
+.nav-sd-region--active {
+    background: #2446A6 !important;
+    color: #fff !important;
+    box-shadow: 0 4px 18px rgba(36, 70, 166, 0.35);
+}
+
+.nav-sd-flag {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.nav-sd-region-label {
+    font-size: 13.5px;
+    font-weight: 500;
+}
+
+/* Indian Service — direct link styled like region button */
+.nav-sd-region-link {
+    text-decoration: none;
+    color: #444;
+}
+
+.nav-sd-region-link:hover {
+    background: rgba(255, 255, 255, 0.55);
+    color: #2446A6;
+}
+
+/* Right panel — service items */
+.nav-sd-right {
+    width: 0;
+    height: 0;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    opacity: 0;
+    pointer-events: none;
+    transition: width .25s ease, padding .25s ease, opacity .2s ease;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.nav-sd-right--open {
+    width: 260px;
+    height: auto;
+    max-height: 400px;
+    opacity: 1;
+    pointer-events: auto;
+    padding: 8px 8px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-sd-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #1a2a5e;
+    font-family: "Inter", sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: background .2s ease, color .2s ease, transform .15s ease, box-shadow .2s ease;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.nav-sd-item:hover {
+    background: #2446A6 !important;
+    color: #ffffff !important;
+    transform: translateX(2px);
+    box-shadow: 0 4px 18px rgba(36, 70, 166, 0.35);
+}
+
+.nav-sd-item--active,
+.nav-sd-item.active {
+    background: #2446A6 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 18px rgba(36, 70, 166, 0.35);
+    font-weight: 600;
+}
+
+.nav-sd-item-label {
+    flex: 1;
+}
+
+.nav-sd-item-arrow {
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity .2s ease, transform .2s ease;
+    flex-shrink: 0;
+    color: inherit;
+}
+
+.nav-sd-item:hover .nav-sd-item-arrow,
+.nav-sd-item--active .nav-sd-item-arrow,
+.nav-sd-item.active .nav-sd-item-arrow {
+    opacity: 1;
+    transform: translateX(0);
 }
 
 /* Mobile Icon */
@@ -163,32 +386,126 @@
     }
 
     .mobile-menu.active {
-        max-height: 500px;
+        max-height: 700px;
         padding: 15px 0;
+        overflow-y: auto;
     }
 
-    .mobile-menu a {
-
+    .mobile-menu > a {
         padding: 14px 22px;
-
         text-decoration: none;
-
         color: #222;
-
         font-size: 15px;
-
         font-weight: 500;
-
         border-bottom: 1px solid #f5f5f5;
-
         transition: .3s;
     }
 
-    .mobile-menu a:hover {
-
+    .mobile-menu > a:hover {
         background: #f7f9ff;
-
         color: #2446A6;
+    }
+
+    /* Mobile Services Accordion */
+    .mobile-services-group {
+        border-bottom: 1px solid #f5f5f5;
+    }
+
+    .mobile-services-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 14px 22px;
+        background: none;
+        border: none;
+        font-size: 15px;
+        font-weight: 500;
+        color: #222;
+        cursor: pointer;
+        text-align: left;
+        transition: .3s;
+    }
+
+    .mobile-services-trigger:hover {
+        background: #f7f9ff;
+        color: #2446A6;
+    }
+
+    .mobile-chevron {
+        font-size: 16px;
+        transition: transform .3s;
+        color: #2446A6;
+    }
+
+    .mobile-chevron--open {
+        transform: rotate(180deg);
+    }
+
+    .mobile-services-panel {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height .35s ease;
+        background: #f8f9ff;
+    }
+
+    .mobile-services-panel--open {
+        max-height: 500px;
+    }
+
+    .mobile-services-section-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 22px 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #2446A6;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    .mobile-service-item {
+        display: block;
+        padding: 10px 22px 10px 32px;
+        text-decoration: none;
+        color: #444;
+        font-size: 14px;
+        font-weight: 400;
+        transition: color .2s, background .2s;
+        border-bottom: 1px solid #eef0f8;
+    }
+
+    .mobile-service-item:hover,
+    .mobile-service-item--active {
+        color: #2446A6;
+        background: #eef2ff;
+        font-weight: 600;
+    }
+
+    .mobile-service-direct-link {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 22px;
+        text-decoration: none;
+        color: #2446A6;
+        font-size: 14px;
+        font-weight: 600;
+        border-bottom: 1px solid #eef0f8;
+        background: #f4f7ff;
+        transition: background .2s, color .2s;
+    }
+
+    .mobile-service-direct-link:hover {
+        background: #e6edff;
+        color: #17388d;
+    }
+
+    .mobile-service-direct-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .mobile-login,

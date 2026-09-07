@@ -1,78 +1,62 @@
 import React, { useState, useEffect } from "react";
 import "./services.css";
 import backusa from "../../assets/image/USA_service_BG.png";
-import img1 from "../../assets/image/Tax_filling_1.png";
-import img2 from "../../assets/image/Tax_filling_2.png";
-import img3 from "../../assets/image/Tax_filling_3.png";
-import img4 from "../../assets/image/Tax_filling_4.png";
-
+import img1 from "../../assets/image/Tax_planning_1.png";
+import img2 from "../../assets/image/Tax_planning_2.png";
+import img3 from "../../assets/image/Tax_planning_3.png";
 
 /* ─── FAQ data ─── */
 const faqs = [
-    { id: 1, question: "What is Umpire Tax Solution?", answer: "Umpire Tax Solution is a modern tax service platform offering accurate preparation, filing support, and practical tax guidance for individuals, freelancers, and growing businesses." },
-    { id: 2, question: "Who can use Umpire Tax Solution?", answer: "Individuals, freelancers, and growing businesses looking for accurate, reliable, and hassle-free tax preparation and filing support can use Umpire Tax Solution." },
-    { id: 3, question: "How easy is it to get started?", answer: "Getting started takes just a few minutes — create your account, upload your documents securely, and our team takes care of the rest." },
-    { id: 4, question: "Are there any hidden fees?", answer: "No. Our pricing is transparent and shown upfront before you file, with no hidden charges added later." },
-    { id: 5, question: "How does customer support work?", answer: "Our support team is available via phone and chat to answer questions and guide you through every step of the filing process." },
+    { id: 1, question: "What is tax planning?", answer: "Tax planning is the process of analyzing your financial situation to ensure maximum tax efficiency. It includes strategies to reduce your tax liability through legal deductions, credits, and investment decisions." },
+    { id: 2, question: "When should I start tax planning?", answer: "Tax planning should be a year-round activity, not just a last-minute exercise before the filing deadline. Starting early allows you to take full advantage of deductions, contributions, and credits." },
+    { id: 3, question: "Can tax planning reduce my tax bill legally?", answer: "Yes. Through legitimate deductions, retirement contributions, capital gains planning, and income deferral strategies, we help reduce your tax burden within the boundaries of the law." },
+    { id: 4, question: "Do you offer business tax planning?", answer: "Absolutely. We work with businesses of all sizes to develop strategic tax plans including depreciation schedules, entity structure decisions, and cash flow optimization." },
+    { id: 5, question: "How does customer support work?", answer: "Our support team is available via phone and chat to answer questions and guide you through every step of the planning process." },
 ];
 
-/* ─── Service steps data ─── */
+/* ─── Service cards data ─── */
 const services = [
     {
         id: 1,
-        title: "Individual Tax Returns",
-        description: "Filing personal taxes requires balancing full accuracy with maximizing your eligible refunds. We guide you through complex tax codes, income structures, and deduction opportunities to keep your personal finances compliant and optimized.",
+        title: "Individual Tax Planning",
+        description: "Smart tax planning for individuals goes beyond just filing returns. We analyze your income, investments, and deductions to design a personalized strategy that minimizes your tax burden throughout the year.",
         bullets: [
-            "Return preparation for salaried, self-employed, and NRI individuals",
-            "Deduction optimization to reduce your total tax liability",
-            "Handling capital gains, rental, investment, and foreign income",
-            "Guidance on tax authority inquiries and notices",
+            "Deduction optimization for W-2, freelance, and NRI individuals",
+            "Retirement contribution planning (IRA, 401k, HSA)",
+            "Capital gains timing and harvesting strategies",
+            "Advance guidance on quarterly estimated tax payments",
         ],
         image: img1,
-        imageAlt: "Individual tax returns — professional reviewing documents",
+        imageAlt: "Individual tax planning — financial advisor with client",
         flip: false,
     },
     {
         id: 2,
-        title: "Business Tax Returns",
-        description: "Managing corporate tax requirements demands precision to avoid penalties and protect your bottom line. We provide strategic return preparation for companies of all sizes, aligning your financial reporting with statutory mandates.",
+        title: "Business Tax Planning",
+        description: "Managing corporate tax requirements demands precision to avoid penalties and protect your bottom line. We provide strategic planning for companies of all sizes, aligning your tax position with long-term business goals.",
         bullets: [
-            "Return filing for Private Limited, LLP, Partnership, and OPC entities",
-            "Tax computation aligned with balance sheet and P&L statements",
-            "Strategic use of loss carry-forwards, depreciation, and exemptions",
-            "Year-round support for corporate tax deadlines and regulations",
+            "Entity structure analysis (LLC, S-Corp, C-Corp, Partnership)",
+            "Tax-efficient compensation and benefit planning",
+            "Loss carry-forwards and accelerated depreciation strategies",
+            "Cash flow forecasting aligned with tax obligations",
         ],
         image: img2,
-        imageAlt: "Business tax returns — team reviewing finances",
+        imageAlt: "Business tax planning — team reviewing financial documents",
         flip: true,
     },
     {
         id: 3,
-        title: "Federal & State Tax Filing",
-        description: "For entities or individuals dealing with multi-tiered tax jurisdictions, navigating federal and state-level compliance is essential. We handle the split obligations to ensure total coverage.",
+        title: "Tax Saving Strategies",
+        description: "Beyond basic filing, we implement proactive strategies that create measurable long-term savings. Our advisors identify opportunities in your financial landscape that most taxpayers miss.",
         bullets: [
-            "Dual submission of both Federal and State returns",
-            "Multi-state income allocation to prevent double taxation",
-            "Cross-border income, foreign reporting, and expat filings",
-            "Identification of state-specific tax incentives and credits",
+            "Investment tax planning and portfolio structuring",
+            "Real estate and rental income tax optimization",
+            "State and local tax (SALT) deduction strategies",
+            "Advanced techniques for high-net-worth individuals",
         ],
         image: img3,
-        imageAlt: "Federal & state tax filing — legal documents and forms",
+        imageAlt: "Tax saving strategies — calculator and financial planning",
         flip: false,
-    },
-    {
-        id: 4,
-        title: "Tax Amendments",
-        description: "Errors, missed deductions, or newly received financial documents shouldn't compromise your tax record. We assist in filing formal amended returns to correct past filings and recover unclaimed refunds.",
-        bullets: [
-            "In-depth evaluation of past returns for errors or missed deductions",
-            "Preparation and submission of official amended returns",
-            "Recovery of unclaimed refunds and overpaid taxes",
-            "Discrepancy resolution with official tax portal records",
-        ],
-        image: img4,
-        imageAlt: "Tax amendments — reviewing and correcting tax documents",
-        flip: true,
     },
 ];
 
@@ -84,8 +68,8 @@ const ChevronIcon = ({ open }) => (
     </svg>
 );
 
-/* ─── Main Page ─── */
-const Services = () => {
+/* ─── Page ─── */
+const TaxPlanning = () => {
     const [openId, setOpenId] = useState(1);
     const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -101,7 +85,6 @@ const Services = () => {
         <>
             {/* ══════════════════════ HERO ══════════════════════ */}
             <section className="srv-hero-wrapper" style={{ backgroundImage: `url(${backusa})` }}>
-                {/* Topbar */}
                 <div className="hero-topbar">
                     <div className="hero-topbar-inner">
                         <div className="hero-topbar-item">
@@ -131,44 +114,36 @@ const Services = () => {
                     </div>
                 </div>
 
-                {/* Hero main */}
                 <div className="srv-hero-main">
                     <div className="srv-hero-content">
                         <div className="srv-hero-badge">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2l7 3v6c0 5-3.4 8.6-7 11-3.6-2.4-7-6-7-11V5l7-3z" stroke="#1B2E6B" strokeWidth="1.6" strokeLinejoin="round" fill="none" /><path d="M9 12l2 2 4-4" stroke="#1B2E6B" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
-                            <span>Our Services</span>
+                            <span>TAX Planning</span>
                         </div>
                         <h1 className="srv-hero-heading">
-                            Complete Tax &amp; <br />
-                            <span className="srv-hero-heading-accent">Compliance Solutions</span>
+                            Strategic Tax &amp; <br />
+                            <span className="srv-hero-heading-accent">Planning Solutions</span>
                         </h1>
                         <p className="srv-hero-desc">
-                            Filing taxes for individuals, businesses and cross-border clients across the USA &amp; India — accurate, fast, and fully compliant.
+                            Year-round proactive tax planning for individuals and businesses — reducing your liability, maximizing savings, and keeping you fully compliant.
                         </p>
                         <a href="/contact" className="srv-hero-btn">Get Started</a>
                     </div>
                 </div>
             </section>
 
-            {/* ══════════════════════ US TAX FILING — STICKY STACK ══════════════════════ */}
+            {/* ══════════════════════ STICKY CARDS ══════════════════════ */}
             <section className="srv-steps-wrapper">
-                {/* Section label */}
                 <div className="srv-steps-header">
-                    <h2 className="srv-steps-title">US Tax Filing</h2>
+                    <h2 className="srv-steps-title">Tax Planning</h2>
                 </div>
-
-                {/* Sticky stacking cards — exact rs-card mechanics */}
                 <div className="srv-steps-stack">
                     {services.map((svc, index) => (
                         <div
                             key={svc.id}
                             className={`srv-card ${svc.flip ? "srv-card--flip" : ""}`}
-                            style={{
-                                "--card-index": index + 1,
-                                zIndex: index + 1,
-                            }}
+                            style={{ "--card-index": index + 1, zIndex: index + 1 }}
                         >
-                            {/* Content side */}
                             <div className="srv-card-content">
                                 <h3 className="srv-card-title">{svc.title}</h3>
                                 <p className="srv-card-desc">{svc.description}</p>
@@ -182,8 +157,6 @@ const Services = () => {
                                     ))}
                                 </ul>
                             </div>
-
-                            {/* Image side */}
                             <div className="srv-card-visual">
                                 <div className="srv-card-img-frame">
                                     <img src={svc.image} alt={svc.imageAlt} className="srv-card-img" />
@@ -202,25 +175,19 @@ const Services = () => {
                             <div className="srv-faq-badge">FAQ</div>
                             <h2 className="srv-faq-heading">Frequently Asked Questions</h2>
                             <p className="srv-faq-desc">
-                                Umpire Tax Solution helps individuals and businesses prepare accurate returns, stay compliant, and navigate tax season with confidence through reliable guidance.
+                                Everything you need to know about our tax planning services and how we help you save more every year.
                             </p>
                             <button className="srv-faq-more" type="button">
                                 Check More
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H9M17 7V15" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
                             </button>
                         </div>
-
                         <div className="srv-faq-accordion">
                             {faqs.map(faq => {
                                 const isOpen = openId === faq.id;
                                 return (
                                     <div key={faq.id} className={`srv-faq-item ${isOpen ? "srv-faq-item--open" : ""}`}>
-                                        <button
-                                            className="srv-faq-item-header"
-                                            type="button"
-                                            onClick={() => setOpenId(prev => prev === faq.id ? null : faq.id)}
-                                            aria-expanded={isOpen}
-                                        >
+                                        <button className="srv-faq-item-header" type="button" onClick={() => setOpenId(prev => prev === faq.id ? null : faq.id)} aria-expanded={isOpen}>
                                             <span className="srv-faq-question">{faq.question}</span>
                                             <ChevronIcon open={isOpen} />
                                         </button>
@@ -232,8 +199,6 @@ const Services = () => {
                             })}
                         </div>
                     </div>
-
-                    {/* Contact bar */}
                     <div className="srv-faq-bar">
                         <div className="srv-faq-bar-left">
                             <span className="srv-faq-bar-icon">
@@ -249,16 +214,11 @@ const Services = () => {
                 </div>
             </section>
 
-            {/* Scroll to top */}
-            <button
-                className={`scroll-to-top-btn ${showScrollTop ? "scroll-to-top-btn--visible" : ""}`}
-                onClick={scrollToTop}
-                aria-label="Scroll to top"
-            >
+            <button className={`scroll-to-top-btn ${showScrollTop ? "scroll-to-top-btn--visible" : ""}`} onClick={scrollToTop} aria-label="Scroll to top">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </button>
         </>
     );
 };
 
-export default Services;
+export default TaxPlanning;
