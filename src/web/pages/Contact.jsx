@@ -177,10 +177,6 @@ const Contact = () => {
                             <div className="ct-faq-badge">FAQ</div>
                             <h2 className="ct-faq-heading">Frequently Asked Questions</h2>
                             <p className="ct-faq-description">Umpire Tax Solution helps individuals and businesses prepare accurate returns, stay compliant, and navigate tax season with confidence through reliable guidance and responsive support.</p>
-                            <button className="ct-faq-check-more" type="button">
-                                Check More
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H9M17 7V15" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
-                            </button>
                         </div>
                         <div className="ct-faq-accordion">
                             {faqs.map((faq) => {

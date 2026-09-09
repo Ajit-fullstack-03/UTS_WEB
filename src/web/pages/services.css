@@ -1,4 +1,4 @@
-﻿
+
 @import url('https://fonts.googleapis.com/css2?family=Ancizar+Serif:ital,wght@0,300..900;1,300..900&display=swap');
 
 body {
@@ -346,8 +346,15 @@ body {
     font-weight: 600;
     cursor: pointer;
     font-family: inherit;
+    text-decoration: none;
     transition: background 0.2s, transform 0.2s;
 }
+
+.srv-faq-more:hover,
+.srv-faq-more:visited {
+    color: #FFFFFF;
+}
+
 .srv-faq-more:hover { background: #16264F; transform: translateY(-1px); }
 
 .srv-faq-accordion {

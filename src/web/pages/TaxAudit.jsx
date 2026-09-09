@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "./services.css";
 import backusa from "../../assets/image/USA_service_BG.png";
 import img1 from "../../assets/image/Tax_audit_1.png";
@@ -178,10 +179,10 @@ const TaxAudit = () => {
                             <p className="srv-faq-desc">
                                 Everything you need to know about IRS audit defense, notice responses, and professional tax representation.
                             </p>
-                            <button className="srv-faq-more" type="button">
+                            <Link to="/contact" className="srv-faq-more">
                                 Check More
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H9M17 7V15" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
-                            </button>
+                            </Link>
                         </div>
                         <div className="srv-faq-accordion">
                             {faqs.map(faq => {

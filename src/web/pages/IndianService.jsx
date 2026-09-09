@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "./services.css";
 import heroBg from "../../assets/image/sector_12.png";
 import serviceHeroImg from "../../assets/image/srtcor_9.png";
@@ -201,10 +202,10 @@ const IndianService = () => {
                             <p className="srv-faq-desc">
                                 Umpire Tax Solution helps individuals and businesses prepare accurate returns, stay GST compliant, and navigate Indian tax season with confidence.
                             </p>
-                            <button className="srv-faq-more" type="button">
+                            <Link to="/contact" className="srv-faq-more">
                                 Check More
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H9M17 7V15" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
-                            </button>
+                            </Link>
                         </div>
 
                         <div className="srv-faq-accordion">

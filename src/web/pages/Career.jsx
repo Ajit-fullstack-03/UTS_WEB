@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "./career.css";
 import careerHeroImage from "../../assets/image/hero_track.png";
 import heroBg from "../../assets/image/BACKGROUD.jpeg";
@@ -201,7 +202,7 @@ const Career = () => {
                             <div className="cr-faq-badge">FAQ</div>
                             <h2 className="cr-faq-heading">Frequently Asked Questions</h2>
                             <p className="cr-faq-description">Umpire Tax Solution helps individuals and businesses prepare accurate returns, stay compliant, and navigate tax season with confidence through reliable guidance and responsive support.</p>
-                            <button className="cr-faq-check-more" type="button">Check More <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H9M17 7V15" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></button>
+                            <Link to="/contact" className="cr-faq-check-more">Check More <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H9M17 7V15" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></Link>
                         </div>
                         <div className="cr-faq-accordion">
                             {faqs.map((faq) => {

@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import "./home.css";
 import heroImage from "../../assets/image/page_track.png";
 import personImage from "../../assets/image/trust.png";
@@ -370,11 +371,11 @@ const Home = () => {
                         </p>
 
                         <div className="hero-cta-group">
-                            <button className="hero-btn hero-btn-primary">Get Started</button>
-                            <button className="hero-btn hero-btn-secondary">
+                            <Link to="/register" className="hero-btn hero-btn-primary">Get Started</Link>
+                            <Link to="/login" className="hero-btn hero-btn-secondary">
                                 <img src={gist} alt="" className="image-icon" />
                                 Refer &amp; Earn
-                            </button>
+                            </Link>
                         </div>
                     </div>
 
@@ -774,9 +775,9 @@ const Home = () => {
             <section className="tm-wrapper">
                 <div className="tm-inner">
                     <div className="tm-header">
-                        <button className="tm-badge" type="button">
+                        <Link to="/testimonials" className="tm-badge">
                             Read reviews
-                        </button>
+                        </Link>
 
                         <h2 className="tm-heading">Quoted with clarity. Tax solutions,</h2>
 
@@ -878,12 +879,12 @@ const Home = () => {
                                 navigate tax season with confidence through reliable guidance and responsive support.
                             </p>
 
-                            <button className="faq-check-more" type="button">
+                            <Link to="/contact" className="faq-check-more">
                                 Check More
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M7 17L17 7M17 7H9M17 7V15" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
                                 </svg>
-                            </button>
+                            </Link>
                         </div>
 
                         {/* Right accordion */}

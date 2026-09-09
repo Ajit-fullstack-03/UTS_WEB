@@ -70,7 +70,7 @@
 }
 
 .cr-hero-inner {
-    max-width: 1160px;
+    max-width: 1456px;
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -252,7 +252,7 @@
 }
 
 .cr-culture-inner {
-    max-width: 1160px;
+    max-width: 1345px;
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -384,7 +384,7 @@
 }
 
 .cr-form-inner {
-    max-width: 760px;
+    max-width: 1300px;
     margin: 0 auto;
     position: relative;
     z-index: 1;
@@ -601,7 +601,7 @@
 }
 
 .cr-faq-inner {
-    max-width: 1160px;
+    max-width: 1423px;
     margin: 0 auto;
 }
 
@@ -657,7 +657,13 @@
     font-weight: 600;
     font-family: 'Inter', sans-serif;
     cursor: pointer;
+    text-decoration: none;
     transition: background 0.2s, transform 0.18s;
+}
+
+.cr-faq-check-more:hover,
+.cr-faq-check-more:visited {
+    color: #fff;
 }
 
 .cr-faq-check-more:hover {
@@ -903,14 +909,14 @@
     }
 
     .cr-hero-float--rocket {
-        right: -10px;
-        top: 16px;
+      right: 19px;
+        top: 63px;
         width: 40px;
         height: 40px;
     }
 
     .cr-hero-float--pill {
-        left: -8px;
+       left: 21px;
         bottom: 20px;
         padding: 8px 14px 8px 8px;
         gap: 8px;
@@ -986,7 +992,7 @@
     }
 
     .cr-hero {
-        padding: 100px 16px 50px;
+        padding: 25px 16px 50px;
     }
 
     .cr-hero-img-frame {
@@ -994,9 +1000,22 @@
     }
 
     .cr-hero-img {
-        height: 220px;
+      position: relative;
+     top: 10px;
     }
 
+    .cr-hero-bg-slab {
+    position: absolute;
+    bottom: 0;
+    left: 8px;
+    right: 8px;
+    height: 72%;
+    width: 97%;
+    background: #8CA3E4;
+    /* background: linear-gradient(145deg, #c8d0f0 0%, #b8c2ec 100%); */
+    border-radius: 50px;
+    z-index: 0;
+}
     .cr-hero-pill {
         font-size: 12px;
         padding: 6px 14px;
