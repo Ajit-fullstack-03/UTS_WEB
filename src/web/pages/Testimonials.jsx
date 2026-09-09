@@ -31,22 +31,90 @@ const BrandAvatar = () => (
 );
 
 const allTestimonials = [
-    { id: 1, text: "My tax filing experience was so smooth and professional. The team responded in a timely manner with loads of information about deductions, allowances and maintenance guidance.", rating: 5, name: "Catherine", time: "10 days ago", avatarType: "brand" },
-    { id: 2, text: "My buying experience is so nice, and received me very politely. Filing experience is also very good. Very good performance. I never experienced such a kind of performance. Very good service.", rating: 5, name: "Karan", time: "1 week ago", avatarType: "person" },
-    { id: 3, text: "I have my e-bike and the customer service is excellent. They responded in a timely manner with loads of information about e-bikes, accessories and maintenance information.", rating: 4, name: "Catherine", time: "12 days ago", avatarType: "brand" },
-    { id: 4, text: "My buying experience is so nice, and received me very politely. Riding experience is also very good. Very good performance. I never experienced such a kind of performance. Very good service.", rating: 5, name: "Karan", time: "1 month ago", avatarType: "person" },
-    { id: 5, text: "The whole process was smooth from start to finish. The team explained every deduction clearly and made sure I understood exactly where my refund was coming from.", rating: 5, name: "Amira", time: "3 weeks ago", avatarType: "person" },
-    { id: 6, text: "Excellent support throughout tax season. Quick responses, accurate filing, and a genuinely friendly team that made a stressful process feel simple.", rating: 5, name: "Liam", time: "1 month ago", avatarType: "person" },
-    { id: 7, text: "Visited EO store. Product quality was particularly well, looked great, and the staff helped me test it in the parking lot area. Bought with customization after they went over all options.", rating: 5, name: "Peter", time: "2 weeks ago", avatarType: "brand" },
-    { id: 8, text: "My filing experience is so nice and politely handled. Filing experience is also very good. Very good performance. Very good service overall - I am very satisfied.", rating: 4, name: "Catherine", time: "5 days ago", avatarType: "brand" },
-    { id: 9, text: "I love my e-bike and the customer service is excellent. They respond in a timely manner with loads of information about e-bikes, accessories and maintenance information.", rating: 5, name: "Karan", time: "1 week ago", avatarType: "person" },
-    { id: 10, text: "My buying experience is so nice, and received me very politely. Riding experience is also very good. Very good performance. Very good service.", rating: 5, name: "Catherine", time: "10 days ago", avatarType: "brand" },
-    { id: 11, text: "Reliable tax expertise and personalized support to keep me compliant and financially confident. These guys truly know their craft.", rating: 5, name: "Marcus", time: "2 weeks ago", avatarType: "person" },
-    { id: 12, text: "Outstanding service! Filed my taxes in no time and maximized every deduction. The team is incredibly knowledgeable and responsive.", rating: 5, name: "Priya", time: "3 days ago", avatarType: "brand" },
+    {
+        id: 1,
+        text: "I highly recommend Umpire Tax Solutions! They were incredibly helpful, not only during the tax filing process but also with any questions or support I needed afterward. Their team guided me through every step, making sure I understood my options. Even after my taxes were filed, they stayed responsive, answering follow-up questions and providing valuable advice. Their commitment to excellent service and ongoing support makes them stand out.",
+        rating: 5,
+        name: "Yasaswi Sykam",
+        time: "10 days ago",
+        avatarType: "person"
+    },
+    {
+        id: 2,
+        text: "I have been using Umpire Tax Solutions for the past three years. They have a fantastic team with extensive knowledge, providing excellent service. They help me understand the filing process and ensure all paperwork is filed correctly. I highly recommend them.",
+        rating: 5,
+        name: "Gangadhar Kondati",
+        time: "1 week ago",
+        avatarType: "person"
+    },
+    {
+        id: 3,
+        text: "I have been doing my taxes with Umpire Tax for quite some time now. They have been really helpful in assessing the documents and filing them correctly. Vinay, especially, has helped me for the past two years by being available on the phone and answering emails promptly.",
+        rating: 5,
+        name: "Kalasamudram Kavya",
+        time: "12 days ago",
+        avatarType: "person"
+    },
+    {
+        id: 4,
+        text: "I have been using Umpire Tax Solutions services for the last 4 years. They do a tremendous job in explaining things and providing services to customers. I am satisfied with their prompt response through calls and emails. Thanks team for all you have done for me. I definitely recommend this consultant to anyone looking for tax filings.",
+        rating: 5,
+        name: "Motupalli Chaitanya",
+        time: "1 month ago",
+        avatarType: "person"
+    },
+    {
+        id: 5,
+        text: "The level of service provided is exceptional! The team's responsiveness to my phone calls and inquiries is nearly instantaneous. Additionally, they possess a wealth of knowledge when it comes to taxes and the intricacies of the rules involved. Their expertise in navigating tax regulations and rules is truly commendable. I appreciate the team's prompt assistance and their ability to offer comprehensive information. Thank you.",
+        rating: 5,
+        name: "Nanda Pai",
+        time: "3 weeks ago",
+        avatarType: "person"
+    },
+    {
+        id: 6,
+        text: "Have had a great experience with Umpire Tax. Have been filing my tax returns with them for the past 3 years and there has been no problems at all. The entire team is very responsive and make the process smooth. They are also always available for questions.",
+        rating: 5,
+        name: "Renuka Rao",
+        time: "1 month ago",
+        avatarType: "person"
+    },
+    {
+        id: 7,
+        text: "I'll definitely recommend Umpire Tax Solutions to my friends and colleagues. The team is friendly, they respond on time, and their price is better when compared with other tax solutions. As I'm new to the USA, they've guided me step by step and it made my life easier.",
+        rating: 5,
+        name: "Madhu C",
+        time: "2 weeks ago",
+        avatarType: "person"
+    },
+    {
+        id: 8,
+        text: "Firstly, I would like to thank Umpire Tax Solutions for what they have been doing. I had a very good experience filing tax with these guys for the last 6 to 7 years and absolutely zero issues. Very responsive, very reasonable price, very talented team. I recommend Umpire Tax Solutions as your next tax filing company.",
+        rating: 5,
+        name: "Jayaprakash Kottapalli",
+        time: "5 days ago",
+        avatarType: "person"
+    },
+    {
+        id: 9,
+        text: "Excellent service! The team at Umpire Tax Solutions are very knowledgeable. They have good insight into technical questions which arise from time to time. They also make sure clients are filing on time and remind us of deadlines. Kudos to all!",
+        rating: 5,
+        name: "Chaitanya Sai",
+        time: "1 week ago",
+        avatarType: "person"
+    },
+    {
+        id: 10,
+        text: "Return process was very smooth with these folks, they are very professional. I have received the return as well within a few weeks. I would definitely recommend Umpire Tax Solutions if you are struggling with filing tax returns.",
+        rating: 5,
+        name: "Ankita Singh",
+        time: "10 days ago",
+        avatarType: "person"
+    }
 ];
 
-     const TestimonialCard = ({ t }) => (
-     <div className="tpg-card">
+const TestimonialCard = ({ t }) => (
+    <div className="tpg-card">
         <p className="tpg-card-text">{t.text}</p>
         <div className="tpg-card-stars">
             {Array.from({ length: t.rating }).map((_, i) => (
@@ -76,27 +144,27 @@ const MarqueeRow = ({ items, direction = "left", speed = 40 }) => {
     const seamless = [...base, ...base];
 
     return (
-            <div
+        <div
             className="tpg-marquee-viewport"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}>
-             <div
+            <div
                 className={`tpg-marquee-track tpg-marquee-track--${direction}`}
                 style={{
                     animationDuration: `${speed}s`,
                     animationPlayState: paused ? "paused" : "running",
                 }}>
                 {seamless.map((t, idx) => (
-                <TestimonialCard key={`${t.id}-${idx}`} t={t} />
+                    <TestimonialCard key={`${t.id}-${idx}`} t={t} />
                 ))}
             </div>
         </div>
     );
-      };
+};
 
-    const Testimonials = () => {
+const Testimonials = () => {
     const [showScrollTop, setShowScrollTop] = useState(false);
-  useEffect(() => {
+    useEffect(() => {
         const onScroll = () => setShowScrollTop(window.scrollY > 300);
         window.addEventListener("scroll", onScroll, { passive: true });
         return () => window.removeEventListener("scroll", onScroll);
@@ -107,8 +175,8 @@ const MarqueeRow = ({ items, direction = "left", speed = 40 }) => {
     const row3 = allTestimonials.slice(8, 12);
     return (
         <>
-        <section className="tpg-hero-wrapper">
-            <div className="hero-topbar">
+            <section className="tpg-hero-wrapper">
+                <div className="hero-topbar">
                     <div className="hero-topbar-inner">
                         <div className="hero-topbar-item">
                             <span className="hero-topbar-icon">
@@ -219,7 +287,7 @@ const MarqueeRow = ({ items, direction = "left", speed = 40 }) => {
             </section>
 
             <button className={`scroll-to-top-btn ${showScrollTop ? "scroll-to-top-btn--visible" : ""}`} onClick={scrollToTop} aria-label="Scroll to top" title="Back to top">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </button>
 
         </>

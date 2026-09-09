@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoEyeOutline, IoEyeOffOutline, IoAlertCircleOutline, IoCheckmarkCircleOutline } from "react-icons/io5";
 import { FiArrowLeft } from "react-icons/fi";
@@ -12,14 +12,26 @@ import Swal from "sweetalert2";
 const Register = () => {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
-    const [showEmail, setShowEmail] = useState(false);
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
 
     // Country Code: Default "+1" (USA), options: +1, +91, other
     const [phoneCodeSelect, setPhoneCodeSelect] = useState("+1");
+    const [isPhoneDropdownOpen, setIsPhoneDropdownOpen] = useState(false);
+    const phoneDropdownRef = useRef(null);
     const [customPhoneCode, setCustomPhoneCode] = useState("+");
     const [phoneNumber, setPhoneNumber] = useState("");
+
+    // Close phone dropdown on click outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (phoneDropdownRef.current && !phoneDropdownRef.current.contains(event.target)) {
+                setIsPhoneDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     const [email, setEmail] = useState("");
     const [confirmEmail, setConfirmEmail] = useState("");
@@ -306,7 +318,7 @@ const Register = () => {
                                         Phone Number
                                     </label>
                                     <div className="row g-2">
-                                        <div className="col-4 col-sm-4 col-md-4">
+                                        <div className="col-4 col-sm-4 col-md-4 position-relative" ref={phoneDropdownRef}>
                                             {phoneCodeSelect === "other" ? (
                                                 <div>
                                                     <input
@@ -334,21 +346,93 @@ const Register = () => {
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <select
-                                                    className="auth-select text-center"
-                                                    value={phoneCodeSelect}
-                                                    onChange={(e) => {
-                                                        const val = e.target.value;
-                                                        setPhoneCodeSelect(val);
-                                                        if (val === "other") {
-                                                            setCustomPhoneCode("+");
-                                                        }
-                                                    }}
-                                                >
-                                                    <option value="+1">+1</option>
-                                                    <option value="+91">+91</option>
-                                                    <option value="other">Other</option>
-                                                </select>
+                                                <>
+                                                    <button
+                                                        type="button"
+                                                        className="auth-flag-dropdown-btn"
+                                                        onClick={() => setIsPhoneDropdownOpen((prev) => !prev)}
+                                                        title="Select Country Code"
+                                                    >
+                                                        <div className="d-flex align-items-center gap-1 overflow-hidden">
+                                                            {phoneCodeSelect === "+1" && (
+                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" width="18" height="12" style={{ borderRadius: "2px", flexShrink: 0 }}>
+                                                                    <rect width="7410" height="3900" fill="#B22234" />
+                                                                    <rect y="300" width="7410" height="300" fill="white" />
+                                                                    <rect y="900" width="7410" height="300" fill="white" />
+                                                                    <rect y="1500" width="7410" height="300" fill="white" />
+                                                                    <rect y="2100" width="7410" height="300" fill="white" />
+                                                                    <rect y="2700" width="7410" height="300" fill="white" />
+                                                                    <rect y="3300" width="7410" height="300" fill="white" />
+                                                                    <rect width="2964" height="2100" fill="#3C3B6E" />
+                                                                </svg>
+                                                            )}
+                                                            {phoneCodeSelect === "+91" && (
+                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="18" height="12" style={{ borderRadius: "2px", flexShrink: 0 }}>
+                                                                    <rect width="900" height="200" fill="#FF9933" />
+                                                                    <rect y="200" width="900" height="200" fill="#FFFFFF" />
+                                                                    <rect y="400" width="900" height="200" fill="#138808" />
+                                                                    <circle cx="450" cy="300" r="60" fill="none" stroke="#000080" strokeWidth="6" />
+                                                                    <circle cx="450" cy="300" r="8" fill="#000080" />
+                                                                </svg>
+                                                            )}
+                                                            <span className="fw-semibold text-white small">{phoneCodeSelect}</span>
+                                                        </div>
+                                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isPhoneDropdownOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+                                                            <polyline points="6 9 12 15 18 9"></polyline>
+                                                        </svg>
+                                                    </button>
+
+                                                    {isPhoneDropdownOpen && (
+                                                        <div className="auth-flag-menu">
+                                                            <div
+                                                                className={`auth-flag-item ${phoneCodeSelect === "+1" ? "active" : ""}`}
+                                                                onClick={() => {
+                                                                    setPhoneCodeSelect("+1");
+                                                                    setIsPhoneDropdownOpen(false);
+                                                                }}
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" width="18" height="12" style={{ borderRadius: "2px", flexShrink: 0 }}>
+                                                                    <rect width="7410" height="3900" fill="#B22234" />
+                                                                    <rect y="300" width="7410" height="300" fill="white" />
+                                                                    <rect y="900" width="7410" height="300" fill="white" />
+                                                                    <rect y="1500" width="7410" height="300" fill="white" />
+                                                                    <rect y="2100" width="7410" height="300" fill="white" />
+                                                                    <rect y="2700" width="7410" height="300" fill="white" />
+                                                                    <rect y="3300" width="7410" height="300" fill="white" />
+                                                                    <rect width="2964" height="2100" fill="#3C3B6E" />
+                                                                </svg>
+                                                                <span>+1 (USA)</span>
+                                                            </div>
+                                                            <div
+                                                                className={`auth-flag-item ${phoneCodeSelect === "+91" ? "active" : ""}`}
+                                                                onClick={() => {
+                                                                    setPhoneCodeSelect("+91");
+                                                                    setIsPhoneDropdownOpen(false);
+                                                                }}
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="18" height="12" style={{ borderRadius: "2px", flexShrink: 0 }}>
+                                                                    <rect width="900" height="200" fill="#FF9933" />
+                                                                    <rect y="200" width="900" height="200" fill="#FFFFFF" />
+                                                                    <rect y="400" width="900" height="200" fill="#138808" />
+                                                                    <circle cx="450" cy="300" r="60" fill="none" stroke="#000080" strokeWidth="6" />
+                                                                    <circle cx="450" cy="300" r="8" fill="#000080" />
+                                                                </svg>
+                                                                <span>+91 (IND)</span>
+                                                            </div>
+                                                            <div
+                                                                className={`auth-flag-item ${phoneCodeSelect === "other" ? "active" : ""}`}
+                                                                onClick={() => {
+                                                                    setPhoneCodeSelect("other");
+                                                                    setCustomPhoneCode("+");
+                                                                    setIsPhoneDropdownOpen(false);
+                                                                }}
+                                                            >
+                                                                <span style={{ fontSize: "14px", lineHeight: 1 }}>🌐</span>
+                                                                <span>Other</span>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </>
                                             )}
                                         </div>
                                         <div className="col-8 col-sm-8 col-md-8">
@@ -373,42 +457,28 @@ const Register = () => {
                                     )}
                                 </div>
 
-                                {/* Masked Email ID (Password format / *** format) */}
-                                <div className="auth-input-group mb-2 position-relative">
+                                {/* Email ID */}
+                                <div className="auth-input-group mb-2">
                                     <label className="auth-input-label">
                                         Email Id
                                     </label>
-                                    <div className="input-group-auth position-relative">
-                                        <input
-                                            type={showEmail ? "text" : "password"}
-                                            className={`auth-input pe-5 ${touched.email && emailError ? "auth-input-invalid" : ""}`}
-                                            placeholder="example@gmail.com"
-                                            value={email}
-                                            onChange={(e) => {
-                                                setEmail(e.target.value);
-                                                setTouched((prev) => ({ ...prev, email: true }));
-                                            }}
-                                            onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
-                                            onPaste={(e) => handlePreventPaste(e, "Email Id")}
-                                            onCopy={(e) => e.preventDefault()}
-                                            onCut={(e) => e.preventDefault()}
-                                            onDrop={(e) => e.preventDefault()}
-                                            autoComplete="new-password"
-                                            required
-                                        />
-                                        <button
-                                            type="button"
-                                            className="password-toggle-btn position-absolute end-0 top-50 translate-middle-y"
-                                            onClick={() => setShowEmail(!showEmail)}
-                                            title={showEmail ? "Hide Email" : "Show Email"}
-                                        >
-                                            {showEmail ? (
-                                                <IoEyeOffOutline size={20} />
-                                            ) : (
-                                                <IoEyeOutline size={20} />
-                                            )}
-                                        </button>
-                                    </div>
+                                    <input
+                                        type="email"
+                                        className={`auth-input ${touched.email && emailError ? "auth-input-invalid" : ""}`}
+                                        placeholder="example@gmail.com"
+                                        value={email}
+                                        onChange={(e) => {
+                                            setEmail(e.target.value);
+                                            setTouched((prev) => ({ ...prev, email: true }));
+                                        }}
+                                        onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
+                                        onPaste={(e) => handlePreventPaste(e, "Email Id")}
+                                        onCopy={(e) => e.preventDefault()}
+                                        onCut={(e) => e.preventDefault()}
+                                        onDrop={(e) => e.preventDefault()}
+                                        autoComplete="email"
+                                        required
+                                    />
                                     {touched.email && emailError && (
                                         <p className="auth-error-text">
                                             <IoAlertCircleOutline size={14} /> {emailError}

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { FiChevronDown, FiX, FiCheckCircle } from "react-icons/fi";
+import React, { useState, useEffect, useRef } from "react";
+import { FiChevronDown, FiX, FiUser, FiMail, FiSearch } from "react-icons/fi";
 import Swal from "sweetalert2";
 import { adminServices } from "../services/AdminServices";
+import { getStoredTaxYear } from "../../utils/taxYear";
 import "./emails.css";
 
 const AdminEmails = () => {
@@ -10,8 +11,14 @@ const AdminEmails = () => {
     const [selectedTemplate, setSelectedTemplate] = useState("");
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
-    const [recipientList, setRecipientList] = useState([]);
+    const [allUsers, setAllUsers] = useState([]);
+    const [usersLoading, setUsersLoading] = useState(false);
+    const [showNameSuggestions, setShowNameSuggestions] = useState(false);
+    const [showEmailSuggestions, setShowEmailSuggestions] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+
+    const nameWrapperRef = useRef(null);
+    const emailWrapperRef = useRef(null);
 
     // Extract credentials helper
     const getCredentials = () => {
@@ -42,10 +49,24 @@ const AdminEmails = () => {
                 }
             }
         }
-        return { userId };
+        return { userId, taxYear: getStoredTaxYear() };
     };
 
-    // Dynamically load available email templates from API
+    // Close suggestion dropdowns when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (nameWrapperRef.current && !nameWrapperRef.current.contains(event.target)) {
+                setShowNameSuggestions(false);
+            }
+            if (emailWrapperRef.current && !emailWrapperRef.current.contains(event.target)) {
+                setShowEmailSuggestions(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    // Load available email templates & customer users list
     useEffect(() => {
         const fetchTemplates = async () => {
             setTemplatesLoading(true);
@@ -70,11 +91,119 @@ const AdminEmails = () => {
                 setTemplatesLoading(false);
             }
         };
+
+        const fetchAllUsers = async () => {
+            setUsersLoading(true);
+            try {
+                const { userId, taxYear } = getCredentials();
+                let rawList = [];
+
+                // Try usersliist first
+                try {
+                    const res = await adminServices.usersliist({
+                        user_id: userId,
+                        taxYear: String(taxYear)
+                    });
+                    if (res?.data) {
+                        rawList = res.data.data || res.data.users || res.data.list || (Array.isArray(res.data) ? res.data : []);
+                    }
+                } catch (e) {
+                    console.warn("usersliist fallback to alluserslist:", e);
+                }
+
+                // Fallback to alluserslist
+                if (!rawList || rawList.length === 0) {
+                    const resAll = await adminServices.alluserslist({
+                        filestate: "ALL",
+                        user_id: userId,
+                        taxYear: String(taxYear),
+                        per_page: 500,
+                        page: 1
+                    });
+                    if (resAll?.data) {
+                        rawList = resAll.data.data || resAll.data.users || resAll.data.list || (Array.isArray(resAll.data) ? resAll.data : []);
+                    }
+                }
+
+                const mapped = (rawList || []).map((item, idx) => {
+                    const uId = item.u_user_id || item.user_id || item.client_id || item.id || idx;
+                    const uName = item.user_name || item.client_name || item.name || `${item.first_name || ""} ${item.last_name || ""}`.trim() || "";
+                    const uEmail = item.email || item.email_id || item.emailaddress || item.email_address || "";
+                    const uFilenumber = item.unique_code || item.filenumber || item.file_number || "";
+                    return {
+                        id: uId,
+                        name: uName,
+                        email: uEmail,
+                        filenumber: uFilenumber
+                    };
+                }).filter(u => u.name || u.email);
+
+                setAllUsers(mapped);
+            } catch (err) {
+                console.error("Failed to fetch all users list:", err);
+            } finally {
+                setUsersLoading(false);
+            }
+        };
+
         fetchTemplates();
+        fetchAllUsers();
     }, []);
 
-    // Add recipient to list
-    const handleAddUser = () => {
+    // Handle pick from suggestions
+    const handleSelectUser = (user) => {
+        setName(user.name || "");
+        setEmail(user.email || "");
+        setShowNameSuggestions(false);
+        setShowEmailSuggestions(false);
+    };
+
+    // Filter suggestions based on name query
+    const filteredByName = allUsers.filter((u) => {
+        const q = name.toLowerCase().trim();
+        if (!q) return true;
+        return (
+            (u.name && u.name.toLowerCase().includes(q)) ||
+            (u.email && u.email.toLowerCase().includes(q)) ||
+            (u.filenumber && String(u.filenumber).toLowerCase().includes(q))
+        );
+    });
+
+    // Filter suggestions based on email query
+    const filteredByEmail = allUsers.filter((u) => {
+        const q = email.toLowerCase().trim();
+        if (!q) return true;
+        return (
+            (u.email && u.email.toLowerCase().includes(q)) ||
+            (u.name && u.name.toLowerCase().includes(q)) ||
+            (u.filenumber && String(u.filenumber).toLowerCase().includes(q))
+        );
+    });
+
+    // Submit single user email
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!selectedTemplate) {
+            Swal.fire({
+                icon: "warning",
+                title: "Template Required",
+                text: "Please select an email template.",
+                confirmButtonColor: "#1b2e6b"
+            });
+            return;
+        }
+
+        if (!name.trim()) {
+            Swal.fire({
+                icon: "warning",
+                title: "Name Required",
+                text: "Please enter or select a client name.",
+                confirmButtonColor: "#1b2e6b"
+            });
+            return;
+        }
+
         if (!email.trim()) {
             Swal.fire({
                 icon: "warning",
@@ -90,61 +219,7 @@ const AdminEmails = () => {
             Swal.fire({
                 icon: "warning",
                 title: "Invalid Email",
-                text: "Please enter a valid email address format.",
-                confirmButtonColor: "#1b2e6b"
-            });
-            return;
-        }
-
-        // Check if already added
-        if (recipientList.some((u) => u.email.toLowerCase() === email.trim().toLowerCase())) {
-            Swal.fire({
-                icon: "info",
-                title: "Already Added",
-                text: "This recipient email is already in the list.",
-                confirmButtonColor: "#1b2e6b"
-            });
-            return;
-        }
-
-        const newUser = {
-            id: Date.now(),
-            name: name.trim() || "Client",
-            email: email.trim()
-        };
-
-        setRecipientList((prev) => [...prev, newUser]);
-        setName("");
-        setEmail("");
-    };
-
-    // Remove recipient
-    const handleRemoveUser = (id) => {
-        setRecipientList((prev) => prev.filter((u) => u.id !== id));
-    };
-
-    // Submit and send emails
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        // If inputs are typed but not added yet, auto-add
-        let targets = [...recipientList];
-        if (email.trim()) {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (emailRegex.test(email.trim()) && !targets.some((u) => u.email.toLowerCase() === email.trim().toLowerCase())) {
-                targets.push({
-                    id: Date.now(),
-                    name: name.trim() || "Client",
-                    email: email.trim()
-                });
-            }
-        }
-
-        if (targets.length === 0) {
-            Swal.fire({
-                icon: "warning",
-                title: "No Recipients",
-                text: "Please enter a recipient Name and Email Id.",
+                text: "Please enter a valid email format.",
                 confirmButtonColor: "#1b2e6b"
             });
             return;
@@ -153,42 +228,34 @@ const AdminEmails = () => {
         setSubmitting(true);
         try {
             const { userId } = getCredentials();
-
-            // Send to all targets using setting/sendEmailToClient endpoint
-            const sendPromises = targets.map((recipient) =>
-                adminServices.sendEmailToClient({
-                    user_id: userId,
-                    ettemplateid: selectedTemplate,
-                    clientname: recipient.name,
-                    useremail: recipient.email
-                })
-            );
-
-            const results = await Promise.allSettled(sendPromises);
-            const successfulCount = results.filter((r) => r.status === "fulfilled" && r.value?.data?.http_code !== 999).length;
+            const payload = {
+                ettemplateid: selectedTemplate,
+                clientname: name.trim(),
+                useremail: email.trim(),
+                user_id: userId
+            };
+            const res = await adminServices.sendEmailToClient(payload);
 
             const selectedTmplObj = templates.find((t) => t.id === selectedTemplate);
             const tmplName = selectedTmplObj ? selectedTmplObj.label : selectedTemplate;
 
-            if (successfulCount > 0 || results.length > 0) {
+            if (res?.data?.http_code !== 999 && res?.data?.status !== false) {
                 Swal.fire({
                     icon: "success",
-                    title: "Emails Sent!",
-                    text: `"${tmplName}" email has been sent successfully to ${targets.length} client(s).`,
+                    title: "Email Sent!",
+                    text: `"${tmplName}" email has been sent successfully to ${name.trim()} (${email.trim()}).`,
                     confirmButtonColor: "#1b2e6b"
                 });
+                setName("");
+                setEmail("");
             } else {
                 Swal.fire({
                     icon: "error",
                     title: "Failed to Send",
-                    text: "Could not send email. Please verify template and email settings.",
+                    text: res?.data?.status_smessage || "Could not send email. Please verify email template settings.",
                     confirmButtonColor: "#1b2e6b"
                 });
             }
-
-            setName("");
-            setEmail("");
-            setRecipientList([]);
         } catch (error) {
             console.error("Error sending email:", error);
             Swal.fire({
@@ -231,58 +298,128 @@ const AdminEmails = () => {
                     <FiChevronDown className="emails-select-arrow" />
                 </div>
 
-                {/* Input Fields Row */}
+                {/* Input Fields Row with Auto-suggestions */}
                 <div className="emails-inputs-row">
-                    <div className="emails-input-box">
-                        <input
-                            type="text"
-                            className="emails-text-input"
-                            placeholder="Name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="emails-input-box">
-                        <input
-                            type="email"
-                            className="emails-text-input"
-                            placeholder="Email Id"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                    </div>
-
-                    <button
-                        type="button"
-                        className="btn btn-add-users"
-                        onClick={handleAddUser}
-                    >
-                        Add Users
-                    </button>
-                </div>
-
-                {/* Added Recipients Chips */}
-                {recipientList.length > 0 && (
-                    <div className="emails-recipients-container">
-                        {recipientList.map((user) => (
-                            <div key={user.id} className="email-user-chip">
-                                <FiCheckCircle size={14} className="text-success" />
-                                <span>
-                                    <strong>{user.name}:</strong> {user.email}
-                                </span>
+                    {/* Name Input with Autocomplete Dropdown */}
+                    <div className="emails-input-box position-relative" ref={nameWrapperRef}>
+                        <div className="emails-input-with-icon">
+                            <FiUser className="input-leading-icon" />
+                            <input
+                                type="text"
+                                className="emails-text-input"
+                                placeholder="Client Name"
+                                value={name}
+                                onChange={(e) => {
+                                    setName(e.target.value);
+                                    setShowNameSuggestions(true);
+                                }}
+                                onFocus={() => setShowNameSuggestions(true)}
+                                autoComplete="off"
+                            />
+                            {name && (
                                 <button
                                     type="button"
-                                    className="chip-remove-btn"
-                                    onClick={() => handleRemoveUser(user.id)}
-                                    title="Remove recipient"
+                                    className="input-clear-btn"
+                                    onClick={() => setName("")}
+                                    title="Clear name"
                                 >
                                     <FiX size={14} />
                                 </button>
+                            )}
+                        </div>
+
+                        {/* Name Suggestions Dropdown */}
+                        {showNameSuggestions && (
+                            <div className="emails-suggestion-dropdown">
+                                {usersLoading ? (
+                                    <div className="suggestion-item text-muted small py-2 text-center">
+                                        Loading users...
+                                    </div>
+                                ) : filteredByName.length === 0 ? (
+                                    <div className="suggestion-item text-muted small py-2 px-3">
+                                        No matching user (custom name)
+                                    </div>
+                                ) : (
+                                    filteredByName.slice(0, 8).map((user) => (
+                                        <div
+                                            key={user.id}
+                                            className="suggestion-item"
+                                            onMouseDown={() => handleSelectUser(user)}
+                                        >
+                                            <div className="suggestion-user-info">
+                                                <span className="suggestion-name">{user.name}</span>
+                                                <span className="suggestion-email">{user.email}</span>
+                                            </div>
+                                            {user.filenumber && (
+                                                <span className="suggestion-badge">#{user.filenumber}</span>
+                                            )}
+                                        </div>
+                                    ))
+                                )}
                             </div>
-                        ))}
+                        )}
                     </div>
-                )}
+
+                    {/* Email Input with Autocomplete Dropdown */}
+                    <div className="emails-input-box position-relative" ref={emailWrapperRef}>
+                        <div className="emails-input-with-icon">
+                            <FiMail className="input-leading-icon" />
+                            <input
+                                type="email"
+                                className="emails-text-input"
+                                placeholder="Client Email Id"
+                                value={email}
+                                onChange={(e) => {
+                                    setEmail(e.target.value);
+                                    setShowEmailSuggestions(true);
+                                }}
+                                onFocus={() => setShowEmailSuggestions(true)}
+                                autoComplete="off"
+                            />
+                            {email && (
+                                <button
+                                    type="button"
+                                    className="input-clear-btn"
+                                    onClick={() => setEmail("")}
+                                    title="Clear email"
+                                >
+                                    <FiX size={14} />
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Email Suggestions Dropdown */}
+                        {showEmailSuggestions && (
+                            <div className="emails-suggestion-dropdown">
+                                {usersLoading ? (
+                                    <div className="suggestion-item text-muted small py-2 text-center">
+                                        Loading users...
+                                    </div>
+                                ) : filteredByEmail.length === 0 ? (
+                                    <div className="suggestion-item text-muted small py-2 px-3">
+                                        No matching user (custom email)
+                                    </div>
+                                ) : (
+                                    filteredByEmail.slice(0, 8).map((user) => (
+                                        <div
+                                            key={user.id}
+                                            className="suggestion-item"
+                                            onMouseDown={() => handleSelectUser(user)}
+                                        >
+                                            <div className="suggestion-user-info">
+                                                <span className="suggestion-name">{user.name}</span>
+                                                <span className="suggestion-email">{user.email}</span>
+                                            </div>
+                                            {user.filenumber && (
+                                                <span className="suggestion-badge">#{user.filenumber}</span>
+                                            )}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
 
                 {/* Submit Action Button */}
                 <div className="emails-submit-row">

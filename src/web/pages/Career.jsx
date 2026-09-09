@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
+import { webservices } from "../services/webServices";
 import "./career.css";
 import careerHeroImage from "../../assets/image/hero_track.png";
-import heroBg from "../../assets/image/BACKGROUD.jpeg";
 import rocket from "../../assets/image/boxicons_rocket.png";
 import apply from "../../assets/image/apply.png";
 
@@ -37,12 +38,230 @@ const Career = () => {
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
     const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
-    const [form, setForm] = useState({ firstName: "", lastName: "", email: "", phone: "", resume: null, website: "" });
+
+    // Phone country code state
+    const [phoneCodeSelect, setPhoneCodeSelect] = useState("+1");
+    const [customPhoneCode, setCustomPhoneCode] = useState("+");
+    const [isPhoneDropdownOpen, setIsPhoneDropdownOpen] = useState(false);
+    const phoneDropdownRef = useRef(null);
+    const fileInputRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (phoneDropdownRef.current && !phoneDropdownRef.current.contains(event.target)) {
+                setIsPhoneDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    // Form state & validations
+    const [form, setForm] = useState({
+        firstname: "",
+        lastname: "",
+        emailaddress: "",
+        phone: "",
+        message: "",
+        uploadresume: null,
+    });
+    const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const handleChange = (e) => {
-        const { name, value, files } = e.target;
-        setForm((prev) => ({ ...prev, [name]: files ? files[0] : value }));
+        const { name, value } = e.target;
+        setForm((prev) => ({ ...prev, [name]: value }));
+        if (errors[name]) {
+            setErrors((prev) => {
+                const next = { ...prev };
+                delete next[name];
+                return next;
+            });
+        }
     };
-    const handleSubmit = (e) => { e.preventDefault(); alert("Application submitted! We'll be in touch."); };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const allowedExtensions = [".pdf", ".doc", ".docx"];
+        const fileExtension = "." + file.name.split(".").pop().toLowerCase();
+
+        if (!allowedExtensions.includes(fileExtension)) {
+            setErrors((prev) => ({
+                ...prev,
+                uploadresume: "Only PDF (.pdf) and Word documents (.doc, .docx) are allowed.",
+            }));
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            return;
+        }
+
+        const maxSize = 4 * 1024 * 1024; // 4 MB
+        if (file.size > maxSize) {
+            setErrors((prev) => ({
+                ...prev,
+                uploadresume: "Resume file size must not exceed 4 MB.",
+            }));
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            return;
+        }
+
+        setForm((prev) => ({ ...prev, uploadresume: file }));
+        setErrors((prev) => {
+            const next = { ...prev };
+            delete next.uploadresume;
+            return next;
+        });
+    };
+
+    const handleRemoveFile = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        setForm((prev) => ({ ...prev, uploadresume: null }));
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        setErrors((prev) => {
+            const next = { ...prev };
+            delete next.uploadresume;
+            return next;
+        });
+    };
+
+    const formatFileSize = (bytes) => {
+        if (!bytes) return "";
+        if (bytes < 1024) return bytes + " B";
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+        return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+    };
+
+    const validate = () => {
+        const newErrors = {};
+
+        // First Name
+        if (!form.firstname || !form.firstname.trim()) {
+            newErrors.firstname = "First name is required.";
+        } else if (form.firstname.trim().length < 2) {
+            newErrors.firstname = "First name must be at least 2 characters.";
+        } else if (!/^[a-zA-Z\s'-]+$/.test(form.firstname.trim())) {
+            newErrors.firstname = "First name can only contain letters, spaces, and hyphens.";
+        }
+
+        // Last Name
+        if (!form.lastname || !form.lastname.trim()) {
+            newErrors.lastname = "Last name is required.";
+        } else if (!/^[a-zA-Z\s'-]+$/.test(form.lastname.trim())) {
+            newErrors.lastname = "Last name can only contain letters, spaces, and hyphens.";
+        }
+
+        // Email
+        if (!form.emailaddress || !form.emailaddress.trim()) {
+            newErrors.emailaddress = "Email address is required.";
+        } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(form.emailaddress.trim())) {
+            newErrors.emailaddress = "Please enter a valid email address.";
+        }
+
+        // Phone Extension
+        const effectivePhoneExt = phoneCodeSelect === "other" ? customPhoneCode.trim() : phoneCodeSelect;
+        if (!effectivePhoneExt || effectivePhoneExt === "+" || !/^\+[0-9]{1,4}$/.test(effectivePhoneExt)) {
+            newErrors.phoneext = "Please enter a valid country code (e.g. +44).";
+        }
+
+        // Phone Number
+        if (!form.phone || !form.phone.trim()) {
+            newErrors.phone = "Phone number is required.";
+        } else {
+            const digits = form.phone.replace(/\D/g, "");
+            if (digits.length < 7 || digits.length > 15) {
+                newErrors.phone = "Phone number must be between 7 and 15 digits.";
+            }
+        }
+
+        // Message
+        if (!form.message || !form.message.trim()) {
+            newErrors.message = "Message / Cover note is required.";
+        } else if (form.message.trim().length < 5) {
+            newErrors.message = "Message must be at least 5 characters.";
+        }
+
+        // Resume
+        if (!form.uploadresume) {
+            newErrors.uploadresume = "Please upload your resume (PDF or Word, max 4MB).";
+        } else {
+            const allowedExtensions = [".pdf", ".doc", ".docx"];
+            const fileExtension = "." + form.uploadresume.name.split(".").pop().toLowerCase();
+            if (!allowedExtensions.includes(fileExtension)) {
+                newErrors.uploadresume = "Only PDF (.pdf) and Word documents (.doc, .docx) are allowed.";
+            } else if (form.uploadresume.size > 4 * 1024 * 1024) {
+                newErrors.uploadresume = "Resume file size must not exceed 4 MB.";
+            }
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!validate()) {
+            return;
+        }
+
+        setIsSubmitting(true);
+        const effectivePhoneExt = phoneCodeSelect === "other" ? customPhoneCode.trim() : phoneCodeSelect;
+
+        try {
+            const formData = new FormData();
+            formData.append("firstname", form.firstname.trim());
+            formData.append("lastname", form.lastname.trim());
+            formData.append("emailaddress", form.emailaddress.trim());
+            formData.append("phoneext", effectivePhoneExt);
+            formData.append("phone", form.phone.trim());
+            formData.append("message", form.message.trim());
+            formData.append("uploadresume", form.uploadresume);
+
+            const response = await webservices.careerssubmit(formData);
+
+            if (response.data && (response.data.http_code === 200 || response.data.status_smessage?.toLowerCase().includes("success"))) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Application Submitted!",
+                    text: response.data.status_smessage || "Career has been added successfully.",
+                    confirmButtonColor: "#1B2E6B",
+                });
+
+                // Reset form
+                setForm({
+                    firstname: "",
+                    lastname: "",
+                    emailaddress: "",
+                    phone: "",
+                    message: "",
+                    uploadresume: null,
+                });
+                setPhoneCodeSelect("+1");
+                setCustomPhoneCode("+");
+                setErrors({});
+                if (fileInputRef.current) fileInputRef.current.value = "";
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Submission Failed",
+                    text: response.data?.status_smessage || "Unable to submit application. Please try again.",
+                    confirmButtonColor: "#1B2E6B",
+                });
+            }
+        } catch (error) {
+            console.error("Career submission error:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Submission Failed",
+                text: error?.response?.data?.status_smessage || error?.message || "Something went wrong while submitting your application. Please try again.",
+                confirmButtonColor: "#1B2E6B",
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <>
@@ -80,7 +299,7 @@ const Career = () => {
 
                             {/* Floating rocket icon — top right, bobs up/down */}
                             <div className="cr-hero-float cr-hero-float--rocket">
-                                <img src={rocket} height={20} width={20}/>
+                                <img src={rocket} alt="Rocket icon" height={20} width={20} />
                             </div>
 
                             {/* Floating "100% Client First" pill — bottom left, bobs up/down (delayed) */}
@@ -106,7 +325,7 @@ const Career = () => {
                         </h1>
 
                         <p className="cr-hero-desc">
-                            We're a tax advisory and compliance practice. These are the roles we're currently hiring for, grouped by practice area."
+                            We're a tax advisory and compliance practice. These are the roles we're currently hiring for, grouped by practice area.
                         </p>
 
                         <a href="#cr-form" className="cr-hero-btn">
@@ -118,7 +337,6 @@ const Career = () => {
                     </div>
                 </div>
             </section>
-
 
             {/* ── Culture ─────────────────────────────────────────────────── */}
             <section className="cr-culture">
@@ -149,11 +367,11 @@ const Career = () => {
             </section>
 
             {/* ── Application Form ─────────────────────────────────────────── */}
-            <section className="cr-form-section" id="cr-form" >
+            <section className="cr-form-section" id="cr-form">
                 <div className="cr-form-inner">
                     <div className="cr-form-header">
                         <div className="cr-form-eyebrow">
-                            <img src={apply} height={13} width={13}/>
+                            <img src={apply} alt="Apply icon" height={13} width={13} />
                             Apply
                         </div>
                         <h2 className="cr-form-title">Forward your CV. We read every one.</h2>
@@ -161,34 +379,277 @@ const Career = () => {
                     </div>
                     <div className="cr-form-card">
                         <p className="cr-form-card-title">Tell us about yourself</p>
-                        <form className="cr-form" onSubmit={handleSubmit}>
+                        <form className="cr-form" onSubmit={handleSubmit} noValidate>
                             <div className="cr-form-row">
-                                <div className="cr-form-group"><label className="cr-form-label" htmlFor="cr-firstName">First name</label><input id="cr-firstName" className="cr-form-input" type="text" name="firstName" placeholder="John" value={form.firstName} onChange={handleChange} required /></div>
-                                <div className="cr-form-group"><label className="cr-form-label" htmlFor="cr-lastName">Last name</label><input id="cr-lastName" className="cr-form-input" type="text" name="lastName" placeholder="Doe" value={form.lastName} onChange={handleChange} required /></div>
-                            </div>
-                            <div className="cr-form-row">
-                                <div className="cr-form-group"><label className="cr-form-label" htmlFor="cr-email">Email</label><input id="cr-email" className="cr-form-input" type="email" name="email" placeholder="john@example.com" value={form.email} onChange={handleChange} required /></div>
                                 <div className="cr-form-group">
-                                    <label className="cr-form-label" htmlFor="cr-phone">Phone</label>
-                                    <div className="cr-phone-wrap">
-                                        <span className="cr-phone-prefix"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" width="20" height="11" style={{ borderRadius: "2px", display: "block" }}><rect width="7410" height="3900" fill="#B22234" /><rect y="300" width="7410" height="300" fill="white" /><rect y="900" width="7410" height="300" fill="white" /><rect y="1500" width="7410" height="300" fill="white" /><rect y="2100" width="7410" height="300" fill="white" /><rect y="2700" width="7410" height="300" fill="white" /><rect y="3300" width="7410" height="300" fill="white" /><rect width="2964" height="2100" fill="#3C3B6E" /></svg><span>+1</span></span>
-                                        <input id="cr-phone" className="cr-form-input cr-phone-input" type="tel" name="phone" placeholder="(555) 000-0000" value={form.phone} onChange={handleChange} />
-                                    </div>
+                                    <label className="cr-form-label" htmlFor="cr-firstname">First name *</label>
+                                    <input
+                                        id="cr-firstname"
+                                        className={`cr-form-input ${errors.firstname ? "is-invalid" : ""}`}
+                                        type="text"
+                                        name="firstname"
+                                        placeholder="John"
+                                        value={form.firstname}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                    {errors.firstname && <span className="cr-field-error">{errors.firstname}</span>}
+                                </div>
+                                <div className="cr-form-group">
+                                    <label className="cr-form-label" htmlFor="cr-lastname">Last name *</label>
+                                    <input
+                                        id="cr-lastname"
+                                        className={`cr-form-input ${errors.lastname ? "is-invalid" : ""}`}
+                                        type="text"
+                                        name="lastname"
+                                        placeholder="Doe"
+                                        value={form.lastname}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                    {errors.lastname && <span className="cr-field-error">{errors.lastname}</span>}
                                 </div>
                             </div>
+
+                            <div className="cr-form-row">
+                                <div className="cr-form-group">
+                                    <label className="cr-form-label" htmlFor="cr-emailaddress">Email *</label>
+                                    <input
+                                        id="cr-emailaddress"
+                                        className={`cr-form-input ${errors.emailaddress ? "is-invalid" : ""}`}
+                                        type="email"
+                                        name="emailaddress"
+                                        placeholder="john.doe@example.com"
+                                        value={form.emailaddress}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                    {errors.emailaddress && <span className="cr-field-error">{errors.emailaddress}</span>}
+                                </div>
+                                <div className="cr-form-group">
+                                    <label className="cr-form-label" htmlFor="cr-phone">Phone *</label>
+                                    <div className={`cr-phone-wrap ${errors.phone || errors.phoneext ? "is-invalid" : ""}`} ref={phoneDropdownRef}>
+                                        {phoneCodeSelect === "other" ? (
+                                            <div className="d-flex align-items-center">
+                                                <input
+                                                    type="text"
+                                                    className="cr-phone-prefix text-center"
+                                                    style={{ width: "65px", padding: "10px 4px", border: "none", borderRight: "1.5px solid #e5e7eb", background: "#f3f4f6" }}
+                                                    value={customPhoneCode}
+                                                    onChange={(e) => {
+                                                        let val = e.target.value;
+                                                        if (val && !val.startsWith("+")) {
+                                                            val = "+" + val.replace(/\+/g, "");
+                                                        }
+                                                        setCustomPhoneCode(val);
+                                                        if (errors.phoneext) {
+                                                            setErrors((prev) => {
+                                                                const next = { ...prev };
+                                                                delete next.phoneext;
+                                                                return next;
+                                                            });
+                                                        }
+                                                    }}
+                                                    placeholder="+XX"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setPhoneCodeSelect("+1");
+                                                        if (errors.phoneext) {
+                                                            setErrors((prev) => {
+                                                                const next = { ...prev };
+                                                                delete next.phoneext;
+                                                                return next;
+                                                            });
+                                                        }
+                                                    }}
+                                                    style={{ background: "none", border: "none", color: "#64748b", fontSize: "11px", padding: "0 6px", cursor: "pointer", textDecoration: "underline" }}
+                                                    title="Back to list"
+                                                >
+                                                    List
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    className="cr-phone-prefix-btn"
+                                                    onClick={() => setIsPhoneDropdownOpen((prev) => !prev)}
+                                                    title="Select country code"
+                                                >
+                                                    {phoneCodeSelect === "+1" && (
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" width="18" height="11" style={{ borderRadius: "2px", display: "block" }}>
+                                                            <rect width="7410" height="3900" fill="#B22234" />
+                                                            <rect y="300" width="7410" height="300" fill="white" />
+                                                            <rect y="900" width="7410" height="300" fill="white" />
+                                                            <rect y="1500" width="7410" height="300" fill="white" />
+                                                            <rect y="2100" width="7410" height="300" fill="white" />
+                                                            <rect y="2700" width="7410" height="300" fill="white" />
+                                                            <rect y="3300" width="7410" height="300" fill="white" />
+                                                            <rect width="2964" height="2100" fill="#3C3B6E" />
+                                                        </svg>
+                                                    )}
+                                                    {phoneCodeSelect === "+91" && (
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="18" height="11" style={{ borderRadius: "2px", display: "block" }}>
+                                                            <rect width="900" height="200" fill="#FF9933" />
+                                                            <rect y="200" width="900" height="200" fill="#FFFFFF" />
+                                                            <rect y="400" width="900" height="200" fill="#138808" />
+                                                            <circle cx="450" cy="300" r="60" fill="none" stroke="#000080" strokeWidth="6" />
+                                                            <circle cx="450" cy="300" r="8" fill="#000080" />
+                                                        </svg>
+                                                    )}
+                                                    <span>{phoneCodeSelect}</span>
+                                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isPhoneDropdownOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+                                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                                    </svg>
+                                                </button>
+
+                                                {isPhoneDropdownOpen && (
+                                                    <div className="cr-flag-menu">
+                                                        <div
+                                                            className={`cr-flag-item ${phoneCodeSelect === "+1" ? "active" : ""}`}
+                                                            onClick={() => {
+                                                                setPhoneCodeSelect("+1");
+                                                                setIsPhoneDropdownOpen(false);
+                                                                if (errors.phoneext) {
+                                                                    setErrors((prev) => {
+                                                                        const next = { ...prev };
+                                                                        delete next.phoneext;
+                                                                        return next;
+                                                                    });
+                                                                }
+                                                            }}
+                                                        >
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" width="18" height="11" style={{ borderRadius: "2px", display: "block" }}>
+                                                                <rect width="7410" height="3900" fill="#B22234" />
+                                                                <rect y="300" width="7410" height="300" fill="white" />
+                                                                <rect y="900" width="7410" height="300" fill="white" />
+                                                                <rect y="1500" width="7410" height="300" fill="white" />
+                                                                <rect y="2100" width="7410" height="300" fill="white" />
+                                                                <rect y="2700" width="7410" height="300" fill="white" />
+                                                                <rect y="3300" width="7410" height="300" fill="white" />
+                                                                <rect width="2964" height="2100" fill="#3C3B6E" />
+                                                            </svg>
+                                                            <span>+1 (USA)</span>
+                                                        </div>
+                                                        <div
+                                                            className={`cr-flag-item ${phoneCodeSelect === "+91" ? "active" : ""}`}
+                                                            onClick={() => {
+                                                                setPhoneCodeSelect("+91");
+                                                                setIsPhoneDropdownOpen(false);
+                                                                if (errors.phoneext) {
+                                                                    setErrors((prev) => {
+                                                                        const next = { ...prev };
+                                                                        delete next.phoneext;
+                                                                        return next;
+                                                                    });
+                                                                }
+                                                            }}
+                                                        >
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="18" height="11" style={{ borderRadius: "2px", display: "block" }}>
+                                                                <rect width="900" height="200" fill="#FF9933" />
+                                                                <rect y="200" width="900" height="200" fill="#FFFFFF" />
+                                                                <rect y="400" width="900" height="200" fill="#138808" />
+                                                                <circle cx="450" cy="300" r="60" fill="none" stroke="#000080" strokeWidth="6" />
+                                                                <circle cx="450" cy="300" r="8" fill="#000080" />
+                                                            </svg>
+                                                            <span>+91 (IND)</span>
+                                                        </div>
+                                                        <div
+                                                            className={`cr-flag-item ${phoneCodeSelect === "other" ? "active" : ""}`}
+                                                            onClick={() => {
+                                                                setPhoneCodeSelect("other");
+                                                                setCustomPhoneCode("+");
+                                                                setIsPhoneDropdownOpen(false);
+                                                            }}
+                                                        >
+                                                            <span style={{ fontSize: "14px", lineHeight: 1 }}>🌐</span>
+                                                            <span>Other</span>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
+                                        <input
+                                            id="cr-phone"
+                                            className="cr-form-input cr-phone-input"
+                                            type="tel"
+                                            name="phone"
+                                            placeholder={phoneCodeSelect === "+1" ? "(555) 000-0000" : phoneCodeSelect === "+91" ? "98765 43210" : "Phone number"}
+                                            value={form.phone}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    {errors.phoneext && <span className="cr-field-error">{errors.phoneext}</span>}
+                                    {errors.phone && <span className="cr-field-error">{errors.phone}</span>}
+                                </div>
+                            </div>
+
                             <div className="cr-form-group cr-form-group--full">
-                                <label className="cr-form-label" htmlFor="cr-resume">Resume</label>
-                                <label className="cr-file-upload" htmlFor="cr-resume">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 16V8M12 8l-3 3M12 8l3 3" stroke="#1B2E6B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /><path d="M20 16.5A4.5 4.5 0 0015.5 12H14a6 6 0 10-11.9 1.2" stroke="#6B7280" strokeWidth="1.6" strokeLinecap="round" fill="none" /></svg>
-                                    <span>{form.resume ? form.resume.name : "Upload your resume here"}</span>
-                                    <input id="cr-resume" type="file" name="resume" accept=".pdf,.doc,.docx" onChange={handleChange} style={{ display: "none" }} />
+                                <label className="cr-form-label" htmlFor="cr-resume">Resume (PDF or Word, max 4MB) *</label>
+                                <label className={`cr-file-upload ${errors.uploadresume ? "is-invalid" : ""}`} htmlFor="cr-resume">
+                                    <div className="cr-file-info">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+                                            <path d="M12 16V8M12 8l-3 3M12 8l3 3" stroke="#1B2E6B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                                            <path d="M20 16.5A4.5 4.5 0 0015.5 12H14a6 6 0 10-11.9 1.2" stroke="#6B7280" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+                                        </svg>
+                                        <span style={{ fontWeight: form.uploadresume ? "600" : "normal", color: form.uploadresume ? "#1B2E6B" : "inherit" }}>
+                                            {form.uploadresume ? form.uploadresume.name : "Upload your resume here (.pdf, .doc, .docx)"}
+                                        </span>
+                                        {form.uploadresume && (
+                                            <span className="cr-file-size">{formatFileSize(form.uploadresume.size)}</span>
+                                        )}
+                                    </div>
+                                    {form.uploadresume && (
+                                        <button
+                                            type="button"
+                                            className="cr-file-remove-btn"
+                                            onClick={handleRemoveFile}
+                                            title="Remove file"
+                                        >
+                                            ✕ Remove
+                                        </button>
+                                    )}
+                                    <input
+                                        id="cr-resume"
+                                        ref={fileInputRef}
+                                        type="file"
+                                        name="uploadresume"
+                                        accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                        onChange={handleFileChange}
+                                        style={{ display: "none" }}
+                                    />
                                 </label>
+                                <span className="cr-file-hint">Supported formats: PDF, DOC, DOCX up to 4 MB</span>
+                                {errors.uploadresume && <span className="cr-field-error">{errors.uploadresume}</span>}
                             </div>
+
                             <div className="cr-form-group cr-form-group--full">
-                                <label className="cr-form-label" htmlFor="cr-website">Website / Portfolio</label>
-                                <textarea id="cr-website" className="cr-form-input cr-form-textarea" name="website" placeholder="Tell us a bit about yourself or share a portfolio / LinkedIn URL..." value={form.website} onChange={handleChange} rows={3} />
+                                <label className="cr-form-label" htmlFor="cr-message">Message / Cover Note *</label>
+                                <textarea
+                                    id="cr-message"
+                                    className={`cr-form-input cr-form-textarea ${errors.message ? "is-invalid" : ""}`}
+                                    name="message"
+                                    placeholder="Tell us a bit about yourself, your background, or share your portfolio / LinkedIn URL..."
+                                    value={form.message}
+                                    onChange={handleChange}
+                                    rows={3}
+                                    required
+                                />
+                                {errors.message && <span className="cr-field-error">{errors.message}</span>}
                             </div>
-                            <button type="submit" className="cr-submit-btn" id="cr-submit-btn">Submit application →</button>
+
+                            <button type="submit" className="cr-submit-btn" id="cr-submit-btn" disabled={isSubmitting}>
+                                {isSubmitting ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Submitting application...
+                                    </>
+                                ) : (
+                                    <>Submit application →</>
+                                )}
+                            </button>
                         </form>
                     </div>
                 </div>

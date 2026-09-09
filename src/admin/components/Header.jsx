@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FiBell, FiChevronDown, FiCheck, FiLogOut, FiSettings } from "react-icons/fi";
+import { FiChevronDown, FiCheck, FiLogOut, FiSettings } from "react-icons/fi";
 import Swal from "sweetalert2";
 import logoImg from "../../assets/image/umpire_tax_logo.png";
 import { adminServices } from "../services/AdminServices";
@@ -145,7 +145,8 @@ const Header = () => {
         { label: "Comments", path: `${prefix}/comments` },
         { label: "Emails", path: `${prefix}/emails` },
         { label: "Call Us", path: `${prefix}/call-us` },
-        { label: "Careers", path: `${prefix}/careers` }
+        { label: "Careers", path: `${prefix}/careers` },
+        { label: "Registration", path: `${prefix}/registration` }
     ];
 
     const navItems = isAnalyst
@@ -174,6 +175,9 @@ const Header = () => {
         if (item.label === "Careers") {
             return location.pathname === `${prefix}/careers`;
         }
+        if (item.label === "Registration") {
+            return location.pathname === `${prefix}/registration`;
+        }
         if (item.isDropdown) {
             return (
                 location.pathname !== `${prefix}/login-history` &&
@@ -183,6 +187,7 @@ const Header = () => {
                 location.pathname !== `${prefix}/emails` &&
                 location.pathname !== `${prefix}/call-us` &&
                 location.pathname !== `${prefix}/careers` &&
+                location.pathname !== `${prefix}/registration` &&
                 location.pathname !== `${prefix}/settings` &&
                 (location.pathname.startsWith(prefix) || location.pathname === "/")
             );
@@ -218,6 +223,7 @@ const Header = () => {
             !location.pathname.startsWith(`${prefix}/emails`) &&
             !location.pathname.startsWith(`${prefix}/call-us`) &&
             !location.pathname.startsWith(`${prefix}/careers`) &&
+            !location.pathname.startsWith(`${prefix}/registration`) &&
             !location.pathname.startsWith(`${prefix}/settings`)
         ) {
             navigate(defaultLandingPage);
@@ -327,17 +333,8 @@ const Header = () => {
                     })}
                 </div>
 
-                {/* Right Actions: Notification Bell + Profile Dropdown */}
+                {/* Right Actions: Profile Dropdown */}
                 <div className="header-right-actions d-flex align-items-center gap-2 ms-3">
-                    {/* Notification Bell */}
-                    <div className="notification-bell-wrapper position-relative">
-                        <button className="btn btn-bell p-2 border-0 bg-transparent text-muted position-relative" title="Notifications">
-                            <FiBell size={20} className="bell-icon" />
-                            <span className="notification-badge position-absolute translate-middle badge rounded-pill">
-                                9
-                            </span>
-                        </button>
-                    </div>
 
                     {/* Profile Dropdown */}
                     <div className="profile-dropdown-wrapper position-relative" ref={profileDropdownRef}>

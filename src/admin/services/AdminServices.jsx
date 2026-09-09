@@ -92,7 +92,7 @@ const refferalslist = (data) => postUrl(`${API_URL}member/refferalslist`, data);
 // 7. Login History & Payments & Call Us & Comments & Emails & Careers
 // ==========================================
 const loginshistory = (data) => postUrl(`${API_URL}user/loginshistory`, data);
-const paymenthistory = (data) => postUrl(`${API_URL}member/paymenthistory`, data);
+const paymenthistory = (data) => postUrl(`${API_URL}user/allpayments`, data);
 const paymentshistory = (data) => postUrl(`${API_URL}user/paymentshistory`, data);
 const paymentslist = (data) => postUrl(`${API_URL}member/paymentslist`, data);
 const createOrder = (data) => postUrl(`${API_URL}payment/createOrder`, data);
@@ -105,8 +105,35 @@ const usercomments = (data) => postUrl(`${API_URL}member/usercomments`, data);
 const sendEmailToClient = (data) => postUrl(`${API_URL}settings/sendemailtoclient`, data);
 const emailtemplates = (data) => postUrl(`${API_URL}settings/emailtemplates`, data);
 const getemailtemplates = (data) => postUrl(`${API_URL}settings/emailtemplates`, data);
+const getsettings = (data = {}) => postUrl(`${API_URL}settings/getsettings`, data);
+const savesetting = (data) => postUrl(`${API_URL}settings/savesetting`, data);
+const updatesettings = (data) => postUrl(`${API_URL}settings/savesetting`, data);
+const getipslist = (data = {}) => postUrl(`${API_URL}settings/getipslist`, data);
+const saveips = (data) => postUrl(`${API_URL}settings/saveips`, data);
+const addip = (data) => postUrl(`${API_URL}settings/saveips`, data);
+const updateips = (data) => postUrl(`${API_URL}settings/updateips`, data);
+const updateip = (data) => postUrl(`${API_URL}settings/updateips`, data);
+const deleteuip = (data) => postUrl(`${API_URL}settings/deleteuip`, data);
+const deleteip = (data) => postUrl(`${API_URL}settings/deleteuip`, data);
 const careerslist = (data) => postUrl(`${API_URL}user/careerslist`, data);
 const deletecareer = (data) => postUrl(`${API_URL}user/deletecareer`, data);
+
+// ==========================================
+// 8. Admin Registration & Verification & Notifications
+// ==========================================
+const registerAnalystUser = (data) => postUrl(`${API_URL}login/register-analyst-user`, data);
+const getRegisteredUsers = (data) => postUrl(`${API_URL}member/getUnverifiedUserList`, data);
+const getUnverifiedUserList = (data) => postUrl(`${API_URL}member/getUnverifiedUserList`, data);
+const getRegisteredAnalysts = (data) => postUrl(`${API_URL}member/getanalystusers`, data);
+const getanalystusers = (data) => postUrl(`${API_URL}member/getanalystusers`, data);
+const registerMemberAdmin = (data) => postUrl(`${API_URL}login/register-analyst-user`, data);
+const forceverifycustomer = (data) => postUrl(`${API_URL}member/forceverifycustomer`, data);
+const pushUserVerification = (data) => postUrl(`${API_URL}member/forceverifycustomer`, data);
+
+// Notification APIs
+const sendUserNotification = (data) => postUrl(`${API_URL}member/sendnotification`, data);
+const getUserNotifications = (data) => postUrl(`${API_URL}member/getusernotifications`, data);
+const markNotificationAsRead = (data) => postUrl(`${API_URL}member/marknotificationread`, data);
 
 // ==========================================
 // Exported Service Object
@@ -167,8 +194,33 @@ export const adminServices = {
     sendEmailToClient,
     emailtemplates,
     getemailtemplates,
+    getsettings,
+    savesetting,
+    updatesettings,
+    getipslist,
+    saveips,
+    addip,
+    updateips,
+    updateip,
+    deleteuip,
+    deleteip,
     careerslist,
     deletecareer,
+
+    // Registration & Verification
+    registerAnalystUser,
+    getRegisteredUsers,
+    getUnverifiedUserList,
+    getRegisteredAnalysts,
+    getanalystusers,
+    registerMemberAdmin,
+    forceverifycustomer,
+    pushUserVerification,
+
+    // User Notifications
+    sendUserNotification,
+    getUserNotifications,
+    markNotificationAsRead,
 };
 
 export default adminServices;

@@ -128,9 +128,9 @@ const TaxAudit = () => {
                         <p className="srv-hero-desc">
                             From IRS audit defense to notice resolution and full tax representation — we stand between you and the IRS so you never face them alone.
                         </p>
-                        <a href="/contact" className="srv-hero-btn">Get Started</a>
+                        <Link to="/register" className="srv-hero-btn">Get Started</Link>
                     </div>
-                  
+
                 </div>
             </section>
 
@@ -177,7 +177,7 @@ const TaxAudit = () => {
                             <div className="srv-faq-badge">FAQ</div>
                             <h2 className="srv-faq-heading">Frequently Asked Questions</h2>
                             <p className="srv-faq-desc">
-                                Everything you need to know about IRS audit defense, notice responses, and professional tax representation.
+                                We help individuals and businesses to prepare accurate returns, stay compliant, and navigate tax season with confidence through reliable guidance and responsive support.
                             </p>
                             <Link to="/contact" className="srv-faq-more">
                                 Check More

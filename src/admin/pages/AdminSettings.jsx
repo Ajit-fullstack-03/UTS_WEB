@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FiTrash2, FiEdit2, FiSave, FiShield } from "react-icons/fi";
 import Swal from "sweetalert2";
 import AdminOtpModal from "../components/AdminOtpModal";
+import { adminServices } from "../services/AdminServices";
 import { getStoredTaxYear, setStoredTaxYear } from "../../utils/taxYear";
 import { getUserInfo } from "../../utils/userRole";
 import "./admin_settings.css";
@@ -18,11 +19,12 @@ const AdminSettings = () => {
     const userInfo = getUserInfo();
     const adminEmail = userInfo.email || "admin@umpiretaxsolutions.com";
 
-    // Form states matching Figma design
-    const [siteEmail, setSiteEmail] = useState("info@umpiretaxsolutions.com");
-    const [usPhone, setUsPhone] = useState("+1 704-555-0199");
-    const [indianPhone, setIndianPhone] = useState("+91 7751002719");
-    const [officeDays, setOfficeDays] = useState("Mon to Fri");
+    // Form states matching Figma & API response
+    const [settingId, setSettingId] = useState(1);
+    const [siteEmail, setSiteEmail] = useState("hello@umpiretaxsolutions.com");
+    const [usPhone, setUsPhone] = useState("5156864275");
+    const [indianPhone, setIndianPhone] = useState("8186051040");
+    const [officeDays, setOfficeDays] = useState("Mon to Sat");
     const [officeTiming, setOfficeTiming] = useState("9:00AM CST to 6:00PM CST");
     const [corporateOffice, setCorporateOffice] = useState("9500 Grove Crest Ln Charlotte NC 28262");
     const [processingCenter, setProcessingCenter] = useState("4-7-18/B Raghavendra Nagar, Nacharam Hyd 500076");
@@ -33,6 +35,7 @@ const AdminSettings = () => {
     const [sitePopupCode, setSitePopupCode] = useState("0");
     const [sitePopupName, setSitePopupName] = useState("Pop Up 3");
     const [taxYear, setTaxYear] = useState(getStoredTaxYear() || "2026");
+    const [settingsLoading, setSettingsLoading] = useState(false);
 
     // IP Address list state
     const [ipList, setIpList] = useState([
@@ -44,41 +47,105 @@ const AdminSettings = () => {
     const [editingIpId, setEditingIpId] = useState(null);
     const [editingIpValue, setEditingIpValue] = useState("");
 
-    // Load saved settings from localStorage if available
-    useEffect(() => {
-        try {
-            const savedSettings = localStorage.getItem("admin_portal_settings");
-            if (savedSettings) {
-                const parsed = JSON.parse(savedSettings);
-                if (parsed.siteEmail) setSiteEmail(parsed.siteEmail);
-                if (parsed.usPhone) setUsPhone(parsed.usPhone);
-                if (parsed.indianPhone) setIndianPhone(parsed.indianPhone);
-                if (parsed.officeDays) setOfficeDays(parsed.officeDays);
-                if (parsed.officeTiming) setOfficeTiming(parsed.officeTiming);
-                if (parsed.corporateOffice) setCorporateOffice(parsed.corporateOffice);
-                if (parsed.processingCenter) setProcessingCenter(parsed.processingCenter);
-                if (parsed.fbLink) setFbLink(parsed.fbLink);
-                if (parsed.twitterLink) setTwitterLink(parsed.twitterLink);
-                if (parsed.linkedinLink) setLinkedinLink(parsed.linkedinLink);
-                if (parsed.siteLink) setSiteLink(parsed.siteLink);
-                if (parsed.sitePopupCode !== undefined) setSitePopupCode(parsed.sitePopupCode);
-                if (parsed.sitePopupName) setSitePopupName(parsed.sitePopupName);
-                if (parsed.taxYear) setTaxYear(parsed.taxYear);
-            }
+    // Extract current authenticated user ID
+    const currentUserId = userInfo.user_id || userInfo.userId || userInfo.id || localStorage.getItem("currentUser")?.replace(/"/g, "") || "1";
 
+    // Fetch IP list function
+    const fetchIpList = async () => {
+        try {
+            const res = await adminServices.getipslist({});
+            if (res?.data && (res.data.http_code === 200 || res.data.status === true)) {
+                const list = res.data.ipslist || res.data.data || (Array.isArray(res.data) ? res.data : []);
+                if (Array.isArray(list)) {
+                    const mapped = list.map((item, idx) => ({
+                        id: item.ipid || item.id || idx + 1,
+                        ipid: item.ipid || item.id || idx + 1,
+                        ip: item.ipaddress || item.ip,
+                        ipaddress: item.ipaddress || item.ip,
+                        neveripdeleteflag: Number(item.neveripdeleteflag) || 0,
+                        ipstatus: item.ipstatus !== undefined ? Number(item.ipstatus) : 1
+                    }));
+                    setIpList(mapped);
+                    localStorage.setItem("admin_allowed_ips", JSON.stringify(mapped));
+                }
+            }
+        } catch (err) {
+            console.warn("Error fetching IP list from API:", err);
+        }
+    };
+
+    // Load dynamic settings and IP list from API
+    useEffect(() => {
+        const fetchSettings = async () => {
+            setSettingsLoading(true);
+            try {
+                const res = await adminServices.getsettings({});
+                if (res?.data && (res.data.http_code === 200 || res.data.status === true)) {
+                    const settingsList = res.data.settings || res.data.data;
+                    if (Array.isArray(settingsList) && settingsList.length > 0) {
+                        const s = settingsList[0];
+                        if (s.setting_id) setSettingId(s.setting_id);
+                        if (s.site_email) setSiteEmail(s.site_email);
+                        if (s.usphonenumber) setUsPhone(s.usphonenumber);
+                        if (s.indianphonenumber) setIndianPhone(s.indianphonenumber);
+                        if (s.officedays) setOfficeDays(s.officedays);
+                        if (s.officetimings) setOfficeTiming(s.officetimings);
+                        if (s.corporateoffice) setCorporateOffice(s.corporateoffice);
+                        if (s.processingcenter) setProcessingCenter(s.processingcenter);
+                        if (s.fblink) setFbLink(s.fblink);
+                        if (s.twitterlink) setTwitterLink(s.twitterlink);
+                        if (s.linkedinlink) setLinkedinLink(s.linkedinlink);
+                        if (s.siteURL) setSiteLink(s.siteURL);
+                        if (s.sitepopupsetting !== undefined) setSitePopupCode(String(s.sitepopupsetting));
+                        if (s.popuptype) setSitePopupName(s.popuptype.startsWith("Pop") ? s.popuptype : `Pop Up ${s.popuptype}`);
+                        if (s.taxyear) {
+                            setTaxYear(String(s.taxyear));
+                            setStoredTaxYear(String(s.taxyear));
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn("Error fetching settings from API:", err);
+            } finally {
+                setSettingsLoading(false);
+            }
+        };
+
+        fetchSettings();
+        fetchIpList();
+
+        try {
             const savedIps = localStorage.getItem("admin_allowed_ips");
             if (savedIps) {
                 setIpList(JSON.parse(savedIps));
             }
         } catch (e) {
-            console.warn("Error loading settings:", e);
+            console.warn("Error loading allowed IPs:", e);
         }
     }, []);
 
     // Handle Form Submit
-    const handleSubmitSettings = (e) => {
+    const handleSubmitSettings = async (e) => {
         e.preventDefault();
+        const popupTypeValue = String(sitePopupName.replace(/[^0-9]/g, "") || sitePopupCode || "1");
+
         const settingsPayload = {
+            user_id: currentUserId,
+            setting_id: settingId,
+            site_email: siteEmail,
+            usphonenumber: usPhone,
+            indianphonenumber: indianPhone,
+            officedays: officeDays,
+            officetimings: officeTiming,
+            corporateoffice: corporateOffice,
+            processingcenter: processingCenter,
+            fblink: fbLink,
+            twitterlink: twitterLink,
+            linkedinlink: linkedinLink,
+            sitepopupsetting: Number(sitePopupCode) || 0,
+            siteURL: siteLink,
+            taxyear: String(taxYear || "2025"),
+            popuptype: popupTypeValue,
             siteEmail,
             usPhone,
             indianPhone,
@@ -95,6 +162,16 @@ const AdminSettings = () => {
             taxYear
         };
 
+        let successMsg = "Settings are updated successfully.";
+        try {
+            const res = await adminServices.savesetting(settingsPayload);
+            if (res?.data?.status_smessage) {
+                successMsg = res.data.status_smessage;
+            }
+        } catch (err) {
+            console.warn("savesetting API error:", err);
+        }
+
         localStorage.setItem("admin_portal_settings", JSON.stringify(settingsPayload));
         if (taxYear) {
             setStoredTaxYear(taxYear);
@@ -104,7 +181,7 @@ const AdminSettings = () => {
         Swal.fire({
             icon: "success",
             title: "Settings Saved!",
-            text: "Global system and website settings have been successfully updated.",
+            text: successMsg,
             confirmButtonColor: "#1b2e6b",
             customClass: {
                 confirmButton: "btn btn-primary px-4 py-2"
@@ -142,7 +219,7 @@ const AdminSettings = () => {
     };
 
     // Add IP Address
-    const handleAddIp = (e) => {
+    const handleAddIp = async (e) => {
         e.preventDefault();
         const trimmed = newIp.trim();
         if (!trimmed) {
@@ -166,7 +243,7 @@ const AdminSettings = () => {
             return;
         }
 
-        if (ipList.some((item) => item.ip === trimmed)) {
+        if (ipList.some((item) => item.ip === trimmed || item.ipaddress === trimmed)) {
             Swal.fire({
                 icon: "info",
                 title: "Duplicate IP",
@@ -176,15 +253,26 @@ const AdminSettings = () => {
             return;
         }
 
-        const updated = [...ipList, { id: Date.now(), ip: trimmed }];
-        setIpList(updated);
-        localStorage.setItem("admin_allowed_ips", JSON.stringify(updated));
+        let successMsg = `IP ${trimmed} added to authorized list.`;
+        try {
+            const res = await adminServices.saveips({
+                user_id: currentUserId,
+                ipaddress: trimmed
+            });
+            if (res?.data?.status_smessage) {
+                successMsg = res.data.status_smessage;
+            }
+        } catch (err) {
+            console.warn("saveips API:", err);
+        }
+
         setNewIp("");
+        await fetchIpList();
 
         Swal.fire({
             icon: "success",
             title: "IP Added",
-            text: `IP ${trimmed} added to authorized list.`,
+            text: successMsg,
             timer: 2000,
             showConfirmButton: false,
             toast: true,
@@ -193,7 +281,19 @@ const AdminSettings = () => {
     };
 
     // Delete IP Address
-    const handleDeleteIp = (id, ip) => {
+    const handleDeleteIp = (id, ip, neveripdeleteflag, ipid) => {
+        if (neveripdeleteflag === 1 || neveripdeleteflag === "1") {
+            Swal.fire({
+                icon: "info",
+                title: "Protected System IP",
+                text: `IP address ${ip} is a system-protected IP and cannot be removed.`,
+                confirmButtonColor: "#1b2e6b"
+            });
+            return;
+        }
+
+        const targetIpId = ipid || id;
+
         Swal.fire({
             title: "Delete IP Address?",
             text: `Are you sure you want to remove IP address ${ip}?`,
@@ -208,15 +308,27 @@ const AdminSettings = () => {
                 cancelButton: "btn btn-light px-3 py-1 ms-2"
             },
             buttonsStyling: false
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
-                const updated = ipList.filter((item) => item.id !== id);
-                setIpList(updated);
-                localStorage.setItem("admin_allowed_ips", JSON.stringify(updated));
+                let successMsg = `IP ${ip} was deleted.`;
+                try {
+                    const res = await adminServices.deleteuip({
+                        user_id: currentUserId,
+                        ipid: targetIpId
+                    });
+                    if (res?.data?.status_smessage) {
+                        successMsg = res.data.status_smessage;
+                    }
+                } catch (err) {
+                    console.warn("deleteuip API:", err);
+                }
+
+                await fetchIpList();
+
                 Swal.fire({
                     icon: "success",
                     title: "IP Removed",
-                    text: `IP ${ip} was deleted.`,
+                    text: successMsg,
                     timer: 1800,
                     showConfirmButton: false,
                     toast: true,
@@ -228,30 +340,39 @@ const AdminSettings = () => {
 
     // Start Editing IP
     const handleStartEditIp = (item) => {
-        setEditingIpId(item.id);
-        setEditingIpValue(item.ip);
+        setEditingIpId(item.ipid || item.id);
+        setEditingIpValue(item.ip || item.ipaddress);
     };
 
     // Save Edited IP
-    const handleSaveEditIp = (id) => {
+    const handleSaveEditIp = async (id, itemObj) => {
         const trimmed = editingIpValue.trim();
         if (!trimmed) return;
 
-        const updated = ipList.map((item) => {
-            if (item.id === id) {
-                return { ...item, ip: trimmed };
-            }
-            return item;
-        });
+        const targetIpId = (itemObj && itemObj.ipid) || id;
+        let successMsg = "IP address is updated successfully.";
 
-        setIpList(updated);
-        localStorage.setItem("admin_allowed_ips", JSON.stringify(updated));
+        try {
+            const res = await adminServices.updateips({
+                user_id: currentUserId,
+                ipid: targetIpId,
+                ipaddress: trimmed
+            });
+            if (res?.data?.status_smessage) {
+                successMsg = res.data.status_smessage;
+            }
+        } catch (err) {
+            console.warn("updateips API:", err);
+        }
+
         setEditingIpId(null);
         setEditingIpValue("");
+        await fetchIpList();
 
         Swal.fire({
             icon: "success",
             title: "IP Updated",
+            text: successMsg,
             timer: 1800,
             showConfirmButton: false,
             toast: true,
@@ -310,16 +431,13 @@ const AdminSettings = () => {
                                     Site Email :
                                 </label>
                                 <div className="settings-input-wrap flex-grow-1">
-                                    <select
-                                        className="form-select settings-select"
+                                    <input
+                                        type="email"
+                                        className="form-control settings-input"
                                         value={siteEmail}
                                         onChange={(e) => setSiteEmail(e.target.value)}
-                                    >
-                                        <option value="Select User">Select User</option>
-                                        <option value="info@umpiretaxsolutions.com">info@umpiretaxsolutions.com</option>
-                                        <option value="admin@umpiretaxsolutions.com">admin@umpiretaxsolutions.com</option>
-                                        <option value="support@umpiretaxsolutions.com">support@umpiretaxsolutions.com</option>
-                                    </select>
+                                        placeholder="e.g. hello@umpiretaxsolutions.com"
+                                    />
                                 </div>
                             </div>
 
@@ -329,16 +447,13 @@ const AdminSettings = () => {
                                     US Phone Number :
                                 </label>
                                 <div className="settings-input-wrap flex-grow-1">
-                                    <select
-                                        className="form-select settings-select"
+                                    <input
+                                        type="text"
+                                        className="form-control settings-input"
                                         value={usPhone}
                                         onChange={(e) => setUsPhone(e.target.value)}
-                                    >
-                                        <option value="Select User">Select User</option>
-                                        <option value="+1 704-555-0199">+1 704-555-0199</option>
-                                        <option value="+1 980-292-1234">+1 980-292-1234</option>
-                                        <option value="+1 800-456-7890">+1 800-456-7890</option>
-                                    </select>
+                                        placeholder="e.g. 5156864275"
+                                    />
                                 </div>
                             </div>
 
@@ -348,16 +463,13 @@ const AdminSettings = () => {
                                     Indian Phone Number :
                                 </label>
                                 <div className="settings-input-wrap flex-grow-1">
-                                    <select
-                                        className="form-select settings-select"
+                                    <input
+                                        type="text"
+                                        className="form-control settings-input"
                                         value={indianPhone}
                                         onChange={(e) => setIndianPhone(e.target.value)}
-                                    >
-                                        <option value="Select User">Select User</option>
-                                        <option value="+91 7751002719">+91 7751002719</option>
-                                        <option value="+91 9876543210">+91 9876543210</option>
-                                        <option value="+91 8008123456">+91 8008123456</option>
-                                    </select>
+                                        placeholder="e.g. 8186051040"
+                                    />
                                 </div>
                             </div>
 
@@ -595,9 +707,9 @@ const AdminSettings = () => {
                                 <tbody>
                                     {ipList.length > 0 ? (
                                         ipList.map((item) => (
-                                            <tr key={item.id} className="ip-row">
+                                            <tr key={item.ipid || item.id} className="ip-row">
                                                 <td className="px-3 py-2 font-monospace fw-semibold text-dark">
-                                                    {editingIpId === item.id ? (
+                                                    {editingIpId === (item.ipid || item.id) ? (
                                                         <div className="d-flex align-items-center gap-2">
                                                             <input
                                                                 type="text"
@@ -609,23 +721,25 @@ const AdminSettings = () => {
                                                             <button
                                                                 type="button"
                                                                 className="btn btn-sm btn-success p-1"
-                                                                onClick={() => handleSaveEditIp(item.id)}
+                                                                onClick={() => handleSaveEditIp(item.ipid || item.id, item)}
                                                                 title="Save"
                                                             >
                                                                 <FiSave size={14} />
                                                             </button>
                                                         </div>
                                                     ) : (
-                                                        item.ip
+                                                        item.ip || item.ipaddress
                                                     )}
                                                 </td>
                                                 <td className="px-3 py-2 text-center">
                                                     <div className="d-flex align-items-center justify-content-center gap-3">
                                                         <button
                                                             type="button"
-                                                            className="btn-ip-action text-danger border-0 bg-transparent p-1"
-                                                            onClick={() => handleDeleteIp(item.id, item.ip)}
-                                                            title="Delete IP"
+                                                            className={`btn-ip-action ${item.neveripdeleteflag === 1 ? "text-muted opacity-50" : "text-danger"} border-0 bg-transparent p-1`}
+                                                            onClick={() => handleDeleteIp(item.id, item.ip || item.ipaddress, item.neveripdeleteflag, item.ipid)}
+                                                            title={item.neveripdeleteflag === 1 ? "Protected System IP (Cannot Delete)" : "Delete IP"}
+                                                            disabled={item.neveripdeleteflag === 1}
+                                                            style={{ cursor: item.neveripdeleteflag === 1 ? "not-allowed" : "pointer" }}
                                                         >
                                                             <FiTrash2 size={16} />
                                                         </button>

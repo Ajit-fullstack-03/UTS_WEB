@@ -110,9 +110,7 @@ const Sidebar = () => {
         { id: "review_upload_pending", path: `${prefix}/review-upload-pending`, label: "Review Upload Pending", count: counts.review_upload_pending }
     ];
 
-    const sidebarItems = isAnalyst
-        ? allSidebarItems.filter((item) => item.id !== "all")
-        : allSidebarItems;
+    const sidebarItems = allSidebarItems;
 
     const handleNavigation = (path) => {
         navigate(path);

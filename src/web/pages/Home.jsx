@@ -15,56 +15,59 @@ import step2Image from "../../assets/image/mid_frame2.png";
 import step3Image from "../../assets/image/mid_frame3.png";
 import heroBg from "../../assets/image/BACKGROUD.jpeg";
 import gist from "../../assets/image/gift.gif";
+import srf1 from "../../assets/image/srf1.png";
+import Tax_planning_2 from "../../assets/image/Tax_planning_2.png";
+import Book_keeping_4 from "../../assets/image/Book_keeping_4.png";
 import { ArrowLeft, ArrowRight } from "iconsax-reactjs";
 
 
 const services = [
     { id: 1, image: onePlatformImg1, label: "Free Tax Estimate" },
-    { id: 2, image: taxEstimateImg2, label: "One Platform. Every Tax Need." },
-    { id: 3, image: weFileImg1, label: "We File. You Relax." },
-    { id: 4, image: onePlatformImg1, label: "Free Tax Estimate" },
-    { id: 5, image: taxEstimateImg2, label: "One Platform. Every Tax Need." },
-    { id: 6, image: weFileImg1, label: "We File. You Relax." },
+    { id: 2, image: weFileImg1, label: "One Platform. Every Tax Need." },
+    { id: 3, image: taxEstimateImg2, label: "We File. You Relax." },
+    { id: 4, image: srf1, label: "Individual & Corporate Tax Filing" },
+    { id: 5, image: Tax_planning_2, label: "Business Tax Returns." },
+    { id: 6, image: Book_keeping_4, label: "Accounts Payable/Receivable." },
 ];
 
 const testimonials = [
     {
         id: 1,
-        text: "My buying experience is so nice, and received me very politely. Riding experience is also very good. Very good performance. I never experienced such a kind of performance. Very good service.",
+        text: "I highly recommend Umpire Tax Solutions! They were incredibly helpful, not only during the tax filing process but also with any questions or support I needed afterward. Their team guided me through every step, making sure I understood my options. Even after my taxes were filed, they stayed responsive, answering follow-up questions and providing valuable advice. Their commitment to excellent service and ongoing support makes them stand out.",
         rating: 5,
-        name: "Karan",
+        name: "yasaswi sykam",
         time: "1 week ago",
         avatarType: "person",
     },
     {
         id: 2,
-        text: "I love my e-bike and the customer service is excellent. They respond in a timely manner with loads of information about e-bikes, accessories and maintenance information.",
+        text: "I have been using Umpire Tax Solutions for the past three years. They have a fantastic team with extensive knowledge, providing excellent service. They help me understand the filing process and ensure all paperwork is filed correctly. I highly recommend them.",
         rating: 5,
-        name: "Catherine",
+        name: "Gangadhar kondati",
         time: "10 days ago",
         avatarType: "brand",
     },
     {
         id: 3,
-        text: "Visited to EO store. Product quality was particularly well, looked great, and the staff helped me test it in the parking lot area. We bought with customization after they went over all the options and I felt satisfied.",
+        text: "I have been doing my taxes with Umpire tax from quite some time now, They have been really helpful in assessing the documents and filing them correctly. Vinay, especially had helped me from past two years by being available on phone and answering the emails promptly.",
         rating: 5,
-        name: "Peter",
+        name: "kalasamudram kavya",
         time: "2 weeks ago",
         avatarType: "brand",
     },
     {
         id: 4,
-        text: "The whole process was smooth from start to finish. The team explained every deduction clearly and made sure I understood exactly where my refund was coming from.",
+        text: "I have been using umpire tax solutions services from last 4 years. they do tremendous job in playing their role and in process of explaining things and providing services to customers. i satisfied with their prompt response through calls and emails..thanks team for all you done for me. i definitely recommend this consultant to anyone there looking for TAX FILINGS.",
         rating: 5,
-        name: "Amira",
+        name: "Motupalli Chaitanya",
         time: "3 weeks ago",
         avatarType: "person",
     },
     {
         id: 5,
-        text: "Excellent support throughout tax season. Quick responses, accurate filing, and a genuinely friendly team that made a stressful process feel simple.",
+        text: "The level of service provided is exceptional! The team's responsiveness to my phone calls and inquiries is nearly instantaneous. Additionally, they possess a wealth of knowledge when it comes to taxes and the intricacies of the rules involved. It's evident that the team is well-versed in these areas and can provide valuable insights and guidance. Their expertise in navigating tax regulations and rules is truly commendable. I appreciate the team's prompt assistance and their ability to offer comprehensive information. Thank you.",
         rating: 5,
-        name: "Liam",
+        name: "Nanda Pai",
         time: "1 month ago",
         avatarType: "person",
     },
@@ -306,15 +309,15 @@ const Home = () => {
                             </span>
                             {/* USA Flag SVG */}
                             <span className="hero-topbar-flag">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" width="22" height="12" style={{borderRadius: "2px", display: "block"}}>
-                                    <rect width="7410" height="3900" fill="#B22234"/>
-                                    <rect y="300" width="7410" height="300" fill="white"/>
-                                    <rect y="900" width="7410" height="300" fill="white"/>
-                                    <rect y="1500" width="7410" height="300" fill="white"/>
-                                    <rect y="2100" width="7410" height="300" fill="white"/>
-                                    <rect y="2700" width="7410" height="300" fill="white"/>
-                                    <rect y="3300" width="7410" height="300" fill="white"/>
-                                    <rect width="2964" height="2100" fill="#3C3B6E"/>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" width="22" height="12" style={{ borderRadius: "2px", display: "block" }}>
+                                    <rect width="7410" height="3900" fill="#B22234" />
+                                    <rect y="300" width="7410" height="300" fill="white" />
+                                    <rect y="900" width="7410" height="300" fill="white" />
+                                    <rect y="1500" width="7410" height="300" fill="white" />
+                                    <rect y="2100" width="7410" height="300" fill="white" />
+                                    <rect y="2700" width="7410" height="300" fill="white" />
+                                    <rect y="3300" width="7410" height="300" fill="white" />
+                                    <rect width="2964" height="2100" fill="#3C3B6E" />
                                 </svg>
                             </span>
                             <span>+1 (515)686-4275</span>
@@ -328,12 +331,12 @@ const Home = () => {
                             </span>
                             {/* India Flag SVG */}
                             <span className="hero-topbar-flag">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="22" height="12" style={{borderRadius: "2px", display: "block"}}>
-                                    <rect width="900" height="200" fill="#FF9933"/>
-                                    <rect y="200" width="900" height="200" fill="#FFFFFF"/>
-                                    <rect y="400" width="900" height="200" fill="#138808"/>
-                                    <circle cx="450" cy="300" r="60" fill="none" stroke="#000080" strokeWidth="6"/>
-                                    <circle cx="450" cy="300" r="8" fill="#000080"/>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="22" height="12" style={{ borderRadius: "2px", display: "block" }}>
+                                    <rect width="900" height="200" fill="#FF9933" />
+                                    <rect y="200" width="900" height="200" fill="#FFFFFF" />
+                                    <rect y="400" width="900" height="200" fill="#138808" />
+                                    <circle cx="450" cy="300" r="60" fill="none" stroke="#000080" strokeWidth="6" />
+                                    <circle cx="450" cy="300" r="8" fill="#000080" />
                                 </svg>
                             </span>
                             <span>+91 81860-51040</span>
@@ -782,9 +785,9 @@ const Home = () => {
                         <h2 className="tm-heading">Quoted with clarity. Tax solutions,</h2>
 
                         <div className="tm-rating">
-                            <span>4.6/5</span>
+                            <span>4.8/5</span>
                             <StarIcon />
-                            <span>Based on 5210 reviews</span>
+                            <span>Based on 123 reviews</span>
                         </div>
                     </div>
 
@@ -842,7 +845,15 @@ const Home = () => {
                             <div className="tm-track" ref={trackRef}>
                                 {testimonials.map((t) => (
                                     <div className="tm-card" key={t.id}>
-                                        <p className="tm-card-text">{t.text}</p>
+                                        {/* <p className="tm-card-text">{t.text}</p> */}
+                                        <p className="tm-card-text">
+                                            {(() => {
+                                                const words = t.text.trim().split(/\s+/);
+                                                return words.length > 41
+                                                    ? words.slice(0, 41).join(' ') + '...'
+                                                    : t.text;
+                                            })()}
+                                        </p>
 
                                         <div className="tm-card-stars">
                                             {Array.from({ length: t.rating }).map((_, i) => (
@@ -875,8 +886,7 @@ const Home = () => {
                             <h2 className="faq-heading">Frequently Asked Questions</h2>
 
                             <p className="faq-description">
-                                Umpire Tax Solution helps individuals and businesses prepare accurate returns, stay compliant, and
-                                navigate tax season with confidence through reliable guidance and responsive support.
+                                We help individuals and businesses to prepare accurate returns, stay compliant, and navigate tax season with confidence through reliable guidance and responsive support.
                             </p>
 
                             <Link to="/contact" className="faq-check-more">
@@ -935,7 +945,7 @@ const Home = () => {
                             <span className="faq-contact-text">Need help with your Financial &amp; Tax services?</span>
                         </div>
 
-                        <a href="tel:+15156864275" className="faq-contact-btn">
+                        <Link to="/contact" className="faq-contact-btn">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z"
@@ -943,7 +953,7 @@ const Home = () => {
                                 />
                             </svg>
                             +1 (515) 686-4275
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </section>

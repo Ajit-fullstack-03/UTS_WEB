@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { FiSearch, FiChevronLeft, FiChevronRight, FiChevronDown, FiRefreshCw } from "react-icons/fi";
+import { FiSearch, FiChevronLeft, FiChevronRight, FiChevronDown, FiRefreshCw, FiSend } from "react-icons/fi";
+import Swal from "sweetalert2";
 import { adminServices } from "../services/AdminServices";
 import { getStoredTaxYear } from "../../utils/taxYear";
 import "./payments.css";
@@ -12,6 +13,7 @@ const Payments = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [errorMsg, setErrorMsg] = useState("");
+    const [sendingNotifId, setSendingNotifId] = useState(null);
 
     // Helper to extract credentials
     const getCredentials = () => {
@@ -60,6 +62,73 @@ const Payments = () => {
             date: dateVal || "-",
             time: timeVal || ""
         };
+    };
+
+    // Direct notification sending handler with hardcoded contextual message
+    const handleSendNotification = async (item, rowIndex) => {
+        const rowKey = item.id || item.order_transaction_id || item.order_id || item.user_id || rowIndex;
+        setSendingNotifId(rowKey);
+
+        try {
+            const { userId: analystUserId } = getCredentials();
+            const targetUserId = item.user_id || item.u_user_id || item.client_id || item.userId || item.id;
+            const fileNo = item.file_number || item.filenumber || item.userfilename || "";
+            const amount = item.amount || item.paid_amount || item.order_amount || "";
+            const orderStatus = String(item.order_status || item.status || item.payment_status || "").toLowerCase();
+
+            // Screen-appropriate hardcoded notification message
+            let hardcodedMessage = "Your tax documents have been reviewed. Please check the update.";
+            if (orderStatus.includes("paid") || orderStatus.includes("success") || orderStatus.includes("completed")) {
+                hardcodedMessage = `Your payment${fileNo ? ` for File #${fileNo}` : ""} has been received successfully. We are proceeding with your tax filing.`;
+            } else if (orderStatus.includes("pending") || orderStatus.includes("created") || !orderStatus) {
+                hardcodedMessage = `Your payment${amount && amount !== "-" ? ` of $${amount}` : ""}${fileNo ? ` for File #${fileNo}` : ""} is pending. Please complete your payment to proceed with your tax filing.`;
+            }
+
+            const payload = {
+                client_id: targetUserId ? (Number(targetUserId) || targetUserId) : targetUserId,
+                userId: targetUserId ? (Number(targetUserId) || targetUserId) : targetUserId,
+                user_id: targetUserId ? (Number(targetUserId) || targetUserId) : targetUserId,
+                analysistId: analystUserId ? (Number(analystUserId) || analystUserId) : 5,
+                analystId: analystUserId ? (Number(analystUserId) || analystUserId) : 5,
+                message: hardcodedMessage
+            };
+
+            const res = await adminServices.sendUserNotification(payload);
+            if (res && (res.status === true || res.data?.status === true || res.status === 200 || res.data?.http_code === 200)) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Notification Sent",
+                    text: res.data?.status_smessage || "Notification sent successfully.",
+                    toast: true,
+                    position: "top-end",
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            } else {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Notice",
+                    text: res.data?.status_smessage || "Unable to send notification.",
+                    toast: true,
+                    position: "top-end",
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            }
+        } catch (err) {
+            console.error("Error sending notification:", err);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: err.response?.data?.status_smessage || "Failed to send notification.",
+                toast: true,
+                position: "top-end",
+                timer: 3000,
+                showConfirmButton: false
+            });
+        } finally {
+            setSendingNotifId(null);
+        }
     };
 
     // Fetch payments data from backend with fallback
@@ -167,10 +236,30 @@ const Payments = () => {
         };
     }, [fetchPayments]);
 
+    // Format status helper
+    const getOrderStatusText = (item) => {
+        if (item.order_status === 1 || item.order_status === "1") {
+            return "Payment Done";
+        }
+        if (item.order_status === 0 || item.order_status === "0") {
+            return "Pending";
+        }
+        if (item.order_status_text) {
+            return item.order_status_text;
+        }
+        return "Pending";
+    };
+
     // Format status css class helper
-    const getStatusClass = (statusStr) => {
+    const getStatusClass = (statusStr, rawStatus) => {
+        if (rawStatus === 1 || rawStatus === "1") {
+            return "pm-status-success";
+        }
+        if (rawStatus === 0 || rawStatus === "0") {
+            return "pm-status-pending";
+        }
         const s = String(statusStr || "").toLowerCase();
-        if (s.includes("success") || s.includes("paid") || s.includes("completed")) {
+        if (s.includes("payment done") || s.includes("done") || s.includes("success") || s.includes("paid") || s.includes("completed")) {
             return "pm-status-success";
         }
         if (s.includes("pending") || s.includes("created")) {
@@ -188,12 +277,12 @@ const Payments = () => {
         const term = searchTerm.toLowerCase().trim();
         return paymentsList.filter((item) => {
             const userName = (item.user_name || item.username || item.name || item.client_name || "").toLowerCase();
-            const email = (item.email_id || item.email || item.useremail || "").toLowerCase();
-            const fileNo = (item.file_number || item.filenumber || item.userfilename || "").toLowerCase();
-            const amount = String(item.amount || item.paid_amount || item.order_amount || "").toLowerCase();
-            const txnId = (item.order_transaction_id || item.transaction_id || item.order_id || "").toLowerCase();
-            const status = (item.order_status || item.status || item.payment_status || "").toLowerCase();
-            const dateStr = (item.order_placed_date || item.createdat || item.created_at || "").toLowerCase();
+            const email = (item.email || item.email_id || item.useremail || "").toLowerCase();
+            const fileNo = (item.filenumber || item.file_number || item.userfilename || "").toLowerCase();
+            const amount = String(item.p_amount != null ? item.p_amount : (item.amount || item.paid_amount || item.order_amount || "")).toLowerCase();
+            const txnId = (item.t_order_id || item.bank_ref_no || item.tracking_id || item.order_transaction_id || item.transaction_id || item.order_id || "").toLowerCase();
+            const status = getOrderStatusText(item).toLowerCase();
+            const dateStr = (item.o_created_at || item.order_placed_date || item.createdat || item.created_at || "").toLowerCase();
 
             return (
                 userName.includes(term) ||
@@ -282,12 +371,13 @@ const Payments = () => {
                                 <th>Order Transaction Id</th>
                                 <th>Order Status</th>
                                 <th>Order Placed</th>
+                                <th style={{ textAlign: "center" }}>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan="7">
+                                    <td colSpan="8">
                                         <div className="pm-loading-state">
                                             <div className="pm-spinner"></div>
                                             <p className="mb-0">Loading payments...</p>
@@ -296,7 +386,7 @@ const Payments = () => {
                                 </tr>
                             ) : errorMsg ? (
                                 <tr>
-                                    <td colSpan="7">
+                                    <td colSpan="8">
                                         <div className="pm-empty-state text-danger">
                                             <p className="mb-2">{errorMsg}</p>
                                             <button
@@ -310,7 +400,7 @@ const Payments = () => {
                                 </tr>
                             ) : paginatedRecords.length === 0 ? (
                                 <tr>
-                                    <td colSpan="7">
+                                    <td colSpan="8">
                                         <div className="pm-empty-state">
                                             <p className="mb-0">No payment records found.</p>
                                         </div>
@@ -319,18 +409,21 @@ const Payments = () => {
                             ) : (
                                 paginatedRecords.map((item, idx) => {
                                     const userName = item.user_name || item.username || item.name || item.client_name || "-";
-                                    const email = item.email_id || item.email || item.useremail || "-";
-                                    const fileNumber = item.file_number || item.filenumber || item.userfilename || "-";
-                                    const amount = item.amount || item.paid_amount || item.order_amount || "-";
-                                    const txnId = item.order_transaction_id || item.transaction_id || item.order_id || "-";
-                                    const orderStatus = item.order_status || item.status || item.payment_status || "Payment Pending";
+                                    const email = item.email || item.email_id || item.useremail || "-";
+                                    const fileNumber = item.filenumber || item.file_number || item.userfilename || "-";
+                                    const amount = item.p_amount != null ? item.p_amount : (item.amount || item.paid_amount || item.order_amount || "-");
+                                    const txnId = item.t_order_id || item.bank_ref_no || item.tracking_id || item.order_transaction_id || item.transaction_id || item.order_id || "-";
+                                    const orderStatus = getOrderStatusText(item);
                                     const placed = formatOrderPlaced(
-                                        item.order_placed_date || item.createdat || item.created_at,
+                                        item.o_created_at || item.order_placed_date || item.createdat || item.created_at,
                                         item.order_placed_time
                                     );
+                                    const rowKey = item.id || item.t_order_id || item.bank_ref_no || item.order_transaction_id || item.order_id || item.user_id || idx;
+                                    const isSending = sendingNotifId === rowKey;
+                                    const isPaymentDone = item.order_status === 1 || item.order_status === "1" || orderStatus === "Payment Done";
 
                                     return (
-                                        <tr key={item.id || item.order_transaction_id || idx}>
+                                        <tr key={rowKey}>
                                             <td>
                                                 <span className="pm-user-link">
                                                     {userName}
@@ -341,13 +434,38 @@ const Payments = () => {
                                             <td className="pm-cell-amount">{amount}</td>
                                             <td className="pm-cell-txnid">{txnId}</td>
                                             <td>
-                                                <span className={getStatusClass(orderStatus)}>
+                                                <span className={getStatusClass(orderStatus, item.order_status)}>
                                                     {orderStatus}
                                                 </span>
                                             </td>
                                             <td className="pm-cell-placed">
                                                 <span className="pm-date-line">{placed.date}</span>
                                                 {placed.time && <span className="pm-time-line">{placed.time}</span>}
+                                            </td>
+                                            <td className="pm-cell-action">
+                                                {!isPaymentDone ? (
+                                                    <button
+                                                        type="button"
+                                                        className="pm-action-send-btn"
+                                                        onClick={() => handleSendNotification(item, idx)}
+                                                        disabled={isSending}
+                                                        title="Send notification to client"
+                                                    >
+                                                        {isSending ? (
+                                                            <>
+                                                                <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true" style={{ width: "12px", height: "12px", borderWidth: "1.5px" }}></span>
+                                                                Sending...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <FiSend size={13} className="me-1" />
+                                                                Send
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                ) : (
+                                                    <span className="text-muted">-</span>
+                                                )}
                                             </td>
                                         </tr>
                                     );

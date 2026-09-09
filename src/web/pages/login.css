@@ -309,6 +309,66 @@
     color: #ffffff;
 }
 
+/* Flag dropdown styling */
+.auth-flag-dropdown-btn {
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 8px;
+    font-size: 0.88rem;
+    padding: 8px 8px;
+    color: #ffffff;
+    transition: all 0.2s ease-in-out;
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 42px;
+}
+
+.auth-flag-dropdown-btn:hover,
+.auth-flag-dropdown-btn:focus {
+    background-color: rgba(255, 255, 255, 0.14);
+    border-color: #ffffff;
+    outline: none;
+}
+
+.auth-flag-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    min-width: 130px;
+    width: 100%;
+    background: #173b88;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    z-index: 1050;
+    padding: 4px 0;
+}
+
+.auth-flag-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    color: #ffffff;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.auth-flag-item:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.auth-flag-item.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    font-weight: 600;
+}
+
 .password-toggle-btn {
     height: 100%;
     display: flex;

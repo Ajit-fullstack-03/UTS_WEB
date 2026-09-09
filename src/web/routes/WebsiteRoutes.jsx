@@ -25,6 +25,7 @@ const WebsiteRoutes = () => {
                 <Route path="testimonials" element={<Testimonials />} />
                 <Route path="services" element={<Services />} />
                 <Route path="services/us-tax-filing" element={<Services />} />
+                <Route path="services/us-tax-filling" element={<Services />} />
                 <Route path="services/tax-planning" element={<TaxPlanning />} />
                 <Route path="services/tax-audit" element={<TaxAudit />} />
                 <Route path="services/bookkeeping" element={<Bookkeeping />} />

@@ -1,0 +1,809 @@
+/* =========================================================
+   Admin Registration Page Styling
+   ========================================================= */
+
+.admin-registration-container {
+    font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100%;
+    gap: 24px;
+}
+
+/* Header & Banner */
+.registration-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 4px;
+}
+
+.reg-title-group h2 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: #1b2e6b;
+    margin: 0;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.reg-title-icon-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(27, 46, 107, 0.1) 0%, rgba(27, 46, 107, 0.03) 100%);
+    color: #1b2e6b;
+}
+
+.reg-title-group p {
+    font-size: 0.88rem;
+    color: #64748b;
+    margin: 4px 0 0 0;
+}
+
+.reg-stats-badges {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.reg-stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 8px 16px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.reg-stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+.reg-stat-icon.user {
+    background-color: #eff6ff;
+    color: #2563eb;
+}
+
+.reg-stat-icon.analyst {
+    background-color: #f5f3ff;
+    color: #7c3aed;
+}
+
+.reg-stat-icon.pending {
+    background-color: #fffbeb;
+    color: #d97706;
+}
+
+.reg-stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.reg-stat-count {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+.reg-stat-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* =========================================================
+   Registration Form Card
+   ========================================================= */
+.reg-form-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    transition: all 0.25s ease;
+}
+
+.reg-form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: linear-gradient(180deg, #fbfcfe 0%, #f8fafc 100%);
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.reg-form-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.reg-form-title h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.reg-form-subtitle {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.reg-collapse-btn {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.reg-collapse-btn:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+    border-color: #94a3b8;
+}
+
+.reg-form-body {
+    padding: 24px;
+}
+
+/* Role Selector Segment */
+.role-segment-selector {
+    display: inline-flex;
+    align-items: center;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+.role-segment-btn {
+    border: none;
+    background: transparent;
+    padding: 8px 20px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #64748b;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.role-segment-btn.active {
+    background: #1b2e6b;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(27, 46, 107, 0.25);
+}
+
+.role-segment-btn:hover:not(.active) {
+    color: #1e293b;
+}
+
+/* Form Input Elements */
+.reg-input-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+    text-align: left;
+}
+
+.reg-input-label .required-star {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+.reg-input-field {
+    width: 100%;
+    height: 42px;
+    padding: 8px 14px;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 9px;
+    font-size: 0.9rem;
+    color: #0f172a;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.reg-input-field:focus {
+    border-color: #1b2e6b;
+    box-shadow: 0 0 0 3px rgba(27, 46, 107, 0.12);
+}
+
+.reg-input-field::placeholder {
+    color: #94a3b8;
+    font-size: 0.88rem;
+}
+
+.reg-input-field.is-invalid {
+    border-color: #ef4444;
+    background-color: #fffbfa;
+}
+
+.reg-input-field.is-valid {
+    border-color: #10b981;
+    background-color: #f0fdf4;
+}
+
+.reg-select-field {
+    width: 100%;
+    height: 42px;
+    padding: 8px 12px;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 9px;
+    font-size: 0.9rem;
+    color: #0f172a;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.reg-select-field:focus {
+    border-color: #1b2e6b;
+    box-shadow: 0 0 0 3px rgba(27, 46, 107, 0.12);
+}
+
+.reg-helper-feedback {
+    font-size: 0.78rem;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.reg-helper-feedback.error {
+    color: #dc2626;
+}
+
+.reg-helper-feedback.success {
+    color: #16a34a;
+}
+
+/* Password Field Wrapper */
+.reg-password-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.reg-password-group .reg-input-field {
+    padding-right: 44px;
+}
+
+.reg-pass-toggle-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #64748b;
+    padding: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: color 0.15s ease;
+}
+
+.reg-pass-toggle-btn:hover {
+    color: #1b2e6b;
+}
+
+/* Form Action Buttons */
+.reg-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.btn-reg-reset {
+    background: #f8fafc;
+    border: 1.5px solid #cbd5e1;
+    color: #475569;
+    padding: 9px 20px;
+    border-radius: 9px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-reg-reset:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #94a3b8;
+}
+
+.btn-reg-submit {
+    background: linear-gradient(135deg, #1b2e6b 0%, #162456 100%);
+    border: none;
+    color: #ffffff;
+    padding: 9px 26px;
+    border-radius: 9px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(27, 46, 107, 0.25);
+    transition: all 0.2s ease;
+}
+
+.btn-reg-submit:hover:not(:disabled) {
+    background: linear-gradient(135deg, #243c8a 0%, #1b2e6b 100%);
+    box-shadow: 0 6px 16px rgba(27, 46, 107, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-reg-submit:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   Table Section: Sub-Tabs & Filter Bar
+   ========================================================= */
+.reg-records-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+}
+
+.reg-subtabs-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 16px 24px;
+    background: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* Sub tabs pills */
+.reg-subtabs-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reg-subtab-btn {
+    border: 1.5px solid transparent;
+    background: #f8fafc;
+    color: #64748b;
+    padding: 8px 18px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.reg-subtab-btn:hover:not(.active) {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.reg-subtab-btn.active {
+    background: #1b2e6b;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(27, 46, 107, 0.2);
+}
+
+.reg-subtab-badge {
+    background: rgba(255, 255, 255, 0.25);
+    color: inherit;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+.reg-subtab-btn:not(.active) .reg-subtab-badge {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+/* Toolbar Controls on Right */
+.reg-toolbar-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.reg-search-box {
+    position: relative;
+    width: 260px;
+}
+
+.reg-search-input {
+    width: 100%;
+    height: 38px;
+    padding: 6px 36px 6px 14px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    color: #1e293b;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.reg-search-input:focus {
+    background: #ffffff;
+    border-color: #1b2e6b;
+    box-shadow: 0 0 0 3px rgba(27, 46, 107, 0.08);
+}
+
+.reg-search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 1rem;
+    pointer-events: none;
+}
+
+.reg-refresh-btn {
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    color: #475569;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.reg-refresh-btn:hover {
+    background: #f1f5f9;
+    color: #1b2e6b;
+    border-color: #cbd5e1;
+}
+
+/* =========================================================
+   Data Table Styling
+   ========================================================= */
+.reg-table-responsive {
+    overflow-x: auto;
+    width: 100%;
+    scrollbar-width: thin;
+}
+
+.reg-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 0;
+}
+
+.reg-table thead th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 14px 20px;
+    text-align: left;
+    border-bottom: 1.5px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+.reg-table tbody tr {
+    transition: background-color 0.15s ease-in-out;
+}
+
+.reg-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.reg-table tbody td {
+    padding: 16px 20px;
+    font-size: 0.88rem;
+    color: #1e293b;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+/* Avatar with initials */
+.user-avatar-initials {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1b2e6b 0%, #3b82f6 100%);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.user-avatar-initials.analyst {
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+}
+
+.user-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-name-cell .name-text {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.user-name-cell .id-text {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.reg-email-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s ease;
+}
+
+.reg-email-link:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+.reg-phone-text {
+    font-weight: 500;
+    color: #334155;
+    font-family: 'Inter', monospace;
+    font-size: 0.85rem;
+}
+
+/* Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.status-badge.verified {
+    background-color: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.status-badge.pending {
+    background-color: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.status-badge.active {
+    background-color: #e0e7ff;
+    color: #4338ca;
+    border: 1px solid #c7d2fe;
+}
+
+/* Action: Push Verification Button */
+.btn-push-verification {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    border: none;
+    color: #ffffff;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(234, 88, 12, 0.25);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-push-verification:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+    box-shadow: 0 4px 10px rgba(234, 88, 12, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-push-verification:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-push-verification.already-verified {
+    background: #f1f5f9;
+    color: #64748b;
+    box-shadow: none;
+    cursor: default;
+    border: 1px solid #cbd5e1;
+}
+
+/* =========================================================
+   Pagination Styling
+   ========================================================= */
+.reg-pagination-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: #ffffff;
+    border-top: 1px solid #f1f5f9;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.reg-pagination-info {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.reg-pagination-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.reg-page-btn {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #475569;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.reg-page-btn:hover:not(:disabled) {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #cbd5e1;
+}
+
+.reg-page-btn.active {
+    background: #1b2e6b;
+    color: #ffffff;
+    border-color: #1b2e6b;
+    font-weight: 600;
+}
+
+.reg-page-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Empty / Loading States */
+.reg-empty-state {
+    padding: 48px 24px;
+    text-align: center;
+    color: #94a3b8;
+}
+
+.reg-empty-icon {
+    font-size: 2.5rem;
+    color: #cbd5e1;
+    margin-bottom: 12px;
+}
+
+.reg-empty-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 4px;
+}
+
+.reg-empty-desc {
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+
+/* Spinner */
+.spin-animation {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .registration-header-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .reg-subtabs-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .reg-toolbar-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .reg-search-box {
+        width: 100%;
+    }
+
+    .reg-pagination-footer {
+        flex-direction: column;
+        align-items: center;
+    }
+}

@@ -20,6 +20,7 @@ import CallUs from "../pages/CallUs";
 import AdminComments from "../pages/AdminComments";
 import AdminEmails from "../pages/AdminEmails";
 import AdminCareers from "../pages/AdminCareers";
+import AdminRegistration from "../pages/AdminRegistration";
 import AdminSettings from "../pages/AdminSettings";
 
 import { isAnalystUser } from "../../utils/userRole";
@@ -40,8 +41,9 @@ const AdminRoutes = () => {
                 <Route path="emails" element={<AdminEmails />} />
                 <Route path="call-us" element={<CallUs />} />
                 <Route path="careers" element={<AdminCareers />} />
-                <Route path="settings" element={isAnalyst ? <Navigate to="../assigned-file-number" replace /> : <AdminSettings />} />
-                <Route path="all-records" element={isAnalyst ? <Navigate to="../assigned-file-number" replace /> : <AllRecords />} />
+                <Route path="registration" element={<AdminRegistration />} />
+                <Route path="settings" element={isAnalyst ? <Navigate to="../all-records" replace /> : <AdminSettings />} />
+                <Route path="all-records" element={<AllRecords />} />
                 <Route path="assigned-file-number" element={<AssignedFileNumber />} />
                 <Route path="to-be-assigned" element={<ToBeAssigned />} />
                 <Route path="basic-info-pending" element={<BasicInfoPending />} />

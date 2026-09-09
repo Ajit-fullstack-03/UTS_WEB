@@ -188,9 +188,9 @@ const Bookkeeping = () => {
                         <p className="srv-hero-desc">
                             From monthly ledger maintenance to payroll and QuickBooks management — we keep your books clean, current, and audit-ready all year long.
                         </p>
-                        <a href="/contact" className="srv-hero-btn">Get Started</a>
+                        <Link to="/register" className="srv-hero-btn">Get Started</Link>
                     </div>
-                   
+
                 </div>
             </section>
 
@@ -237,7 +237,7 @@ const Bookkeeping = () => {
                             <div className="srv-faq-badge">FAQ</div>
                             <h2 className="srv-faq-heading">Frequently Asked Questions</h2>
                             <p className="srv-faq-desc">
-                                Everything you need to know about our bookkeeping, reconciliation, QuickBooks, and payroll services.
+                                We help individuals and businesses to prepare accurate returns, stay compliant, and navigate tax season with confidence through reliable guidance and responsive support.
                             </p>
                             <Link to="/contact" className="srv-faq-more">
                                 Check More

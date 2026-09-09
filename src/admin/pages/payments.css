@@ -329,6 +329,43 @@
     }
 }
 
+/* Action Cell & Send Button */
+.pm-cell-action {
+    text-align: center;
+    white-space: nowrap;
+    padding: 14px 20px;
+}
+
+.pm-action-send-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #1b2e6b 0%, #254294 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 0.84rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(27, 46, 107, 0.15);
+}
+
+.pm-action-send-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #152454 0%, #1c3577 100%);
+    box-shadow: 0 4px 10px rgba(27, 46, 107, 0.25);
+    transform: translateY(-1px);
+    color: #ffffff;
+}
+
+.pm-action-send-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
 @media (max-width: 768px) {
     .pm-topbar {
         justify-content: stretch;
@@ -341,3 +378,4 @@
         align-items: center;
     }
 }
+

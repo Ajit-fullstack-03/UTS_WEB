@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import Swal from "sweetalert2";
+import { webservices } from "../services/webServices";
 import "./contact.css";
 
 /* ── FAQ data ─────────────────────────────────────────────────── */
@@ -26,7 +28,7 @@ const contactInfo = [
     {
         id: "phone",
         label: "CALL US",
-        lines: ["+1 (555) 686-4275", "+91 81860-51040"],
+        lines: ["+1 (515) 686-4275", "+91 81860-51040"],
         flags: [
             <svg key="us" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" width="20" height="11" style={{ borderRadius: "2px", display: "inline-block", verticalAlign: "middle", marginRight: "5px" }}><rect width="7410" height="3900" fill="#B22234" /><rect y="300" width="7410" height="300" fill="white" /><rect y="900" width="7410" height="300" fill="white" /><rect y="1500" width="7410" height="300" fill="white" /><rect y="2100" width="7410" height="300" fill="white" /><rect y="2700" width="7410" height="300" fill="white" /><rect y="3300" width="7410" height="300" fill="white" /><rect width="2964" height="2100" fill="#3C3B6E" /></svg>,
             <svg key="in" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="20" height="11" style={{ borderRadius: "2px", display: "inline-block", verticalAlign: "middle", marginRight: "5px" }}><rect width="900" height="200" fill="#FF9933" /><rect y="200" width="900" height="200" fill="#FFFFFF" /><rect y="400" width="900" height="200" fill="#138808" /><circle cx="450" cy="300" r="60" fill="none" stroke="#000080" strokeWidth="6" /><circle cx="450" cy="300" r="8" fill="#000080" /></svg>,
@@ -84,10 +86,148 @@ const Contact = () => {
     const [openId, setOpenId] = useState(null);
     const toggle = (id) => setOpenId((prev) => (prev === id ? null : id));
 
+    /* Country code dropdown state */
+    const [phoneCodeSelect, setPhoneCodeSelect] = useState("+1");
+    const [customPhoneCode, setCustomPhoneCode] = useState("+");
+    const [isPhoneDropdownOpen, setIsPhoneDropdownOpen] = useState(false);
+    const phoneDropdownRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (phoneDropdownRef.current && !phoneDropdownRef.current.contains(event.target)) {
+                setIsPhoneDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     /* contact form */
-    const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
-    const handleChange = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
-    const handleSubmit = (e) => { e.preventDefault(); alert("Message sent! We will get back to you soon."); };
+    const [form, setForm] = useState({
+        name: "",
+        email: "",
+        phone: "",
+        message: "",
+    });
+    const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setForm((p) => ({ ...p, [name]: value }));
+        if (errors[name]) {
+            setErrors((prev) => {
+                const next = { ...prev };
+                delete next[name];
+                return next;
+            });
+        }
+    };
+
+    const validate = () => {
+        const newErrors = {};
+
+        // Name
+        if (!form.name || !form.name.trim()) {
+            newErrors.name = "Full name is required.";
+        } else if (form.name.trim().length < 2) {
+            newErrors.name = "Full name must be at least 2 characters.";
+        } else if (!/^[a-zA-Z\s'.-]+$/.test(form.name.trim())) {
+            newErrors.name = "Please enter a valid name (letters, spaces, hyphens).";
+        }
+
+        // Email
+        if (!form.email || !form.email.trim()) {
+            newErrors.email = "Email is required.";
+        } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(form.email.trim())) {
+            newErrors.email = "Please enter a valid email address.";
+        }
+
+        // Phone Extension
+        const effectivePhoneExt = phoneCodeSelect === "other" ? customPhoneCode.trim() : phoneCodeSelect;
+        if (!effectivePhoneExt || effectivePhoneExt === "+" || !/^\+[0-9]{1,4}$/.test(effectivePhoneExt)) {
+            newErrors.phoneext = "Please enter a valid country code (e.g. +44).";
+        }
+
+        // Phone Number
+        if (!form.phone || !form.phone.trim()) {
+            newErrors.phone = "Phone number is required.";
+        } else {
+            const digits = form.phone.replace(/\D/g, "");
+            if (digits.length < 7 || digits.length > 15) {
+                newErrors.phone = "Phone number must be between 7 and 15 digits.";
+            }
+        }
+
+        // Message
+        if (!form.message || !form.message.trim()) {
+            newErrors.message = "Message is required.";
+        } else if (form.message.trim().length < 5) {
+            newErrors.message = "Message must be at least 5 characters.";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!validate()) {
+            return;
+        }
+
+        setIsSubmitting(true);
+        const effectivePhoneExt = phoneCodeSelect === "other" ? customPhoneCode.trim() : phoneCodeSelect;
+
+        const payload = {
+            c_name: form.name.trim(),
+            c_email: form.email.trim(),
+            c_phone_ext: effectivePhoneExt,
+            c_phone: form.phone.trim(),
+            c_message: form.message.trim(),
+        };
+
+        try {
+            const response = await webservices.savecontactinfo(payload);
+
+            if (response.data && (response.data.http_code === 200 || response.data.status_smessage?.toLowerCase().includes("success") || response.data.status_smessage?.toLowerCase().includes("received"))) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Message Sent!",
+                    text: response.data.status_smessage || "Your query has been successfully received. One of our Associate will contact you soon.",
+                    confirmButtonColor: "#1B2E6B",
+                });
+
+                setForm({
+                    name: "",
+                    email: "",
+                    phone: "",
+                    message: "",
+                });
+                setPhoneCodeSelect("+1");
+                setCustomPhoneCode("+");
+                setErrors({});
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Submission Error",
+                    text: response.data?.status_smessage || "Failed to send message. Please try again.",
+                    confirmButtonColor: "#1B2E6B",
+                });
+            }
+        } catch (error) {
+            console.error("Contact submission error:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Submission Failed",
+                text: error?.response?.data?.status_smessage || error?.message || "Something went wrong while sending your message. Please try again.",
+                confirmButtonColor: "#1B2E6B",
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <>
@@ -139,31 +279,221 @@ const Contact = () => {
 
                     {/* Right — dark form card */}
                     <div className="ct-form-card">
-                        <form className="ct-form" onSubmit={handleSubmit}>
+                        <form className="ct-form" onSubmit={handleSubmit} noValidate>
                             <div className="ct-form-group">
                                 <label className="ct-form-label" htmlFor="ct-name">Full name*</label>
-                                <input id="ct-name" className="ct-form-input" type="text" name="name" placeholder="Billy Jane" value={form.name} onChange={handleChange} required />
+                                <input
+                                    id="ct-name"
+                                    className={`ct-form-input ${errors.name ? "is-invalid" : ""}`}
+                                    type="text"
+                                    name="name"
+                                    placeholder="Billy Jane"
+                                    value={form.name}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                {errors.name && <span className="ct-field-error">{errors.name}</span>}
                             </div>
+
                             <div className="ct-form-group">
                                 <label className="ct-form-label" htmlFor="ct-email">Email*</label>
-                                <input id="ct-email" className="ct-form-input" type="email" name="email" placeholder="Enter email" value={form.email} onChange={handleChange} required />
+                                <input
+                                    id="ct-email"
+                                    className={`ct-form-input ${errors.email ? "is-invalid" : ""}`}
+                                    type="email"
+                                    name="email"
+                                    placeholder="Enter email"
+                                    value={form.email}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                {errors.email && <span className="ct-field-error">{errors.email}</span>}
                             </div>
+
                             <div className="ct-form-group">
                                 <label className="ct-form-label" htmlFor="ct-phone">Phone number*</label>
-                                <div className="ct-phone-wrap">
-                                    <span className="ct-phone-prefix">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" width="22" height="12" style={{ borderRadius: "2px", display: "block" }}><rect width="7410" height="3900" fill="#B22234" /><rect y="300" width="7410" height="300" fill="white" /><rect y="900" width="7410" height="300" fill="white" /><rect y="1500" width="7410" height="300" fill="white" /><rect y="2100" width="7410" height="300" fill="white" /><rect y="2700" width="7410" height="300" fill="white" /><rect y="3300" width="7410" height="300" fill="white" /><rect width="2964" height="2100" fill="#3C3B6E" /></svg>
-                                        <span>+1</span>
-                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round" /></svg>
-                                    </span>
-                                    <input id="ct-phone" className="ct-form-input ct-phone-input" type="tel" name="phone" placeholder="Enter phone number" value={form.phone} onChange={handleChange} />
+                                <div className={`ct-phone-wrap ${errors.phone || errors.phoneext ? "is-invalid" : ""}`} ref={phoneDropdownRef}>
+                                    {phoneCodeSelect === "other" ? (
+                                        <div className="d-flex align-items-center">
+                                            <input
+                                                type="text"
+                                                className="ct-phone-prefix text-center"
+                                                style={{ width: "65px", padding: "10px 4px", border: "none", borderRight: "1.5px solid rgba(255,255,255,0.18)", background: "rgba(255,255,255,0.15)", color: "#fff" }}
+                                                value={customPhoneCode}
+                                                onChange={(e) => {
+                                                    let val = e.target.value;
+                                                    if (val && !val.startsWith("+")) {
+                                                        val = "+" + val.replace(/\+/g, "");
+                                                    }
+                                                    setCustomPhoneCode(val);
+                                                    if (errors.phoneext) {
+                                                        setErrors((prev) => {
+                                                            const next = { ...prev };
+                                                            delete next.phoneext;
+                                                            return next;
+                                                        });
+                                                    }
+                                                }}
+                                                placeholder="+XX"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setPhoneCodeSelect("+1");
+                                                    if (errors.phoneext) {
+                                                        setErrors((prev) => {
+                                                            const next = { ...prev };
+                                                            delete next.phoneext;
+                                                            return next;
+                                                        });
+                                                    }
+                                                }}
+                                                style={{ background: "none", border: "none", color: "rgba(255,255,255,0.75)", fontSize: "11px", padding: "0 6px", cursor: "pointer", textDecoration: "underline" }}
+                                                title="Back to list"
+                                            >
+                                                List
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <button
+                                                type="button"
+                                                className="ct-phone-prefix-btn"
+                                                onClick={() => setIsPhoneDropdownOpen((prev) => !prev)}
+                                                title="Select country code"
+                                            >
+                                                {phoneCodeSelect === "+1" && (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" width="18" height="11" style={{ borderRadius: "2px", display: "block" }}>
+                                                        <rect width="7410" height="3900" fill="#B22234" />
+                                                        <rect y="300" width="7410" height="300" fill="white" />
+                                                        <rect y="900" width="7410" height="300" fill="white" />
+                                                        <rect y="1500" width="7410" height="300" fill="white" />
+                                                        <rect y="2100" width="7410" height="300" fill="white" />
+                                                        <rect y="2700" width="7410" height="300" fill="white" />
+                                                        <rect y="3300" width="7410" height="300" fill="white" />
+                                                        <rect width="2964" height="2100" fill="#3C3B6E" />
+                                                    </svg>
+                                                )}
+                                                {phoneCodeSelect === "+91" && (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="18" height="11" style={{ borderRadius: "2px", display: "block" }}>
+                                                        <rect width="900" height="200" fill="#FF9933" />
+                                                        <rect y="200" width="900" height="200" fill="#FFFFFF" />
+                                                        <rect y="400" width="900" height="200" fill="#138808" />
+                                                        <circle cx="450" cy="300" r="60" fill="none" stroke="#000080" strokeWidth="6" />
+                                                        <circle cx="450" cy="300" r="8" fill="#000080" />
+                                                    </svg>
+                                                )}
+                                                <span>{phoneCodeSelect}</span>
+                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: isPhoneDropdownOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>
+                                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                                </svg>
+                                            </button>
+
+                                            {isPhoneDropdownOpen && (
+                                                <div className="ct-flag-menu">
+                                                    <div
+                                                        className={`ct-flag-item ${phoneCodeSelect === "+1" ? "active" : ""}`}
+                                                        onClick={() => {
+                                                            setPhoneCodeSelect("+1");
+                                                            setIsPhoneDropdownOpen(false);
+                                                            if (errors.phoneext) {
+                                                                setErrors((prev) => {
+                                                                    const next = { ...prev };
+                                                                    delete next.phoneext;
+                                                                    return next;
+                                                                });
+                                                            }
+                                                        }}
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" width="18" height="11" style={{ borderRadius: "2px", display: "block" }}>
+                                                            <rect width="7410" height="3900" fill="#B22234" />
+                                                            <rect y="300" width="7410" height="300" fill="white" />
+                                                            <rect y="900" width="7410" height="300" fill="white" />
+                                                            <rect y="1500" width="7410" height="300" fill="white" />
+                                                            <rect y="2100" width="7410" height="300" fill="white" />
+                                                            <rect y="2700" width="7410" height="300" fill="white" />
+                                                            <rect y="3300" width="7410" height="300" fill="white" />
+                                                            <rect width="2964" height="2100" fill="#3C3B6E" />
+                                                        </svg>
+                                                        <span>+1 (USA)</span>
+                                                    </div>
+                                                    <div
+                                                        className={`ct-flag-item ${phoneCodeSelect === "+91" ? "active" : ""}`}
+                                                        onClick={() => {
+                                                            setPhoneCodeSelect("+91");
+                                                            setIsPhoneDropdownOpen(false);
+                                                            if (errors.phoneext) {
+                                                                setErrors((prev) => {
+                                                                    const next = { ...prev };
+                                                                    delete next.phoneext;
+                                                                    return next;
+                                                                });
+                                                            }
+                                                        }}
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="18" height="11" style={{ borderRadius: "2px", display: "block" }}>
+                                                            <rect width="900" height="200" fill="#FF9933" />
+                                                            <rect y="200" width="900" height="200" fill="#FFFFFF" />
+                                                            <rect y="400" width="900" height="200" fill="#138808" />
+                                                            <circle cx="450" cy="300" r="60" fill="none" stroke="#000080" strokeWidth="6" />
+                                                            <circle cx="450" cy="300" r="8" fill="#000080" />
+                                                        </svg>
+                                                        <span>+91 (IND)</span>
+                                                    </div>
+                                                    <div
+                                                        className={`ct-flag-item ${phoneCodeSelect === "other" ? "active" : ""}`}
+                                                        onClick={() => {
+                                                            setPhoneCodeSelect("other");
+                                                            setCustomPhoneCode("+");
+                                                            setIsPhoneDropdownOpen(false);
+                                                        }}
+                                                    >
+                                                        <span style={{ fontSize: "14px", lineHeight: 1 }}>🌐</span>
+                                                        <span>Other</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                    <input
+                                        id="ct-phone"
+                                        className="ct-form-input ct-phone-input"
+                                        type="tel"
+                                        name="phone"
+                                        placeholder={phoneCodeSelect === "+1" ? "(555) 000-0000" : phoneCodeSelect === "+91" ? "98765 43210" : "Phone number"}
+                                        value={form.phone}
+                                        onChange={handleChange}
+                                    />
                                 </div>
+                                {errors.phoneext && <span className="ct-field-error">{errors.phoneext}</span>}
+                                {errors.phone && <span className="ct-field-error">{errors.phone}</span>}
                             </div>
+
                             <div className="ct-form-group">
                                 <label className="ct-form-label" htmlFor="ct-message">Message*</label>
-                                <textarea id="ct-message" className="ct-form-input ct-form-textarea" name="message" placeholder="Enter a question, feedback, or suggestions..." value={form.message} onChange={handleChange} rows={4} required />
+                                <textarea
+                                    id="ct-message"
+                                    className={`ct-form-input ct-form-textarea ${errors.message ? "is-invalid" : ""}`}
+                                    name="message"
+                                    placeholder="Enter a question, feedback, or suggestions..."
+                                    value={form.message}
+                                    onChange={handleChange}
+                                    rows={4}
+                                    required
+                                />
+                                {errors.message && <span className="ct-field-error">{errors.message}</span>}
                             </div>
-                            <button type="submit" className="ct-submit-btn" id="ct-submit-btn">Submit</button>
+
+                            <button type="submit" className="ct-submit-btn" id="ct-submit-btn" disabled={isSubmitting}>
+                                {isSubmitting ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Sending message...
+                                    </>
+                                ) : (
+                                    <>Submit</>
+                                )}
+                            </button>
                         </form>
                     </div>
                 </div>

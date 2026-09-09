@@ -115,9 +115,11 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
         statusFilterKey === "docs_upload_pending" ||
         statusFilterKey === "payment_pending";
 
-    const showReminderColumn = isAnalyst && isDocsOrPaymentPending;
+    // Show Action / Reminder column on Payment Pending page, Docs Pending page, or for Analysts
+    const showReminderColumn = isAnalyst || isDocsOrPaymentPending || filestate === 8 || filestate === "8" || statusFilterKey === "payment_pending";
 
     const [clients, setClients] = useState([]);
+    const [sendingReminderId, setSendingReminderId] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
@@ -161,6 +163,7 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
         comment: ""
     });
     const [paymentSubmitting, setPaymentSubmitting] = useState(false);
+    const [sendingNotification, setSendingNotification] = useState(false);
 
     // Helper to calculate final payable amount based on standard amount and discount
     const calculateFinalAmount = (standardAmount, discountType, discountValue) => {
@@ -1394,6 +1397,85 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
         }
     };
 
+    // Handle Send Direct Notification to Client
+    const handleSendClientNotification = async () => {
+        if (!selectedClient) return;
+        setSendingNotification(true);
+
+        try {
+            let analystUserId = 5;
+            const userInfoStr = localStorage.getItem("userInfo") || localStorage.getItem("currentUser");
+            if (userInfoStr) {
+                try {
+                    const parsed = JSON.parse(userInfoStr);
+                    if (parsed.user_id || parsed.id) analystUserId = parsed.user_id || parsed.id;
+                } catch {
+                    if (typeof userInfoStr === "string" && userInfoStr.length > 0) {
+                        analystUserId = userInfoStr.replace(/"/g, "");
+                    }
+                }
+            }
+            const targetUserId = selectedClient.id || selectedClient.user_id || selectedClient.u_user_id || selectedClient.client_id;
+            const fileNo = selectedClient.filenumber || selectedClient.file_number || "";
+            const clientStatus = String(selectedClient.status || "").toLowerCase();
+
+            // Screen & Context-appropriate hardcoded message
+            let hardcodedMessage = "Your tax documents have been reviewed. Please check the update.";
+            if (activeInnerTab === "upload_docs" || activeInnerTab === "download_docs") {
+                hardcodedMessage = "Your tax documents have been reviewed. Please check the update.";
+            } else if (activeInnerTab === "payment" || clientStatus.includes("payment")) {
+                hardcodedMessage = `Your payment for File #${fileNo || "UTS"} is pending. Please complete your payment to proceed with your tax filing.`;
+            } else if (activeInnerTab === "file_status") {
+                hardcodedMessage = `Your file status has been updated to "${selectedClient.status}". Please review your account dashboard.`;
+            }
+
+            const payload = {
+                client_id: targetUserId ? (Number(targetUserId) || targetUserId) : targetUserId,
+                userId: targetUserId ? (Number(targetUserId) || targetUserId) : targetUserId,
+                user_id: targetUserId ? (Number(targetUserId) || targetUserId) : targetUserId,
+                analysistId: analystUserId ? (Number(analystUserId) || analystUserId) : 5,
+                analystId: analystUserId ? (Number(analystUserId) || analystUserId) : 5,
+                message: hardcodedMessage
+            };
+
+            const res = await adminServices.sendUserNotification(payload);
+            if (res && (res.status === true || res.data?.status === true || res.status === 200 || res.data?.http_code === 200)) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Notification Sent",
+                    text: res.data?.status_smessage || "Notification sent successfully.",
+                    toast: true,
+                    position: "top-end",
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            } else {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Notice",
+                    text: res.data?.status_smessage || "Unable to send notification.",
+                    toast: true,
+                    position: "top-end",
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            }
+        } catch (err) {
+            console.error("Error sending notification:", err);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: err.response?.data?.status_smessage || "Failed to send notification.",
+                toast: true,
+                position: "top-end",
+                timer: 3000,
+                showConfirmButton: false
+            });
+        } finally {
+            setSendingNotification(false);
+        }
+    };
+
     // Client Detail View
     if (selectedClient) {
         const isAnalyst = isAnalystUser();
@@ -1414,14 +1496,44 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
         return (
             <div className="client-details-workspace d-flex flex-column gap-4">
                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                    <button
-                        onClick={() => setSelectedClient(null)}
-                        className="btn btn-back-dashboard d-flex align-items-center gap-2"
-                    >
-                        <FiArrowLeft />
-                        <span>Back to List</span>
-                    </button>
-                    <div className="d-flex align-items-center gap-3">
+                    <div className="d-flex align-items-center gap-3 flex-wrap">
+                        <button
+                            onClick={() => setSelectedClient(null)}
+                            className="btn btn-back-dashboard d-flex align-items-center gap-2"
+                        >
+                            <FiArrowLeft />
+                            <span>Back to List</span>
+                        </button>
+                        <div className="client-header-summary d-flex align-items-center gap-2">
+                            <span className="client-header-summary-name">
+                                {selectedClient.name || basicInfo?.u_name || "Client"}
+                            </span>
+                            <span className="client-header-summary-divider">|</span>
+                            <span className="client-header-summary-fileno">
+                                {selectedClient.filenumber ? `#${selectedClient.filenumber}` : (selectedClient.id ? `#${selectedClient.id}` : "")}
+                            </span>
+                        </div>
+                    </div>
+                    <div className="d-flex align-items-center gap-2">
+                        <button
+                            className="btn btn-sm btn-primary d-flex align-items-center gap-1 shadow-sm"
+                            onClick={handleSendClientNotification}
+                            disabled={sendingNotification}
+                            title="Send instant notification to client"
+                            style={{ background: "linear-gradient(135deg, #1b2e6b 0%, #254294 100%)", border: "none" }}
+                        >
+                            {sendingNotification ? (
+                                <>
+                                    <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    <span>Sending...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <FiSend size={13} />
+                                    <span>Send Notification</span>
+                                </>
+                            )}
+                        </button>
                         <button
                             className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
                             onClick={() => fetchClientDetails(selectedClient)}
@@ -2681,15 +2793,85 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
         );
     }
 
-    // Handle Send Reminder for Analyst
-    const handleSendReminder = (client, e) => {
+    // Handle Send Direct Notification / Reminder from Table Row
+    const handleSendReminder = async (client, e) => {
         if (e) e.stopPropagation();
-        Swal.fire({
-            icon: "success",
-            title: "Notification Send Successfully",
-            confirmButtonColor: "#1b2e6b",
-            timer: 2500
-        });
+        const rowKey = client.user_id || client.client_id || client.rawData?.user_id || client.rawData?.u_user_id || client.id;
+        setSendingReminderId(rowKey);
+
+        try {
+            let analystUserId = 5;
+            const userInfoStr = localStorage.getItem("userInfo") || localStorage.getItem("currentUser");
+            if (userInfoStr) {
+                try {
+                    const parsed = JSON.parse(userInfoStr);
+                    if (parsed.user_id || parsed.id) analystUserId = parsed.user_id || parsed.id;
+                } catch {
+                    if (typeof userInfoStr === "string" && userInfoStr.length > 0) {
+                        analystUserId = userInfoStr.replace(/"/g, "");
+                    }
+                }
+            }
+
+            const targetUserId = client.user_id || client.client_id || client.rawData?.user_id || client.rawData?.u_user_id || client.rawData?.ps_user_id || client.rawData?.unlists_u_id || client.id;
+            const fileNo = client.filenumber || client.unique_code || client.id || "";
+            const statusStr = String(client.status || "").toLowerCase();
+
+            // Direct contextual hardcoded notification message
+            let hardcodedMessage = "Your tax documents have been reviewed. Please check the update.";
+            if (filestate === 8 || filestate === "8" || statusFilterKey === "payment_pending" || statusStr.includes("payment")) {
+                hardcodedMessage = `Your payment for File #${fileNo} is pending. Please complete your payment to proceed with your tax filing.`;
+            } else if (filestate === 4 || filestate === "4" || statusFilterKey === "docs_upload_pending" || statusStr.includes("doc")) {
+                hardcodedMessage = `Please upload the pending documents for File #${fileNo} to continue your tax filing.`;
+            } else if (filestate === 1 || filestate === "1" || statusFilterKey === "basic_info_pending" || statusStr.includes("basic")) {
+                hardcodedMessage = `Please complete your basic information for File #${fileNo}.`;
+            }
+
+            const payload = {
+                client_id: targetUserId ? (Number(targetUserId) || targetUserId) : targetUserId,
+                userId: targetUserId ? (Number(targetUserId) || targetUserId) : targetUserId,
+                user_id: targetUserId ? (Number(targetUserId) || targetUserId) : targetUserId,
+                analysistId: analystUserId ? (Number(analystUserId) || analystUserId) : 5,
+                analystId: analystUserId ? (Number(analystUserId) || analystUserId) : 5,
+                message: hardcodedMessage
+            };
+
+            const res = await adminServices.sendUserNotification(payload);
+            if (res && (res.status === true || res.data?.status === true || res.status === 200 || res.data?.http_code === 200)) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Notification Sent",
+                    text: res.data?.status_smessage || "Notification sent successfully.",
+                    toast: true,
+                    position: "top-end",
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            } else {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Notice",
+                    text: res.data?.status_smessage || "Unable to send notification.",
+                    toast: true,
+                    position: "top-end",
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            }
+        } catch (err) {
+            console.error("Error sending notification:", err);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: err.response?.data?.status_smessage || "Failed to send notification.",
+                toast: true,
+                position: "top-end",
+                timer: 3000,
+                showConfirmButton: false
+            });
+        } finally {
+            setSendingReminderId(null);
+        }
     };
 
     // List Table View
@@ -2721,7 +2903,7 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
                             <th>File Status</th>
                             <th>Assigned</th>
                             <th>Referral</th>
-                            {showReminderColumn && <th className="text-center">Reminder</th>}
+                            {showReminderColumn && <th className="text-center">Action</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -2733,7 +2915,11 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
                                 </td>
                             </tr>
                         ) : filteredClients.length > 0 ? (
-                            filteredClients.map((client) => (
+                            filteredClients.map((client) => {
+                                const rowKey = client.user_id || client.client_id || client.rawData?.user_id || client.rawData?.u_user_id || client.id;
+                                const isSending = sendingReminderId === rowKey;
+
+                                return (
                                 <tr key={client.id}>
                                     <td className="fw-semibold text-dark">{client.id}</td>
                                     <td>
@@ -2773,17 +2959,27 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
                                             <button
                                                 type="button"
                                                 className="btn btn-sm btn-primary d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill fw-semibold shadow-sm"
-                                                style={{ fontSize: "0.82rem" }}
+                                                style={{ fontSize: "0.82rem", background: "linear-gradient(135deg, #1b2e6b 0%, #254294 100%)", border: "none" }}
                                                 onClick={(e) => handleSendReminder(client, e)}
-                                                title={`Send notification reminder to ${client.name}`}
+                                                disabled={isSending}
+                                                title={`Send notification to ${client.name}`}
                                             >
-                                                <FiSend size={12} />
-                                                <span>Send</span>
+                                                {isSending ? (
+                                                    <>
+                                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: "11px", height: "11px" }}></span>
+                                                        <span>Sending...</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <FiSend size={12} />
+                                                        <span>Send</span>
+                                                    </>
+                                                )}
                                             </button>
                                         </td>
                                     )}
                                 </tr>
-                            ))
+                            );})
                         ) : (
                             <tr>
                                 <td colSpan={showReminderColumn ? 8 : 7} className="text-center py-5 text-muted">

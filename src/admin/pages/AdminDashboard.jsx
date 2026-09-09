@@ -517,10 +517,17 @@ const AdminDashboard = () => {
             <div className="client-details-workspace d-flex flex-column gap-4">
                 {/* Back button and status banner */}
                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                    <button onClick={handleBackToDashboard} className="btn btn-back-dashboard d-flex align-items-center gap-2">
-                        <FiArrowLeft />
-                        <span>Back to Dashboard</span>
-                    </button>
+                    <div className="d-flex align-items-center gap-3 flex-wrap">
+                        <button onClick={handleBackToDashboard} className="btn btn-back-dashboard d-flex align-items-center gap-2">
+                            <FiArrowLeft />
+                            <span>Back to List</span>
+                        </button>
+                        <div className="client-header-summary d-flex align-items-center gap-2">
+                            <span className="client-header-summary-name">{clientDetailFields.name}</span>
+                            <span className="client-header-summary-divider">|</span>
+                            <span className="client-header-summary-fileno">#{clientDetailFields.id}</span>
+                        </div>
+                    </div>
                     <div className="status-indicator-badge px-3 py-2 rounded">
                         Status: <span className="text-danger fw-bold">{clientDetailFields.status}</span>
                     </div>

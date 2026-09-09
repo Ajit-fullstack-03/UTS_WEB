@@ -451,6 +451,11 @@
     font-size: 1rem;
 }
 
+.db-notif-item.unread {
+    background: #f0f4fe;
+    border-color: #d6e2fb;
+}
+
 .db-notif-icon.warning {
     background: rgba(239, 68, 68, 0.10);
     color: #ef4444;
@@ -459,6 +464,16 @@
 .db-notif-icon.success {
     background: rgba(34, 197, 94, 0.10);
     color: #22c55e;
+}
+
+.db-notif-icon.primary {
+    background: rgba(27, 46, 107, 0.10);
+    color: #1b2e6b;
+}
+
+.db-notif-icon.read {
+    background: #edf2f7;
+    color: #718096;
 }
 
 .db-notif-body {

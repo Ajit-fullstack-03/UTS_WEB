@@ -33,9 +33,20 @@ const postNoAuthUrl = (uri, data) => {
 const login = (data) => postNoAuthUrl(`${API_URL}login/check`, data);
 const register = (data) => postNoAuthUrl(`${API_URL}login/register`, data);
 const verifyregister = (data) => postNoAuthUrl(`${API_URL}login/cregisterverify`, data);
+const careerssubmit = (formData) => {
+    return axios.post(`${API_URL}settings/careerssubmit`, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+};
+
+const savecontactinfo = (data) => postNoAuthUrl(`${API_URL}savecontactinfo`, data);
 
 export const webservices = {
     login,
     register,
-    verifyregister
+    verifyregister,
+    careerssubmit,
+    savecontactinfo
 };

@@ -14,6 +14,7 @@ import { getStoredTaxYear } from "../../utils/taxYear";
 const Referrals = () => {
     const [view, setView] = useState("list"); // 'list' or 'form'
     const [referralHistory, setReferralHistory] = useState([]);
+    const [totalBonusAmount, setTotalBonusAmount] = useState(0);
     const [loading, setLoading] = useState(false);
 
     // User details for prefilling
@@ -51,23 +52,40 @@ const Referrals = () => {
                 rawList = Array.isArray(response.data)
                     ? response.data
                     : (Array.isArray(response.data.data) ? response.data.data : []);
+
+                const totalBonus = response.data.total_bonus_amount !== undefined
+                    ? Number(response.data.total_bonus_amount)
+                    : (response.data.available_bonus_amount !== undefined
+                        ? Number(response.data.available_bonus_amount)
+                        : (response.data.total_referral_amount !== undefined
+                            ? Number(response.data.total_referral_amount)
+                            : (response.data.referral_bonus !== undefined
+                                ? Number(response.data.referral_bonus)
+                                : 0)));
+                setTotalBonusAmount(totalBonus);
             }
 
             const formattedHistory = rawList.map(ref => {
                 let dateStr = "N/A";
-                const createdDate = ref.created_at || ref.rf_created_at;
+                const createdDate = ref.created_at || ref.rf_created_at || ref.createdOn || ref.created_on;
                 if (createdDate) {
                     const d = new Date(createdDate);
-                    dateStr = d.toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric"
-                    });
+                    if (!isNaN(d.getTime())) {
+                        dateStr = d.toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric"
+                        });
+                    }
+                } else if (ref.rf_year) {
+                    dateStr = String(ref.rf_year);
                 }
 
-                let status = ref.status || ref.rf_status || "Pending";
+                let status = ref.registration_status || ref.registrationStatus || ref.status || ref.rf_status || "Pending";
                 if (status === 1 || status === "1" || status === "Completed") status = "Completed";
-                else status = "Pending";
+                else if (status === 0 || status === "0") status = "Pending";
+
+                const isRegistered = status === "Registered" || status === "Completed";
 
                 return {
                     id: ref.rf_id || ref.id || Math.random(),
@@ -76,7 +94,7 @@ const Referrals = () => {
                     phone: ref.rf_phone || "",
                     date: dateStr,
                     status: status,
-                    earnings: status === "Completed" ? 100 : 0
+                    earnings: isRegistered ? 10 : 0
                 };
             });
 
@@ -111,9 +129,11 @@ const Referrals = () => {
 
     // Calculate stats
     const friendsReferred = referralHistory.length;
-    const creditEarned = referralHistory
-        .filter(r => r.status === "Completed")
-        .reduce((sum, r) => sum + r.earnings, 0);
+    const creditEarned = totalBonusAmount !== undefined && totalBonusAmount !== null
+        ? totalBonusAmount
+        : referralHistory
+            .filter(r => r.status === "Completed" || r.status === "Registered")
+            .reduce((sum, r) => sum + r.earnings, 0);
 
     // Form submit handler
     const handleSubmitInvite = async (e) => {
@@ -274,7 +294,7 @@ const Referrals = () => {
                                             <th scope="col">Friend's Email</th>
                                             <th scope="col">Invited Date</th>
                                             <th scope="col">Status</th>
-                                            <th scope="col" className="text-end pe-4">Credit</th>
+                                            {/* <th scope="col" className="text-end pe-4">Credit</th> */}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -288,9 +308,9 @@ const Referrals = () => {
                                                         {row.status}
                                                     </span>
                                                 </td>
-                                                <td className="text-end pe-4 fw-bold text-dark">
-                                                    {row.status === "Completed" ? `+$${row.earnings}` : "$0"}
-                                                </td>
+                                                {/* <td className="text-end pe-4 fw-bold text-dark">
+                                                    {row.status === "Completed" || row.status === "Registered" ? `+$${row.earnings}` : "$0"}
+                                                </td> */}
                                             </tr>
                                         ))}
                                     </tbody>

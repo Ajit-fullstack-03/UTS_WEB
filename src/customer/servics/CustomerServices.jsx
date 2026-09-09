@@ -62,6 +62,8 @@ const downloadZip = (data) => postUrl(`${API_URL}upload/downloadZip`, data);
 const viewOrders = (data) => postUrl(`${API_URL}payment/viewOrders`, data);
 const initiateOrder = (data) => postUrl(`${API_URL}payment/initiateOrder`, data);
 const verifyOrder = (data) => postUrl(`${API_URL}payment/verifyOrder`, data);
+const getUserNotifications = (data) => postUrl(`${API_URL}member/getusernotifications`, data);
+const markNotificationAsRead = (data) => postUrl(`${API_URL}member/marknotificationread`, data);
 
 export const webservices = {
     currentfileststus,
@@ -82,5 +84,7 @@ export const webservices = {
     downloadZip,
     viewOrders,
     initiateOrder,
-    verifyOrder
+    verifyOrder,
+    getUserNotifications,
+    markNotificationAsRead
 };
