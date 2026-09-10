@@ -53,7 +53,7 @@
 .ct-info { display: flex; flex-direction: column; gap: 28px; }
 
 .ct-info-heading {
-    font-size: clamp(28px, 4vw, 42px);
+    font-size: clamp(28px, 4vw, 60px);
     font-weight: 500;
     color: #0f1a3d;
     line-height: 1.18;
@@ -99,14 +99,14 @@
     gap: 2px;
 }
 .ct-contact-label {
-    font-size: 10.5px;
-    font-weight: 700;
+        font-size: 13.5px;
+    font-weight: 600;
     color: #9ca3af;
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
 .ct-contact-value {
-    font-size: 13.5px;
+    font-size: 15.5px;
     font-weight: 500;
     color: #1B2E6B;
     line-height: 1.5;
@@ -322,13 +322,13 @@
     margin-bottom: 16px;
 }
 .ct-faq-heading {
-    font-size: clamp(22px, 3vw, 34px);
-    font-weight: 500;
+       font-size: clamp(22px, 3vw, 40px);
+    font-weight: 600;
     color: #0f1a3d;
     line-height: 1.25;
     margin: 0 0 14px;
     letter-spacing: -0.02em;
-     font-family: "Ancizar Serif", serif;
+    font-family: "Ancizar Serif", serif;
 }
 .ct-faq-description {
     font-size: 14px;
@@ -485,7 +485,7 @@
 }
 
 @media (max-width: 768px) {
-    .ct-topbar { max-width: 100%; border-radius: 0; padding: 10px 16px; }
+    .ct-topbar { max-width: 100%; border-radius: 0; padding: 10px 16px; display: none; }
     .ct-topbar-inner { gap: 14px; justify-content: center; }
     .ct-topbar-item:nth-child(3) { display: none; }
 
@@ -510,7 +510,7 @@
 
 @media (max-width: 480px) {
     .ct-topbar-item:nth-child(2) { display: none; }
-    .ct-hero { padding: 90px 16px 50px; }
+    .ct-hero { padding: 20px 16px 50px; }
     .ct-info-heading { font-size: 23px; }
     .ct-form-card { padding: 20px 16px 24px; }
     .ct-faq-wrapper { padding: 50px 16px 0; }

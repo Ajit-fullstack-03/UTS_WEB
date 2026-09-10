@@ -18,19 +18,19 @@
 /* Reuse hero-topbar classes from home.css — already defined globally */
 
 .tpg-hero-main {
-    margin: 0 auto;
+   margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 40px;
     padding: 120px 90px 0px;
-    max-width: 1358px;
+    max-width: 1550px;
     flex-wrap: wrap;
 }
 
 .tpg-hero-content {
     flex: 1 1 420px;
-    max-width: 520px;
+    max-width: 575px;
 }
 
 .tpg-hero-badge {
@@ -48,7 +48,7 @@
 }
 
 .tpg-hero-heading {
-    font-size: 46px;
+    font-size: 55px;
     line-height: 1.15;
     font-weight: 700;
     letter-spacing: -0.5px;
@@ -78,7 +78,7 @@
 .tpg-hero-stats {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 25px;
     flex-wrap: nowrap;
 }
 
@@ -153,25 +153,26 @@
     border-radius: 50%;
     z-index: 0;
     opacity: 0.12;
+    display: none;
 }
 
 .tpg-hero-image {
     position: absolute;
-    bottom: 0;
-    left: 50%;
+    bottom: -20px;
+    left: 52%;
     transform: translateX(-50%);
-    height: 400px;
+    height: 533px;
     width: auto;
     object-fit: contain;
     z-index: 1;
-    filter: drop-shadow(0 12px 40px rgba(27,46,107,0.18));
+    filter: drop-shadow(0 12px 40px rgba(27, 46, 107, 0.18));
 }
 
 /* Trust badge on hero image */
 .tpg-hero-trust-badge {
-    position: absolute;
-    bottom: 24px;
-    right: -10px;
+     position: absolute;
+    bottom: 20px;
+    right: -90px;
     background: #FFFFFF;
     border-radius: 16px;
     padding: 16px 18px;
@@ -179,7 +180,7 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
-    box-shadow: 0 8px 32px rgba(27, 46, 107, 0.15), 0 2px 8px rgba(0,0,0,0.07);
+    box-shadow: 0 8px 32px rgba(27, 46, 107, 0.15), 0 2px 8px rgba(0, 0, 0, 0.07);
     z-index: 10;
     min-width: 168px;
     max-width: 200px;
@@ -508,6 +509,7 @@
     background: #F8FAFF;
     display: flex;
     justify-content: center;
+    margin-top: 65px;
 }
 
 .tpg-helpbar {
@@ -518,7 +520,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 20px;
-    max-width: 900px;
+    max-width: 1400px;
     width: 100%;
     flex-wrap: nowrap;
     box-shadow: 0 8px 40px rgba(27,46,107,0.18);

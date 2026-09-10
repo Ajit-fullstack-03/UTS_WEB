@@ -365,8 +365,9 @@ const Home = () => {
                         </div>
 
                         <h1 className="hero-heading">
-                            <span className="hero-heading-accent">Tax Filing, </span>
-                            <span className="hero-heading-dark">Done right. Every Time.</span>
+                            <span className="hero-heading-accent">Tax Filing, Done </span>
+                            <br/>
+                            <span className="hero-heading-dark"> right. Every Time.</span>
                         </h1>
 
                         <p className="hero-description">
