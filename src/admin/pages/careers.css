@@ -137,6 +137,55 @@
     text-overflow: ellipsis;
 }
 
+.careers-cell-document {
+    white-space: nowrap;
+}
+
+.careers-doc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background-color: #f1f5f9;
+    color: #1b2e6b;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    max-width: 170px;
+    cursor: pointer;
+}
+
+.careers-doc-btn:hover {
+    background-color: #1b2e6b;
+    color: #ffffff;
+    border-color: #1b2e6b;
+    box-shadow: 0 2px 6px rgba(27, 46, 107, 0.15);
+}
+
+.careers-doc-icon {
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.careers-doc-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.careers-doc-ext-icon {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    flex-shrink: 0;
+}
+
+.careers-doc-btn:hover .careers-doc-ext-icon {
+    opacity: 1;
+}
+
 .careers-cell-date {
     color: #64748b;
     font-size: 0.85rem;

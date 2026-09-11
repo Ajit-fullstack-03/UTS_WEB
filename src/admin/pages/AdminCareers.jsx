@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { FiSearch, FiChevronLeft, FiChevronRight, FiChevronDown, FiRefreshCw } from "react-icons/fi";
+import {
+    FiSearch,
+    FiChevronLeft,
+    FiChevronRight,
+    FiChevronDown,
+    FiRefreshCw,
+    FiFileText,
+    FiExternalLink
+} from "react-icons/fi";
 import Swal from "sweetalert2";
 import { adminServices } from "../services/AdminServices";
 import "./careers.css";
@@ -64,6 +72,40 @@ const AdminCareers = () => {
         return formatted;
     };
 
+    // Helper to resolve document/resume URL
+    const getDocumentUrl = (rawDoc) => {
+        if (!rawDoc) return null;
+        const str = String(rawDoc).trim();
+        if (!str || str === "-" || str === "null" || str === "undefined") return null;
+        if (
+            str.startsWith("http://") ||
+            str.startsWith("https://") ||
+            str.startsWith("blob:") ||
+            str.startsWith("data:")
+        ) {
+            return str;
+        }
+        const apiBase = (process.env.REACT_APP_API_URL || "").replace(/\/api\/?$/, "");
+        if (str.startsWith("/")) {
+            return `${apiBase}${str}`;
+        }
+        return `${apiBase}/${str}`;
+    };
+
+    // Helper to get friendly document name
+    const getDocumentName = (rawDoc) => {
+        if (!rawDoc) return "";
+        const str = String(rawDoc).trim();
+        if (!str || str === "-" || str === "null" || str === "undefined") return "";
+        try {
+            const clean = str.split("?")[0];
+            const name = clean.split("/").pop();
+            return name || "Resume";
+        } catch {
+            return "Resume";
+        }
+    };
+
     // Format datetime into Date and Time parts
     const formatDateTime = (dateStr) => {
         if (!dateStr) return { date: "-", time: "" };
@@ -126,6 +168,20 @@ const AdminCareers = () => {
                     if (Array.isArray(raw) && raw.length > 0) {
                         const mapped = raw.map((item, idx) => {
                             const dt = formatDateTime(item.createdat || item.created_at || item.date);
+                            const rawDoc =
+                                item.uploadresume ||
+                                item.upload_resume ||
+                                item.resume ||
+                                item.resume_file ||
+                                item.resume_url ||
+                                item.doc ||
+                                item.document ||
+                                item.file ||
+                                item.file_url ||
+                                null;
+                            const docUrl = getDocumentUrl(rawDoc);
+                            const docName = getDocumentName(rawDoc);
+
                             return {
                                 id: item.id || `car_${idx}`,
                                 first_name: item.firstname || item.first_name || item.name || `Applicant ${idx + 1}`,
@@ -133,6 +189,9 @@ const AdminCareers = () => {
                                 email: item.emailaddress || item.email || item.email_id || "-",
                                 phone: formatPhoneNumber(item.phone || item.mobile, item.phoneext || item.phone_ext),
                                 message: item.message || item.cover_letter || item.comments || "-",
+                                document_url: docUrl,
+                                document_name: docName,
+                                raw_document: rawDoc,
                                 date: dt.date,
                                 time: dt.time
                             };
@@ -173,7 +232,12 @@ const AdminCareers = () => {
                         <b>Name:</b> ${item.first_name} ${item.last_name}<br/>
                         <b>Email:</b> ${item.email}<br/>
                         <b>Phone:</b> ${item.phone}<br/>
-                        <b>Applied Date:</b> ${item.date} ${item.time}
+                        <b>Applied Date:</b> ${item.date} ${item.time}<br/>
+                        <b>Resume / Document:</b> ${
+                            item.document_url
+                                ? `<a href="${item.document_url}" target="_blank" rel="noopener noreferrer" style="color:#1b2e6b;font-weight:600;text-decoration:underline;">${item.document_name || "View Resume / Document"} ↗</a>`
+                                : '<span style="color:#94a3b8;">No document uploaded</span>'
+                        }
                     </div>
                     <div>
                         <strong style="color:#1b2e6b;">Message / Cover Note:</strong>
@@ -242,6 +306,7 @@ const AdminCareers = () => {
             const phone = (item.phone || "").toLowerCase();
             const message = (item.message || "").toLowerCase();
             const dateStr = (item.date + " " + item.time).toLowerCase();
+            const docName = (item.document_name || "").toLowerCase();
 
             return (
                 fName.includes(term) ||
@@ -249,7 +314,8 @@ const AdminCareers = () => {
                 email.includes(term) ||
                 phone.includes(term) ||
                 message.includes(term) ||
-                dateStr.includes(term)
+                dateStr.includes(term) ||
+                docName.includes(term)
             );
         });
     }, [careersList, searchTerm]);
@@ -327,6 +393,7 @@ const AdminCareers = () => {
                                 <th>Email</th>
                                 <th>Phone</th>
                                 <th>Message</th>
+                                <th>Document</th>
                                 <th>Date</th>
                                 <th>Delete</th>
                             </tr>
@@ -334,7 +401,7 @@ const AdminCareers = () => {
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan="7">
+                                    <td colSpan="8">
                                         <div className="careers-loading-state">
                                             <div className="careers-spinner"></div>
                                             <p className="mb-0">Loading applicant records...</p>
@@ -343,7 +410,7 @@ const AdminCareers = () => {
                                 </tr>
                             ) : errorMsg ? (
                                 <tr>
-                                    <td colSpan="7">
+                                    <td colSpan="8">
                                         <div className="careers-empty-state text-danger">
                                             <p className="mb-2">{errorMsg}</p>
                                             <button
@@ -357,7 +424,7 @@ const AdminCareers = () => {
                                 </tr>
                             ) : paginatedRecords.length === 0 ? (
                                 <tr>
-                                    <td colSpan="7">
+                                    <td colSpan="8">
                                         <div className="careers-empty-state">
                                             <p className="mb-0">No career application records found.</p>
                                         </div>
@@ -376,6 +443,25 @@ const AdminCareers = () => {
                                             onClick={() => handleViewMessage(item)}
                                         >
                                             {item.message}
+                                        </td>
+                                        <td className="careers-cell-document">
+                                            {item.document_url ? (
+                                                <a
+                                                    href={item.document_url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="careers-doc-btn"
+                                                    title={`View ${item.document_name || "Document"} (opens in new tab)`}
+                                                >
+                                                    <FiFileText className="careers-doc-icon" />
+                                                    <span className="careers-doc-text">
+                                                        {item.document_name || "View Document"}
+                                                    </span>
+                                                    <FiExternalLink className="careers-doc-ext-icon" />
+                                                </a>
+                                            ) : (
+                                                <span className="text-muted small">-</span>
+                                            )}
                                         </td>
                                         <td className="careers-cell-date">
                                             <span className="careers-date-line">{item.date}</span>

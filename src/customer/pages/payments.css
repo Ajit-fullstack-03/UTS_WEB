@@ -64,6 +64,11 @@
     color: #16a34a;
 }
 
+.cp-stat-icon.bonus {
+    background-color: #ecfdf5;
+    color: #059669;
+}
+
 .cp-stat-icon.primary {
     background-color: #e0e7ff;
     color: #4338ca;
@@ -375,6 +380,72 @@
 .summary-item-discount-amt {
     color: #1e6b37;
     font-weight: 600;
+}
+
+/* Bonus Application Box in Order Summary Modal */
+.bonus-application-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin: 14px 0;
+    transition: all 0.2s ease-in-out;
+}
+
+.bonus-box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bonus-custom-checkbox {
+    width: 17px;
+    height: 17px;
+    accent-color: #16a34a;
+    cursor: pointer;
+}
+
+.bonus-box-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #14532d;
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+.bonus-avail-pill {
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+.bonus-box-subtitle {
+    font-size: 0.78rem;
+    color: #166534;
+    margin-top: 4px;
+    padding-left: 25px;
+}
+
+.bonus-input-controls {
+    padding-left: 25px;
+}
+
+.bonus-input-controls .input-group {
+    max-width: 190px;
+}
+
+.bonus-input-controls .form-control {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.bonus-deduct-line {
+    background-color: #f8fafc;
+    border-radius: 8px;
+    padding: 6px 10px;
 }
 
 /* Total Due Section */

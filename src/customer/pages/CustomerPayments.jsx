@@ -9,7 +9,9 @@ import {
     FiX,
     FiRefreshCw,
     FiAlertCircle,
-    FiChevronRight
+    FiChevronRight,
+    FiGift,
+    FiCheck
 } from "react-icons/fi";
 import Swal from "sweetalert2";
 import { webservices } from "../servics/CustomerServices";
@@ -31,24 +33,60 @@ const loadRazorpayScript = () => {
     });
 };
 
+// Currency Conversion Rates (base USD: 1 USD = 85 INR)
+const EXCHANGE_RATES = {
+    USD: 1,
+    INR: 85,
+    EUR: 0.92,
+    GBP: 0.79
+};
+
+const normalizeCurrency = (currency) => {
+    if (!currency) return "USD";
+    const c = String(currency).toUpperCase().trim();
+    if (c === "INR" || c === "INDIA" || c === "₹") return "INR";
+    if (c === "EUR" || c === "€") return "EUR";
+    if (c === "GBP" || c === "£") return "GBP";
+    if (c === "USD" || c === "USA" || c === "$") return "USD";
+    return c;
+};
+
+const getCurrencySymbol = (currency) => {
+    const c = normalizeCurrency(currency);
+    if (c === "INR") return "₹";
+    if (c === "EUR") return "€";
+    if (c === "GBP") return "£";
+    return "$";
+};
+
+const convertCurrency = (amount, fromCurr, toCurr) => {
+    const num = parseFloat(amount || 0);
+    if (!num || isNaN(num)) return 0;
+    const from = normalizeCurrency(fromCurr);
+    const to = normalizeCurrency(toCurr);
+    if (from === to) return num;
+
+    const rateFrom = EXCHANGE_RATES[from] || 1;
+    const rateTo = EXCHANGE_RATES[to] || 1;
+    const inUSD = num / rateFrom;
+    const converted = inUSD * rateTo;
+    return Number(converted.toFixed(2));
+};
+
 const CustomerPayments = () => {
     const [orders, setOrders] = useState([]);
     const [stats, setStats] = useState({ total: 0, paid: 0, unpaid: 0 });
+    const [availableBonus, setAvailableBonus] = useState(0);
+    const [bonusCurrency, setBonusCurrency] = useState("INR");
     const [loading, setLoading] = useState(true);
     const [activeFilter, setActiveFilter] = useState("all"); // "all", "unpaid", "paid"
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
-    // Helper to get currency symbol
-    const getCurrencySymbol = (currency) => {
-        if (!currency) return "$";
-        const c = String(currency).toUpperCase().trim();
-        if (c === "INR" || c === "INDIA") return "₹";
-        if (c === "EUR") return "€";
-        if (c === "GBP") return "£";
-        return "$";
-    };
+    // Bonus usage in payment modal
+    const [useBonus, setUseBonus] = useState(false);
+    const [bonusAmountToUse, setBonusAmountToUse] = useState(0);
 
     // Helper to calculate exact discount amount
     const calculateDiscountAmount = (order) => {
@@ -109,6 +147,32 @@ const CustomerPayments = () => {
 
             setOrders(orderList);
 
+            // Extract available bonus & currency from response
+            const bonus =
+                resData?.available_bonus_amount !== undefined
+                    ? Number(resData.available_bonus_amount)
+                    : (resData?.bonusData?.available_bonus_amount !== undefined
+                        ? Number(resData.bonusData.available_bonus_amount)
+                        : (resData?.referral_bonus !== undefined
+                            ? Number(resData.referral_bonus)
+                            : (resData?.referralBonus !== undefined
+                                ? Number(resData.referralBonus)
+                                : (resData?.total_bonus_amount !== undefined
+                                    ? Number(resData.total_bonus_amount)
+                                    : 0))));
+
+            const bCurrency =
+                resData?.bonus_currency ||
+                resData?.referral_bonus_currency ||
+                resData?.bonusData?.bonus_currency ||
+                resData?.bonusData?.referral_bonus_currency ||
+                resData?.bonusData?.currency ||
+                (orderList.length > 0 ? (orderList[0].bonus_currency || orderList[0].referral_bonus_currency) : null) ||
+                "INR";
+
+            setAvailableBonus(bonus);
+            setBonusCurrency(bCurrency);
+
             // Update stats from response or compute from array
             const paid = resData?.paid_count !== undefined
                 ? resData.paid_count
@@ -127,6 +191,7 @@ const CustomerPayments = () => {
             console.error("Error fetching orders from viewOrders:", error);
             setOrders([]);
             setStats({ total: 0, paid: 0, unpaid: 0 });
+            setAvailableBonus(0);
         } finally {
             setLoading(false);
         }
@@ -158,6 +223,42 @@ const CustomerPayments = () => {
     // Handle Open Payment Summary Screen
     const handleOpenPaymentModal = (order) => {
         setSelectedOrder(order);
+
+        const orderBonus = Number(
+            order.available_bonus_amount ??
+            order.referral_bonus ??
+            availableBonus ??
+            0
+        );
+
+        const orderBonusCurr = normalizeCurrency(
+            order.bonus_currency ??
+            order.referral_bonus_currency ??
+            bonusCurrency ??
+            "INR"
+        );
+
+        const orderCurr = normalizeCurrency(order.currency);
+
+        const stdAmt = parseFloat(order.p_standardAmount || 0);
+        const discAmt = calculateDiscountAmount(order);
+        const payableBeforeBonus = parseFloat(order.p_amount || (stdAmt - discAmt));
+
+        // Convert bonus to order currency
+        const bonusInOrderCurr = convertCurrency(orderBonus, orderBonusCurr, orderCurr);
+
+        // Max bonus allowed is below / up to 50% of payable amount
+        const maxAllowedBonus = Math.max(0, Math.min(bonusInOrderCurr, Number((payableBeforeBonus * 0.5).toFixed(2))));
+
+        // Set bonus usage defaults (enabled by default if user has eligible bonus, or user can toggle)
+        if (maxAllowedBonus > 0) {
+            setUseBonus(true);
+            setBonusAmountToUse(maxAllowedBonus);
+        } else {
+            setUseBonus(false);
+            setBonusAmountToUse(0);
+        }
+
         setIsPaymentModalOpen(true);
     };
 
@@ -180,8 +281,38 @@ const CustomerPayments = () => {
         setIsProcessingPayment(true);
 
         try {
-            // Step 1: Call /payment/initiateOrder
-            const initPayload = { order_id: Number(orderId) };
+            const orderBonus = Number(
+                selectedOrder.available_bonus_amount ??
+                selectedOrder.referral_bonus ??
+                availableBonus ??
+                0
+            );
+
+            const orderBonusCurr = normalizeCurrency(
+                selectedOrder.bonus_currency ??
+                selectedOrder.referral_bonus_currency ??
+                bonusCurrency ??
+                "INR"
+            );
+
+            const orderCurr = normalizeCurrency(selectedOrder.currency);
+            const stdAmt = parseFloat(selectedOrder.p_standardAmount || 0);
+            const discAmt = calculateDiscountAmount(selectedOrder);
+            const payableBeforeBonus = parseFloat(selectedOrder.p_amount || (stdAmt - discAmt));
+            const bonusInOrderCurr = convertCurrency(orderBonus, orderBonusCurr, orderCurr);
+            const maxAllowedBonus = Math.max(0, Math.min(bonusInOrderCurr, Number((payableBeforeBonus * 0.5).toFixed(2))));
+
+            const finalBonusToApply = useBonus
+                ? Math.min(maxAllowedBonus, Math.max(0, parseFloat(bonusAmountToUse || 0)))
+                : 0;
+
+            // Step 1: Call /payment/initiateOrder with bonus_amount in order currency
+            const initPayload = {
+                order_id: Number(orderId),
+                bonus_amount: finalBonusToApply,
+                bonus_currency: orderBonusCurr,
+                order_currency: orderCurr
+            };
             const initRes = await webservices.initiateOrder(initPayload);
             const initData = initRes?.data;
 
@@ -213,13 +344,13 @@ const CustomerPayments = () => {
                 initData?.currency ||
                 initData?.razorpay_order?.currency ||
                 initData?.data?.currency ||
-                (selectedOrder.currency === "INDIA" || selectedOrder.currency === "INR" ? "INR" : "USD");
+                (orderCurr === "INR" ? "INR" : "USD");
 
             const amountInSmallestUnit =
                 initData?.amount ||
                 initData?.razorpay_order?.amount ||
                 initData?.data?.amount ||
-                Math.round(parseFloat(selectedOrder.p_amount || 0) * 100);
+                Math.round(Math.max(0, payableBeforeBonus - finalBonusToApply) * 100);
 
             // Step 2: Load Razorpay Checkout Script
             const isScriptLoaded = await loadRazorpayScript();
@@ -373,6 +504,18 @@ const CustomerPayments = () => {
                 </div>
 
                 <div className="cp-stat-card">
+                    <div className="cp-stat-icon bonus">
+                        <FiGift />
+                    </div>
+                    <div>
+                        <div className="cp-stat-value">
+                            {getCurrencySymbol(bonusCurrency)}{availableBonus.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </div>
+                        <p className="cp-stat-label">Available Referral Bonus ({normalizeCurrency(bonusCurrency)})</p>
+                    </div>
+                </div>
+
+                <div className="cp-stat-card">
                     <div className="cp-stat-icon primary">
                         <FiClock />
                     </div>
@@ -457,7 +600,7 @@ const CustomerPayments = () => {
                                                     {order.comment || "Tax Return Preparation"}
                                                 </div>
                                                 <small className="text-muted" style={{ fontSize: "0.75rem" }}>
-                                                    Currency: {order.currency || "USA"}
+                                                    Currency: {normalizeCurrency(order.currency)}
                                                 </small>
                                             </td>
                                             <td>
@@ -528,18 +671,45 @@ const CustomerPayments = () => {
             </div>
 
             {/* =========================================================
-                ORDER SUMMARY MODAL SCREEN (Exact Screenshot Match)
+                ORDER SUMMARY MODAL SCREEN (With Multi-Currency Bonus Support)
                ========================================================= */}
             {isPaymentModalOpen && selectedOrder && (() => {
-                const symbol = getCurrencySymbol(selectedOrder.currency);
+                const orderCurr = normalizeCurrency(selectedOrder.currency);
+                const symbol = getCurrencySymbol(orderCurr);
                 const stdAmt = parseFloat(selectedOrder.p_standardAmount || 0);
                 const discAmt = calculateDiscountAmount(selectedOrder);
-                const finalAmt = parseFloat(selectedOrder.p_amount || (stdAmt - discAmt));
+                const payableBeforeBonus = parseFloat(selectedOrder.p_amount || (stdAmt - discAmt));
                 const fileNum = selectedOrder.filenumber || `UTS-${selectedOrder.order_id}`;
                 const isPaid =
                     selectedOrder.order_status === 1 ||
                     selectedOrder.order_status === "1" ||
                     String(selectedOrder.order_status_text).toLowerCase() === "paid";
+
+                const orderBonus = Number(
+                    selectedOrder.available_bonus_amount ??
+                    selectedOrder.referral_bonus ??
+                    availableBonus ??
+                    0
+                );
+
+                const orderBonusCurr = normalizeCurrency(
+                    selectedOrder.bonus_currency ??
+                    selectedOrder.referral_bonus_currency ??
+                    bonusCurrency ??
+                    "INR"
+                );
+
+                const bonusSymbol = getCurrencySymbol(orderBonusCurr);
+                const bonusInOrderCurr = convertCurrency(orderBonus, orderBonusCurr, orderCurr);
+                const isCrossCurrency = orderBonusCurr !== orderCurr;
+
+                // Max bonus usable in order currency (capped at 50% of payable amount)
+                const maxAllowedBonus = Math.max(0, Math.min(bonusInOrderCurr, Number((payableBeforeBonus * 0.5).toFixed(2))));
+                const currentAppliedBonus = useBonus
+                    ? Math.min(maxAllowedBonus, Math.max(0, parseFloat(bonusAmountToUse || 0)))
+                    : 0;
+
+                const finalPayable = Math.max(0, payableBeforeBonus - currentAppliedBonus);
 
                 return (
                     <div className="order-summary-modal-overlay" onClick={() => setIsPaymentModalOpen(false)}>
@@ -577,17 +747,111 @@ const CustomerPayments = () => {
                                 </span>
                             </div>
 
-                            {/* Referral credit / discount applied */}
-                            <div className="summary-line-item">
-                                <span className="summary-item-discount">
-                                    {discAmt > 0 && selectedOrder.p_discountType === "Percentage"
-                                        ? `Referral / Discount applied (${selectedOrder.p_discountValue}%)`
-                                        : "Referral credit applied"}
-                                </span>
-                                <span className="summary-item-discount-amt">
-                                    -{symbol}{discAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                </span>
-                            </div>
+                            {/* Standard Discount applied if any */}
+                            {discAmt > 0 && (
+                                <div className="summary-line-item">
+                                    <span className="summary-item-discount">
+                                        {selectedOrder.p_discountType === "Percentage"
+                                            ? `Discount applied (${selectedOrder.p_discountValue}%)`
+                                            : "Discount applied"}
+                                    </span>
+                                    <span className="summary-item-discount-amt">
+                                        -{symbol}{discAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </span>
+                                </div>
+                            )}
+
+                            {/* Optional Bonus Application Section (For unpaid orders with available bonus) */}
+                            {!isPaid && orderBonus > 0 && (
+                                <div className="bonus-application-box">
+                                    <div className="bonus-box-header">
+                                        <div className="d-flex align-items-center gap-2">
+                                            <input
+                                                type="checkbox"
+                                                id="useBonusCheckbox"
+                                                className="bonus-custom-checkbox"
+                                                checked={useBonus}
+                                                onChange={(e) => {
+                                                    const checked = e.target.checked;
+                                                    setUseBonus(checked);
+                                                    if (checked && (!bonusAmountToUse || bonusAmountToUse <= 0)) {
+                                                        setBonusAmountToUse(maxAllowedBonus);
+                                                    }
+                                                }}
+                                            />
+                                            <label htmlFor="useBonusCheckbox" className="bonus-box-title">
+                                                Use Referral Bonus
+                                            </label>
+                                        </div>
+                                        <span className="bonus-avail-pill">
+                                            Avail: {bonusSymbol}{orderBonus.toFixed(2)} {orderBonusCurr}
+                                        </span>
+                                    </div>
+
+                                    <div className="bonus-box-subtitle">
+                                        {isCrossCurrency && (
+                                            <div className="mb-1 text-muted small">
+                                                Converted Value: <strong>{symbol}{bonusInOrderCurr.toFixed(2)} {orderCurr}</strong> (1 {orderBonusCurr === "USD" ? "USD ≈ ₹85 INR" : "INR ≈ $0.012 USD"})
+                                            </div>
+                                        )}
+                                        Max 50% of bill eligible: <strong>{symbol}{maxAllowedBonus.toFixed(2)} {orderCurr}</strong>
+                                    </div>
+
+                                    {useBonus && (
+                                        <div className="bonus-input-controls mt-2">
+                                            <div className="input-group input-group-sm">
+                                                <span className="input-group-text bg-white">{symbol}</span>
+                                                <input
+                                                    type="number"
+                                                    className="form-control"
+                                                    min="0"
+                                                    max={maxAllowedBonus}
+                                                    step="0.01"
+                                                    value={bonusAmountToUse}
+                                                    onChange={(e) => {
+                                                        const val = parseFloat(e.target.value);
+                                                        if (isNaN(val)) {
+                                                            setBonusAmountToUse("");
+                                                        } else if (val > maxAllowedBonus) {
+                                                            setBonusAmountToUse(maxAllowedBonus);
+                                                        } else if (val < 0) {
+                                                            setBonusAmountToUse(0);
+                                                        } else {
+                                                            setBonusAmountToUse(val);
+                                                        }
+                                                    }}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-outline-primary btn-sm px-2"
+                                                    onClick={() => setBonusAmountToUse(maxAllowedBonus)}
+                                                >
+                                                    Max
+                                                </button>
+                                            </div>
+                                            {currentAppliedBonus > 0 && (
+                                                <small className="text-success d-flex align-items-center gap-1 mt-1 font-weight-500">
+                                                    <FiCheck size={12} />
+                                                    Applying {symbol}{currentAppliedBonus.toFixed(2)} discount
+                                                    {isCrossCurrency && ` (≈ ${bonusSymbol}${convertCurrency(currentAppliedBonus, orderCurr, orderBonusCurr).toFixed(2)} ${orderBonusCurr})`}
+                                                </small>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Referral bonus applied line */}
+                            {useBonus && currentAppliedBonus > 0 && (
+                                <div className="summary-line-item bonus-deduct-line">
+                                    <span className="summary-item-discount d-flex align-items-center gap-1">
+                                        <FiGift size={13} /> Referral Bonus Applied
+                                    </span>
+                                    <span className="summary-item-discount-amt">
+                                        -{symbol}{currentAppliedBonus.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </span>
+                                </div>
+                            )}
 
                             {/* Separator */}
                             <div className="summary-divider"></div>
@@ -596,7 +860,7 @@ const CustomerPayments = () => {
                             <div className="total-due-row">
                                 <span className="total-due-text">Total due</span>
                                 <span className="total-due-val">
-                                    {symbol}{finalAmt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    {symbol}{finalPayable.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                 </span>
                             </div>
 
@@ -634,7 +898,9 @@ const CustomerPayments = () => {
                                     ) : (
                                         <>
                                             <FiCreditCard />
-                                            <span>Make Payment</span>
+                                            <span>
+                                                Pay {symbol}{finalPayable.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            </span>
                                         </>
                                     )}
                                 </button>

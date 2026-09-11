@@ -15,7 +15,17 @@ const Referrals = () => {
     const [view, setView] = useState("list"); // 'list' or 'form'
     const [referralHistory, setReferralHistory] = useState([]);
     const [totalBonusAmount, setTotalBonusAmount] = useState(0);
+    const [bonusCurrency, setBonusCurrency] = useState("USD");
     const [loading, setLoading] = useState(false);
+
+    // Helper for currency symbol
+    const getCurrencySymbol = (curr) => {
+        const c = String(curr || "").toUpperCase().trim();
+        if (c === "INR" || c === "INDIA" || c === "₹") return "₹";
+        if (c === "EUR" || c === "€") return "€";
+        if (c === "GBP" || c === "£") return "£";
+        return "$";
+    };
 
     // User details for prefilling
     const [userProfile, setUserProfile] = useState({
@@ -53,16 +63,30 @@ const Referrals = () => {
                     ? response.data
                     : (Array.isArray(response.data.data) ? response.data.data : []);
 
-                const totalBonus = response.data.total_bonus_amount !== undefined
-                    ? Number(response.data.total_bonus_amount)
-                    : (response.data.available_bonus_amount !== undefined
-                        ? Number(response.data.available_bonus_amount)
-                        : (response.data.total_referral_amount !== undefined
-                            ? Number(response.data.total_referral_amount)
-                            : (response.data.referral_bonus !== undefined
-                                ? Number(response.data.referral_bonus)
-                                : 0)));
+                // Prioritize available_bonus_amount as primary bonus key
+                const totalBonus = response.data.available_bonus_amount !== undefined
+                    ? Number(response.data.available_bonus_amount)
+                    : (response.data.total_bonus_amount !== undefined
+                        ? Number(response.data.total_bonus_amount)
+                        : (response.data.referral_bonus !== undefined
+                            ? Number(response.data.referral_bonus)
+                            : (response.data.referralBonus !== undefined
+                                ? Number(response.data.referralBonus)
+                                : (response.data.total_referral_amount !== undefined
+                                    ? Number(response.data.total_referral_amount)
+                                    : (response.data.bonusData?.available_bonus_amount !== undefined
+                                        ? Number(response.data.bonusData.available_bonus_amount)
+                                        : 0)))));
                 setTotalBonusAmount(totalBonus);
+
+                const curr =
+                    response.data.bonus_currency ||
+                    response.data.referral_bonus_currency ||
+                    response.data.currency ||
+                    response.data.bonusData?.bonus_currency ||
+                    response.data.bonusData?.currency ||
+                    "USD";
+                setBonusCurrency(curr);
             }
 
             const formattedHistory = rawList.map(ref => {
@@ -241,7 +265,7 @@ const Referrals = () => {
                                     <FiCreditCard size={20} />
                                 </div>
                                 <div className="text-start">
-                                    <h3 className="ref-metric-val mb-0">${creditEarned}</h3>
+                                    <h3 className="ref-metric-val mb-0">{getCurrencySymbol(bonusCurrency)}{creditEarned}</h3>
                                     <p className="ref-metric-label text-muted mb-0 small">Credit earned</p>
                                 </div>
                             </div>

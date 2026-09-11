@@ -18,7 +18,6 @@ import "./dashboard.css";
 
 const CustomerDashboard = () => {
     const navigate = useNavigate();
-    const [greeting, setGreeting] = useState("Good Morning");
     const [userName, setUserName] = useState("Somya");
     const [fileStatus, setFileStatus] = useState({
         presentfilestatus: 1,
@@ -119,12 +118,7 @@ const CustomerDashboard = () => {
     };
 
     useEffect(() => {
-        const updateGreeting = () => {
-            const hours = new Date().getHours();
-            if (hours < 12) setGreeting("Good Morning");
-            else if (hours < 17) setGreeting("Good Afternoon");
-            else setGreeting("Good Evening");
-
+        const loadUserInfo = () => {
             const userInfoStr = localStorage.getItem("userInfo");
             if (userInfoStr) {
                 try {
@@ -204,7 +198,7 @@ const CustomerDashboard = () => {
             }
         };
 
-        updateGreeting();
+        loadUserInfo();
         try {
             const stored = localStorage.getItem("currentFileStatus");
             if (stored) {
@@ -287,7 +281,7 @@ const CustomerDashboard = () => {
         <div className="db-container">
             <header className="db-header">
                 <span className="db-pre-heading">WELCOME</span>
-                <h1 className="db-greeting">{greeting}, {userName}</h1>
+                <h1 className="db-greeting">Hello, {userName}</h1>
             </header>
 
             <section className="db-progress-card">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Swal from "sweetalert2";
 import {
     FiSearch,
@@ -16,7 +16,8 @@ import {
     FiRefreshCw,
     FiPackage,
     FiExternalLink,
-    FiSend
+    FiSend,
+    FiEdit2
 } from "react-icons/fi";
 import { adminServices } from "../services/AdminServices";
 import { getStoredTaxYear, getStoredTaxYearsList } from "../../utils/taxYear";
@@ -200,6 +201,23 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
             return updated;
         });
     };
+
+    // User Payment Orders Table States (/payment/getPaymentsByUserId, /payment/updateOrder, /payment/deleteOrder)
+    const [userPaymentsList, setUserPaymentsList] = useState([]);
+    const [userPaymentsLoading, setUserPaymentsLoading] = useState(false);
+    const [userPaymentStats, setUserPaymentStats] = useState({
+        total_records: 0,
+        paid_count: 0,
+        unpaid_count: 0,
+        total_paid_amount: 0,
+        total_pending_amount: 0
+    });
+    const [userPaymentSearch, setUserPaymentSearch] = useState("");
+    const [userPaymentStatusFilter, setUserPaymentStatusFilter] = useState("all");
+    const [userPaymentPage, setUserPaymentPage] = useState(1);
+    const [userPaymentRowsPerPage, setUserPaymentRowsPerPage] = useState(10);
+    const [editingOrderId, setEditingOrderId] = useState(null);
+    const [deletingOrderId, setDeletingOrderId] = useState(null);
 
     // Referral tab states
     const [referralsList, setReferralsList] = useState([]);
@@ -486,6 +504,59 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
         };
     }, [loadRecords]);
 
+    // Fetch payments data for selected user (/payment/getPaymentsByUserId)
+    const fetchUserPayments = useCallback(async (client, search = "", statusFilter = "all") => {
+        if (!client) return;
+        const targetUserId =
+            client.user_id ||
+            client.client_id ||
+            client.rawData?.user_id ||
+            client.rawData?.u_user_id ||
+            client.rawData?.ps_user_id ||
+            client.rawData?.unlists_u_id ||
+            client.id;
+
+        if (!targetUserId) return;
+
+        setUserPaymentsLoading(true);
+        try {
+            const payload = {
+                client_id: isNaN(Number(targetUserId)) ? targetUserId : Number(targetUserId),
+                taxyear: "all",
+                order_status: statusFilter === "all" ? "all" : Number(statusFilter),
+                search: search || ""
+            };
+            const res = await adminServices.getPaymentsByUserId(payload);
+            const resData = res?.data;
+            if (resData?.data && Array.isArray(resData.data)) {
+                setUserPaymentsList(resData.data);
+                setUserPaymentStats({
+                    total_records: resData.total_records != null ? resData.total_records : resData.data.length,
+                    paid_count: resData.paid_count != null ? resData.paid_count : resData.data.filter(d => d.order_status === 1 || String(d.order_status_text).toLowerCase() === "success").length,
+                    unpaid_count: resData.unpaid_count != null ? resData.unpaid_count : resData.data.filter(d => d.order_status === 0 || String(d.order_status_text).toLowerCase().includes("pending")).length,
+                    total_paid_amount: resData.total_paid_amount != null ? resData.total_paid_amount : 0,
+                    total_pending_amount: resData.total_pending_amount != null ? resData.total_pending_amount : 0
+                });
+            } else if (Array.isArray(resData)) {
+                setUserPaymentsList(resData);
+                setUserPaymentStats({
+                    total_records: resData.length,
+                    paid_count: resData.filter(d => d.order_status === 1).length,
+                    unpaid_count: resData.filter(d => d.order_status === 0).length,
+                    total_paid_amount: 0,
+                    total_pending_amount: 0
+                });
+            } else {
+                setUserPaymentsList([]);
+            }
+        } catch (err) {
+            console.warn("Error fetching user payments:", err);
+            setUserPaymentsList([]);
+        } finally {
+            setUserPaymentsLoading(false);
+        }
+    }, []);
+
     // Fetch client details: taxpayerinfo, getSpouseInfo, getDependentInfo, getEmployerInfo, gettotalcountofdocs
     const fetchClientDetails = useCallback(async (client) => {
         if (!client) return;
@@ -763,11 +834,14 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
             } finally {
                 setSynopsysLoading(false);
             }
+
+            // 9. Fetch user payment orders (/payment/getPaymentsByUserId)
+            fetchUserPayments(client);
         } finally {
             setDetailsLoading(false);
             setDocsLoading(false);
         }
-    }, []);
+    }, [fetchUserPayments]);
 
     // Refresh synopsys documents standalone
     const fetchUserSynopsys = useCallback(async (client) => {
@@ -814,9 +888,17 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
 
     useEffect(() => {
         if (selectedClient) {
+            setEditingOrderId(null);
             fetchClientDetails(selectedClient);
         }
     }, [selectedClient, fetchClientDetails]);
+
+    useEffect(() => {
+        if (selectedClient && activeInnerTab === "payment") {
+            setEditingOrderId(null);
+            fetchUserPayments(selectedClient, userPaymentSearch, userPaymentStatusFilter);
+        }
+    }, [selectedClient, activeInnerTab, userPaymentStatusFilter, fetchUserPayments]);
 
     const filteredClients = clients.filter(c => {
         if (!searchTerm.trim()) return true;
@@ -1229,7 +1311,20 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
         }
     };
 
-    // Handle Payment form submission (/payment/createOrder)
+    // Cancel editing an existing payment order and reset form
+    const handleCancelEditPayment = () => {
+        setEditingOrderId(null);
+        setPaymentForm({
+            p_standardAmount: "",
+            p_discountType: "Flat",
+            p_discountValue: "",
+            p_amount: "",
+            currency: "USA",
+            comment: ""
+        });
+    };
+
+    // Handle Payment form submission (/payment/createOrder when new, /payment/updateOrder when editing)
     const handlePaymentSubmit = async (e) => {
         e.preventDefault();
         if (!selectedClient) return;
@@ -1264,62 +1359,217 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
         const finalAmt = paymentForm.p_amount !== "" ? paymentForm.p_amount : paymentForm.p_standardAmount;
         const currentTaxYear = getStoredTaxYear() || "2025";
 
-        const payload = {
-            client_id: isNaN(Number(clientId)) ? clientId : Number(clientId),
-            p_standardAmount: String(paymentForm.p_standardAmount),
-            p_discountType: paymentForm.p_discountType || "Flat",
-            p_discountValue: String(paymentForm.p_discountValue || "0"),
-            p_amount: String(finalAmt),
-            currency: paymentForm.currency || "USA",
-            comment: paymentForm.comment || "",
-            taxyear: String(currentTaxYear)
-        };
-
         setPaymentSubmitting(true);
         try {
-            const res = await adminServices.createOrder(payload);
-            const resData = res?.data;
+            if (editingOrderId) {
+                // Update Order API (/payment/updateOrder)
+                const updatePayload = {
+                    order_id: Number(editingOrderId),
+                    p_standardAmount: String(paymentForm.p_standardAmount),
+                    p_discountType: paymentForm.p_discountType || "Flat",
+                    p_discountValue: String(paymentForm.p_discountValue || "0"),
+                    p_amount: String(finalAmt),
+                    currency: paymentForm.currency || "USA",
+                    comment: paymentForm.comment || "",
+                    taxyear: String(paymentForm.taxyear || currentTaxYear)
+                };
 
-            if (
-                resData?.http_code === 200 ||
-                resData?.status === 200 ||
-                resData?.success ||
-                resData?.order_id ||
-                resData?.id ||
-                res?.status === 200
-            ) {
-                Swal.fire({
-                    icon: "success",
-                    title: "Order Created Successfully",
-                    text: resData?.message || `Payment order created for ${selectedClient.name} with amount ${payload.currency} ${payload.p_amount}.`,
-                    confirmButtonColor: "#1b2e6b"
-                });
-                setPaymentForm({
-                    p_standardAmount: "",
-                    p_discountType: "Flat",
-                    p_discountValue: "",
-                    p_amount: "",
-                    currency: "USA",
-                    comment: ""
-                });
+                const res = await adminServices.updateOrder(updatePayload);
+                const resData = res?.data;
+
+                if (resData?.http_code === 200 || resData?.success || res?.status === 200) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Order Updated Successfully",
+                        text: resData?.status_smessage || resData?.message || `Payment order #${editingOrderId} updated successfully.`,
+                        confirmButtonColor: "#1b2e6b"
+                    });
+                    handleCancelEditPayment();
+                    fetchUserPayments(selectedClient, userPaymentSearch, userPaymentStatusFilter);
+                } else {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Notice",
+                        text: resData?.status_smessage || resData?.message || "Order update completed with warnings.",
+                        confirmButtonColor: "#1b2e6b"
+                    });
+                }
             } else {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Notice",
-                    text: resData?.message || "Order creation completed with warnings.",
-                    confirmButtonColor: "#1b2e6b"
-                });
+                // Create Order API (/payment/createOrder)
+                const createPayload = {
+                    client_id: isNaN(Number(clientId)) ? clientId : Number(clientId),
+                    p_standardAmount: String(paymentForm.p_standardAmount),
+                    p_discountType: paymentForm.p_discountType || "Flat",
+                    p_discountValue: String(paymentForm.p_discountValue || "0"),
+                    p_amount: String(finalAmt),
+                    currency: paymentForm.currency || "USA",
+                    comment: paymentForm.comment || "",
+                    taxyear: String(currentTaxYear)
+                };
+
+                const res = await adminServices.createOrder(createPayload);
+                const resData = res?.data;
+
+                if (
+                    resData?.http_code === 200 ||
+                    resData?.status === 200 ||
+                    resData?.success ||
+                    resData?.order_id ||
+                    resData?.id ||
+                    res?.status === 200
+                ) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Order Created Successfully",
+                        text: resData?.message || `Payment order created for ${selectedClient.name} with amount ${createPayload.currency} ${createPayload.p_amount}.`,
+                        confirmButtonColor: "#1b2e6b"
+                    });
+                    handleCancelEditPayment();
+                    fetchUserPayments(selectedClient, userPaymentSearch, userPaymentStatusFilter);
+                } else {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Notice",
+                        text: resData?.message || "Order creation completed with warnings.",
+                        confirmButtonColor: "#1b2e6b"
+                    });
+                }
             }
         } catch (err) {
-            console.error("Error creating payment order:", err);
+            console.error("Error submitting payment order:", err);
             Swal.fire({
                 icon: "error",
-                title: "Failed to Create Order",
-                text: err?.response?.data?.message || err?.message || "Could not process order creation on server.",
+                title: editingOrderId ? "Failed to Update Order" : "Failed to Create Order",
+                text: err?.response?.data?.message || err?.response?.data?.status_smessage || err?.message || "Could not process order on server.",
                 confirmButtonColor: "#1b2e6b"
             });
         } finally {
             setPaymentSubmitting(false);
+        }
+    };
+
+    // Filtered User Payments for Table
+    const filteredUserPayments = useMemo(() => {
+        let list = userPaymentsList || [];
+        if (userPaymentStatusFilter !== "all") {
+            const filterNum = Number(userPaymentStatusFilter);
+            list = list.filter(item => {
+                if (filterNum === 1) {
+                    return item.order_status === 1 || String(item.order_status) === "1" || String(item.order_status_text).toLowerCase() === "success" || String(item.order_status_text).toLowerCase() === "paid";
+                }
+                return item.order_status === 0 || String(item.order_status) === "0" || String(item.order_status_text).toLowerCase().includes("pending") || String(item.order_status_text).toLowerCase().includes("unpaid");
+            });
+        }
+        if (userPaymentSearch && userPaymentSearch.trim()) {
+            const term = userPaymentSearch.toLowerCase().trim();
+            list = list.filter(item => {
+                const orderId = String(item.order_id || "");
+                const user = String(item.user_name || item.name || "").toLowerCase();
+                const fileNo = String(item.filenumber || "").toLowerCase();
+                const comment = String(item.comment || "").toLowerCase();
+                const amt = String(item.p_amount != null ? item.p_amount : (item.amount || ""));
+                const stdAmt = String(item.p_standardAmount || "");
+                const taxyear = String(item.taxyear || "").toLowerCase();
+                const txnId = String(item.t_order_id || item.bank_ref_no || "").toLowerCase();
+                const statusText = String(item.order_status_text || (item.order_status === 1 ? "paid success" : "pending unpaid")).toLowerCase();
+
+                return (
+                    orderId.includes(term) ||
+                    user.includes(term) ||
+                    fileNo.includes(term) ||
+                    comment.includes(term) ||
+                    amt.includes(term) ||
+                    stdAmt.includes(term) ||
+                    taxyear.includes(term) ||
+                    txnId.includes(term) ||
+                    statusText.includes(term)
+                );
+            });
+        }
+        return list;
+    }, [userPaymentsList, userPaymentStatusFilter, userPaymentSearch]);
+
+    const totalPaymentPages = Math.max(1, Math.ceil(filteredUserPayments.length / userPaymentRowsPerPage));
+    const currentPaymentPageClamped = Math.min(userPaymentPage, totalPaymentPages);
+    const paginatedUserPayments = filteredUserPayments.slice(
+        (currentPaymentPageClamped - 1) * userPaymentRowsPerPage,
+        currentPaymentPageClamped * userPaymentRowsPerPage
+    );
+
+    // Edit Order in Form above
+    const handleOpenEditPaymentOrder = (order) => {
+        setEditingOrderId(order.order_id);
+        setPaymentForm({
+            p_standardAmount: order.p_standardAmount != null ? String(order.p_standardAmount) : "",
+            p_discountType: order.p_discountType || "Flat",
+            p_discountValue: order.p_discountValue != null ? String(order.p_discountValue) : "",
+            p_amount: order.p_amount != null ? String(order.p_amount) : (order.amount != null ? String(order.amount) : ""),
+            currency: order.currency || "USA",
+            comment: order.comment || "",
+            taxyear: order.taxyear ? String(order.taxyear) : (getStoredTaxYear() || "2025")
+        });
+
+        // Smooth scroll up to payment form
+        setTimeout(() => {
+            const formElement = document.getElementById("client-payment-form");
+            if (formElement) {
+                formElement.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        }, 50);
+    };
+
+    const handleDeletePaymentOrder = async (order) => {
+        if (!order?.order_id) return;
+
+        const result = await Swal.fire({
+            title: `Delete Order #${order.order_id}?`,
+            text: `Are you sure you want to permanently delete this payment order? This action cannot be undone.`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#dc2626",
+            cancelButtonColor: "#64748b",
+            confirmButtonText: "Yes, delete it",
+            cancelButtonText: "Cancel"
+        });
+
+        if (result.isConfirmed) {
+            setDeletingOrderId(order.order_id);
+            try {
+                const payload = {
+                    order_id: Number(order.order_id)
+                };
+                const res = await adminServices.deleteOrder(payload);
+                const resData = res?.data;
+                if (resData?.http_code === 200 || resData?.success || res?.status === 200) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Deleted!",
+                        text: resData?.status_smessage || resData?.message || `Order #${order.order_id} has been deleted.`,
+                        confirmButtonColor: "#1b2e6b"
+                    });
+                    if (editingOrderId === order.order_id) {
+                        handleCancelEditPayment();
+                    }
+                    fetchUserPayments(selectedClient, userPaymentSearch, userPaymentStatusFilter);
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Delete Failed",
+                        text: resData?.status_smessage || resData?.message || "Could not delete order.",
+                        confirmButtonColor: "#1b2e6b"
+                    });
+                }
+            } catch (err) {
+                console.error("Error deleting order:", err);
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: err?.response?.data?.message || err?.response?.data?.status_smessage || err?.message || "Failed to delete order on server.",
+                    confirmButtonColor: "#1b2e6b"
+                });
+            } finally {
+                setDeletingOrderId(null);
+            }
         }
     };
 
@@ -2341,7 +2591,26 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
                                     Status : {selectedClient.status || "Payment Pending"}
                                 </div>
 
-                                <form onSubmit={handlePaymentSubmit}>
+                                <form id="client-payment-form" onSubmit={handlePaymentSubmit}>
+                                    {/* Editing Active Notice */}
+                                    {editingOrderId && (
+                                        <div className="alert alert-info py-2 px-3 mb-3 d-flex align-items-center justify-content-between rounded-3 border">
+                                            <div className="d-flex align-items-center gap-2">
+                                                <FiEdit2 className="text-primary" size={16} />
+                                                <span className="small fw-semibold text-dark">
+                                                    Editing Payment Order #{editingOrderId} — Modify billing details below and click &quot;Update Order&quot; to save.
+                                                </span>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                className="btn btn-sm btn-outline-secondary py-0 px-2 small"
+                                                onClick={handleCancelEditPayment}
+                                            >
+                                                Cancel Edit
+                                            </button>
+                                        </div>
+                                    )}
+
                                     <div className="row g-3">
                                         {/* Row 1: Customer Name & File Number */}
                                         <div className="col-12 col-md-6">
@@ -2481,7 +2750,17 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
                                         </div>
                                     </div>
 
-                                    <div className="d-flex justify-content-end mt-4">
+                                    <div className="d-flex justify-content-end align-items-center gap-2 mt-4">
+                                        {editingOrderId && (
+                                            <button
+                                                type="button"
+                                                className="btn btn-outline-secondary px-4"
+                                                onClick={handleCancelEditPayment}
+                                                disabled={paymentSubmitting}
+                                            >
+                                                Cancel Edit
+                                            </button>
+                                        )}
                                         <button
                                             type="submit"
                                             className="btn btn-figma-primary px-5 d-flex align-items-center gap-2"
@@ -2490,14 +2769,282 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
                                             {paymentSubmitting ? (
                                                 <>
                                                     <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                                    <span>Creating Order...</span>
+                                                    <span>{editingOrderId ? "Updating Order..." : "Creating Order..."}</span>
                                                 </>
                                             ) : (
-                                                <span>Create Order</span>
+                                                <span>{editingOrderId ? "Update Order" : "Create Order"}</span>
                                             )}
                                         </button>
                                     </div>
                                 </form>
+
+                                {/* Payment Orders List Table Section (/payment/getPaymentsByUserId) */}
+                                <div className="mt-4 pt-4 border-top">
+                                    {/* Section Header with Stats */}
+                                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                                        <div>
+                                            <h6 className="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                                                <span>Payment Orders History</span>
+                                                <span className="badge bg-light text-primary border fw-semibold rounded-pill px-2.5 py-1 small">
+                                                    {filteredUserPayments.length} {filteredUserPayments.length === 1 ? 'Record' : 'Records'}
+                                                </span>
+                                            </h6>
+                                            <p className="text-muted small mb-0">
+                                                View all payment records created for this customer, update billing details, or remove orders.
+                                            </p>
+                                        </div>
+
+                                        {/* Quick Summary Badges */}
+                                        <div className="d-flex align-items-center gap-2 flex-wrap">
+                                            <div
+                                                className="px-3 py-1.5 rounded-3 d-flex align-items-center gap-2 small fw-semibold"
+                                                style={{ backgroundColor: "#dcfce7", color: "#166534", border: "1px solid #bbf7d0" }}
+                                            >
+                                                <span>Paid ({userPaymentStats.paid_count || userPaymentsList.filter(o => o.order_status === 1).length})</span>
+                                                <span>${Number(userPaymentStats.total_paid_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            </div>
+                                            <div
+                                                className="px-3 py-1.5 rounded-3 d-flex align-items-center gap-2 small fw-semibold"
+                                                style={{ backgroundColor: "#fee2e2", color: "#dc2626", border: "1px solid #fecaca" }}
+                                            >
+                                                <span>Pending ({userPaymentStats.unpaid_count || userPaymentsList.filter(o => o.order_status === 0).length})</span>
+                                                <span>${Number(userPaymentStats.total_pending_amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Search & Filter Bar */}
+                                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                                        <div className="d-flex align-items-center gap-2">
+                                            <select
+                                                className="form-select form-select-sm figma-form-control"
+                                                style={{ width: "160px" }}
+                                                value={userPaymentStatusFilter}
+                                                onChange={e => {
+                                                    setUserPaymentStatusFilter(e.target.value);
+                                                    setUserPaymentPage(1);
+                                                }}
+                                            >
+                                                <option value="all">All Status</option>
+                                                <option value="1">Paid / Success</option>
+                                                <option value="0">Unpaid / Pending</option>
+                                            </select>
+                                            <button
+                                                type="button"
+                                                className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+                                                onClick={() => fetchUserPayments(selectedClient, userPaymentSearch, userPaymentStatusFilter)}
+                                                title="Refresh payments list"
+                                            >
+                                                <FiRefreshCw className={userPaymentsLoading ? "spin-animation" : ""} />
+                                                <span>Refresh</span>
+                                            </button>
+                                        </div>
+
+                                        <div className="position-relative" style={{ maxWidth: "260px", width: "100%" }}>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm figma-form-control pe-5"
+                                                placeholder="Search orders..."
+                                                value={userPaymentSearch}
+                                                onChange={e => {
+                                                    setUserPaymentSearch(e.target.value);
+                                                    setUserPaymentPage(1);
+                                                }}
+                                            />
+                                            <FiSearch className="position-absolute top-50 end-0 translate-middle-y me-3 text-muted" />
+                                        </div>
+                                    </div>
+
+                                    {/* Payment Table */}
+                                    <div className="figma-table-container mb-3 shadow-sm">
+                                        <div className="table-responsive">
+                                            <table className="table figma-table align-middle mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th style={{ minWidth: "90px" }}>Order ID</th>
+                                                        <th style={{ minWidth: "90px" }}>Tax Year</th>
+                                                        <th style={{ minWidth: "100px" }}>Standard</th>
+                                                        <th style={{ minWidth: "120px" }}>Discount</th>
+                                                        <th style={{ minWidth: "110px" }}>Payable</th>
+                                                        <th style={{ minWidth: "110px" }}>Status</th>
+                                                        <th style={{ minWidth: "130px" }}>Ref / Txn ID</th>
+                                                        <th style={{ minWidth: "160px" }}>Comment</th>
+                                                        <th style={{ minWidth: "110px" }}>Created</th>
+                                                        <th style={{ minWidth: "90px", textAlign: "center" }}>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {userPaymentsLoading ? (
+                                                        <tr>
+                                                            <td colSpan="10" className="text-center py-5 text-muted small">
+                                                                <div className="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                                                                Loading payment orders...
+                                                            </td>
+                                                        </tr>
+                                                    ) : paginatedUserPayments.length > 0 ? (
+                                                        paginatedUserPayments.map((order, idx) => {
+                                                            const isPaid = order.order_status === 1 || String(order.order_status) === "1" || String(order.order_status_text).toLowerCase() === "success" || String(order.order_status_text).toLowerCase() === "paid";
+                                                            const currencySymbol = order.currency === "INDIA" || order.currency === "INR" ? "₹" : "$";
+                                                            const stdAmt = order.p_standardAmount != null ? `${currencySymbol}${order.p_standardAmount}` : "-";
+                                                            const finalAmt = order.p_amount != null ? `${currencySymbol}${order.p_amount}` : (order.amount != null ? `${currencySymbol}${order.amount}` : "-");
+                                                            const discountText = order.p_discountType && order.p_discountType !== "None"
+                                                                ? `${order.p_discountType === "Percentage" ? `${order.p_discountValue}%` : `${currencySymbol}${order.p_discountValue}`} (${order.p_discountType})`
+                                                                : "None";
+
+                                                            return (
+                                                                <tr key={order.order_id || idx}>
+                                                                    <td>
+                                                                        <span className="fw-bold text-dark">#{order.order_id}</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span className="badge bg-light text-secondary border fw-semibold">
+                                                                            {order.taxyear || "N/A"}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span className="text-muted">{stdAmt}</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <small className="text-muted">{discountText}</small>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span className="fw-bold text-dark">{finalAmt}</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span
+                                                                            className="badge rounded-pill px-2.5 py-1 small fw-semibold"
+                                                                            style={
+                                                                                isPaid
+                                                                                    ? { backgroundColor: "#dcfce7", color: "#166534", border: "1px solid #bbf7d0" }
+                                                                                    : { backgroundColor: "#fee2e2", color: "#dc2626", border: "1px solid #fecaca" }
+                                                                            }
+                                                                        >
+                                                                            {isPaid ? "● Paid" : "● Pending"}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <small className="text-secondary font-monospace" title={order.bank_ref_no || order.t_order_id || "-"}>
+                                                                            {order.bank_ref_no || order.t_order_id || "-"}
+                                                                        </small>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div className="text-truncate small" style={{ maxWidth: "180px" }} title={order.comment || "-"}>
+                                                                            {order.comment || "-"}
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <small className="text-muted">
+                                                                            {order.o_created_at ? (order.o_created_at.split("T")[0] || order.o_created_at.split(" ")[0]) : "-"}
+                                                                        </small>
+                                                                    </td>
+                                                                    <td className="text-center">
+                                                                        {!isPaid ? (
+                                                                            <div className="d-flex align-items-center justify-content-center gap-1">
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="btn btn-sm btn-outline-primary border-0 p-1.5 rounded-2"
+                                                                                    onClick={() => handleOpenEditPaymentOrder(order)}
+                                                                                    title="Edit Order"
+                                                                                >
+                                                                                    <FiEdit2 size={15} />
+                                                                                </button>
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="btn btn-sm btn-outline-danger border-0 p-1.5 rounded-2"
+                                                                                    onClick={() => handleDeletePaymentOrder(order)}
+                                                                                    disabled={deletingOrderId === order.order_id}
+                                                                                    title="Delete Order"
+                                                                                >
+                                                                                    {deletingOrderId === order.order_id ? (
+                                                                                        <span className="spinner-border spinner-border-sm" style={{ width: "12px", height: "12px" }}></span>
+                                                                                    ) : (
+                                                                                        <FiTrash2 size={15} />
+                                                                                    )}
+                                                                                </button>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <span className="text-muted small">-</span>
+                                                                        )}
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        })
+                                                    ) : (
+                                                        <tr>
+                                                            <td colSpan="10" className="text-center py-5 text-muted small">
+                                                                <p className="mb-0">No payment orders found for this user.</p>
+                                                                <small className="text-secondary">Use the form above to generate a new payment order.</small>
+                                                            </td>
+                                                        </tr>
+                                                    )}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    {/* Pagination */}
+                                    {filteredUserPayments.length > 0 && (
+                                        <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 text-muted small mt-2">
+                                            <div className="d-flex align-items-center gap-2">
+                                                <span>Row per page</span>
+                                                <select
+                                                    className="form-select form-select-sm"
+                                                    style={{ width: "95px" }}
+                                                    value={userPaymentRowsPerPage}
+                                                    onChange={e => {
+                                                        setUserPaymentRowsPerPage(Number(e.target.value));
+                                                        setUserPaymentPage(1);
+                                                    }}
+                                                >
+                                                    <option value={5}>5 / page</option>
+                                                    <option value={10}>10 / page</option>
+                                                    <option value={25}>25 / page</option>
+                                                </select>
+                                                <span className="ms-2">
+                                                    Showing {(currentPaymentPageClamped - 1) * userPaymentRowsPerPage + 1} to {Math.min(currentPaymentPageClamped * userPaymentRowsPerPage, filteredUserPayments.length)} of {filteredUserPayments.length} entries
+                                                </span>
+                                            </div>
+                                            <div className="d-flex align-items-center gap-1">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm figma-pagination-btn"
+                                                    disabled={currentPaymentPageClamped <= 1}
+                                                    onClick={() => setUserPaymentPage(prev => Math.max(1, prev - 1))}
+                                                >
+                                                    &lt;
+                                                </button>
+                                                {Array.from({ length: totalPaymentPages }, (_, i) => i + 1)
+                                                    .filter(p => p === 1 || p === totalPaymentPages || Math.abs(p - currentPaymentPageClamped) <= 1)
+                                                    .reduce((acc, p, i, arr) => {
+                                                        if (i > 0 && p - arr[i - 1] > 1) acc.push("...");
+                                                        acc.push(p);
+                                                        return acc;
+                                                    }, [])
+                                                    .map((item, idx) => item === "..." ? (
+                                                        <span key={`dots-payment-${idx}`} className="px-1 text-muted">...</span>
+                                                    ) : (
+                                                        <button
+                                                            type="button"
+                                                            key={`page-payment-${item}`}
+                                                            className={`btn btn-sm figma-pagination-btn ${item === currentPaymentPageClamped ? "active" : ""}`}
+                                                            onClick={() => setUserPaymentPage(item)}
+                                                        >
+                                                            {item}
+                                                        </button>
+                                                    ))
+                                                }
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm figma-pagination-btn"
+                                                    disabled={currentPaymentPageClamped >= totalPaymentPages}
+                                                    onClick={() => setUserPaymentPage(prev => Math.min(totalPaymentPages, prev + 1))}
+                                                >
+                                                    &gt;
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         )}
 
@@ -2789,6 +3336,8 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
                         </div>
                     </div>
                 )}
+
+
             </div>
         );
     }
