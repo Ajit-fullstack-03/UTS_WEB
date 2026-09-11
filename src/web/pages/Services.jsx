@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./services.css";
 import backusa from "../../assets/image/USA_service_BG.png";
+import usaHeroImg from "../../assets/image/USA_service_hero.png";
 import img1 from "../../assets/image/Tax_filling_1.png";
 import img2 from "../../assets/image/Tax_filling_2.png";
 import img3 from "../../assets/image/Tax_filling_3.png";
@@ -147,6 +148,12 @@ const Services = () => {
                             Filing taxes for individuals, businesses and cross-border clients across the USA &amp; India — accurate, fast, and fully compliant.
                         </p>
                         <Link to="/register" className="srv-hero-btn">Get Started</Link>
+                    </div>
+
+                    <div className="srv-hero-visual srv-hero-visual--mobile-only">
+                        <div className="srv-hero-img-frame">
+                            <img src={usaHeroImg} alt="US Tax Filing and Compliance Solutions" className="srv-hero-img" />
+                        </div>
                     </div>
                 </div>
             </section>

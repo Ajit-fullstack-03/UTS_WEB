@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./services.css";
 import backusa from "../../assets/image/USA_service_BG.png";
+import usaHeroImg from "../../assets/image/USA_service_hero.png";
 import img1 from "../../assets/image/Tax_planning_1.png";
 import img2 from "../../assets/image/Tax_planning_2.png";
 import img3 from "../../assets/image/Tax_planning_3.png";
@@ -129,6 +130,12 @@ const TaxPlanning = () => {
                             Year-round proactive tax planning for individuals and businesses — reducing your liability, maximizing savings, and keeping you fully compliant.
                         </p>
                         <Link to="/register" className="srv-hero-btn">Get Started</Link>
+                    </div>
+
+                    <div className="srv-hero-visual srv-hero-visual--mobile-only">
+                        <div className="srv-hero-img-frame">
+                            <img src={usaHeroImg} alt="Strategic Tax and Planning Solutions" className="srv-hero-img" />
+                        </div>
                     </div>
                 </div>
             </section>

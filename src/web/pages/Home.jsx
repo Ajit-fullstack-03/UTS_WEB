@@ -18,7 +18,9 @@ import gist from "../../assets/image/gift.gif";
 import srf1 from "../../assets/image/srf1.png";
 import Tax_planning_2 from "../../assets/image/Tax_planning_2.png";
 import Book_keeping_4 from "../../assets/image/Book_keeping_4.png";
+import wcuwrapperimg from "../../assets/image/Frame_12.png";
 import { ArrowLeft, ArrowRight } from "iconsax-reactjs";
+import dollar_bag from "../../assets/image/Dollar_bag.png"; 
 
 
 const services = [
@@ -414,7 +416,9 @@ const Home = () => {
 
                             {/* Floating refund pill - bottom right */}
                             <div className="hero-float-card hero-float-card--refund">
-                                <span className="hero-float-card-refund-icon" role="img" aria-label="money bag">💰</span>
+                                <span className="hero-float-card-refund-icon" role="img" aria-label="money bag">
+                                    <img src={dollar_bag} alt="Dollar bag" className="hero-dollar-bag-img" height={20} width={20} />
+                                </span>
                                 <span>Estimated Refund</span>
                             </div>
                         </div>
@@ -448,9 +452,10 @@ const Home = () => {
                 </div>
             </section>
 
-            <section className="wcu-wrapper">
-                <div className="wcu-bg-circles" aria-hidden="true"></div>
-
+            <section
+                className="wcu-wrapper"
+                style={{ backgroundImage: `url(${wcuwrapperimg})` }}
+            >
                 <div className="wcu-inner">
                     {/* Left visual */}
                     <div className="wcu-visual">
@@ -544,8 +549,10 @@ const Home = () => {
                 </div>
             </section>
 
-            <section className="tso-wrapper">
-                <div className="tso-bg-circles" aria-hidden="true"></div>
+            <section
+                className="tso-wrapper"
+                style={{ backgroundImage: `url(${wcuwrapperimg})` }}
+            >
                 <div className="tso-inner">
                     <div className="tso-header">
                         <div className="tso-badge">

@@ -3,8 +3,8 @@
 /* ================================================================
    CONTACT PAGE — contact.css
    ================================================================ */
-
 /* ─── Top Contact Bar ─────────────────────────────────────────── */
+
 .ct-topbar {
     background-color: #1E3A8ACC;
     padding: 14px 37px;
@@ -307,7 +307,7 @@
     align-items: flex-start;
     padding-bottom: 60px;
 }
-
+    
 /* Left */
 .ct-faq-badge {
     display: inline-block;

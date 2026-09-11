@@ -256,19 +256,20 @@
     min-height: 310px;
     background: #FFFFFF;
     border: 1px solid #E8ECF4;
-    border-radius: 16px;
+    border-radius: 20px;
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 14px;
-    /* box-shadow: 0 2px 12px rgba(27, 46, 107, 0.07); */
+    box-shadow: 0 4px 20px rgba(15, 26, 60, 0.06), 0 1px 4px rgba(15, 26, 60, 0.03);
     transition: box-shadow 0.25s ease, transform 0.25s ease;
     margin-right: 18px;
+    box-sizing: border-box;
 }
 
 .tpg-card:hover {
-    box-shadow: 0 8px 32px rgba(27,46,107,0.14);
-    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(15, 26, 60, 0.12);
+    transform: translateY(-3px);
 }
 
 .tpg-card-text {
@@ -334,18 +335,25 @@
    MARQUEE (SCROLLING ROWS)
 ─────────────────────────────────────────────── */
 .tpg-reviews-section {
-    padding: 60px 0 20px;
+    padding: 60px 48px 24px;
     background: #F8FAFF;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 22px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .tpg-marquee-viewport {
     overflow: hidden;
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
     cursor: pointer;
+    padding: 12px 0;
+    margin: -12px 0;
 }
 
 /* LEFT direction → scrolls left */
@@ -579,7 +587,7 @@
 ─────────────────────────────────────────────── */
 @media (max-width: 900px) {
     .tpg-hero-main {
-        padding: 100px 24px 0;
+        padding: 30px 24px 0;
         flex-direction: column;
     }
 
@@ -613,6 +621,11 @@
     .tpg-helpbar-left {
         flex-direction: column;
     }
+
+    .tpg-reviews-section {
+        padding: 40px 24px 18px;
+        gap: 18px;
+    }
 }
 
 @media (max-width: 600px) {
@@ -633,6 +646,48 @@
     .tpg-trust-stat-div {
         display: none;
     }
+
+    .tpg-reviews-section {
+        padding: 30px 16px 14px;
+        gap: 16px;
+    }
+    .tpg-hero-desc {
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.7;
+    margin: 0 0 32px;
+    max-width: 440px;
+}
+.tpg-hero-trust-badge {
+    position: absolute;
+    bottom: 20px;
+    right:40px;
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    box-shadow: 0 8px 32px rgba(27, 46, 107, 0.15), 0 2px 8px rgba(0, 0, 0, 0.07);
+    z-index: 10;
+    min-width: 168px;
+    max-width: 200px;
+}
+.tpg-hero-visual {
+     flex: 1 1 0px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.tpg-hero-main {
+    gap:0px;
+}
+.tpg-hero-image {
+   
+    left: 49%;
+  
+}
 }
 
 /* ─── Scroll To Top ─── */

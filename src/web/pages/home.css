@@ -290,17 +290,14 @@ body {
     border-radius: 10px;
     overflow: hidden;
     isolation: isolate;
-    /* Premium Glass */
-    background: linear-gradient(135deg,
-            rgba(253, 251, 251, 0.24),
-            rgba(255, 255, 255, 0.08));
-    backdrop-filter: blur(45px) saturate(220%) brightness(1.15);
-    -webkit-backdrop-filter: blur(45px) saturate(220%) brightness(1.15);
-    border: 1px solid rgba(255, 255, 255, .35);
+    /* Premium Frosted Whitish Semi-Transparent Glass */
+    background: rgba(255, 255, 255, 0.62);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.75);
     box-shadow:
-        0 15px 45px rgba(31, 38, 135, .16),
-        inset 0 1px 1px rgba(255, 255, 255, .75),
-        inset 0 -1px 2px rgba(255, 255, 255, .12);
+        0 14px 36px rgba(27, 46, 107, 0.12),
+        0 4px 12px rgba(0, 0, 0, 0.04);
     animation: heroFloatY 3.2s ease-in-out infinite;
     animation-delay: .6s;
     will-change: transform;
@@ -337,12 +334,12 @@ body {
 .hero-float-card-refund-icon {
     width: 30px;
     height: 30px;
-    border-radius: 50%;
     background-color: #EAF7EE;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 15px;
+    border-radius: 5px;
 }
 
 /* Respect users who prefer reduced motion */
@@ -489,6 +486,9 @@ body {
     position: relative;
     width: 100%;
     background-color: #FFFFFF;
+    background-repeat: no-repeat;
+    background-position: calc(100% + 80px) center;
+    background-size: cover;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     overflow: hidden;
     padding: 72px 24px 39px;
@@ -745,6 +745,9 @@ body {
     position: relative;
     width: 100%;
     background-color: #FFFFFF;
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: cover;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     overflow: hidden;
     padding: 70px 24px;
@@ -1159,26 +1162,26 @@ body {
 
     .wcu-chip--turnaround {
         top: 49%;
-        left: -46px;
+        left: -26px;
         right: auto;
         bottom: auto;
-        font-size: 8px;
+        font-size: 5px;
     }
 
     .wcu-chip--cpa {
         top: 25%;
-        right: -45px;
+        right: -25px;
         left: auto;
         bottom: auto;
-        font-size: 8px;
+         font-size: 5px;
     }
 
     .wcu-chip--refund {
          bottom: 23%;
-        right: -8px;
+        right: -12px;
         left: auto;
         top: auto;
-        font-size: 8px;
+        font-size: 5px;
     }
 }
 
@@ -1314,9 +1317,13 @@ body {
     position: relative;
     width: 100%;
     background-color: #FFFFFF;
+    background-repeat: no-repeat;
+    background-position: calc(90% + 214px) center;
+    background-size: cover;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     overflow: hidden;
-    padding: 72px 0px 39px;;
+    padding: 72px 0px 39px;
+   
 }
 
 /* Decorative concentric circles, top-right background */
@@ -2361,7 +2368,7 @@ body {
 /* ---------- Carousel ---------- */
 .tm-carousel {
     flex: 1 1 auto;
-    min-width: 0;
+    min-width:   0;
     overflow: hidden;
 }
 
@@ -3118,16 +3125,7 @@ body {
     }
 
     .hero-float-card--refund {
-        bottom: 14px;
-        right: 10px;
-        padding: 8px 14px 8px 8px;
-        font-size: 11px;
-    }
-
-    .hero-float-card-refund-icon {
-        width: 24px;
-        height: 24px;
-        font-size: 12px;
+        display: none !important;
     }
 
     .hero-statsbar {
@@ -3150,6 +3148,7 @@ body {
     /* ---------- Why Choose Us: content first, image below ---------- */
     .wcu-wrapper {
         padding: 40px 16px;
+        background-image: none !important;
     }
 
     .wcu-inner {
@@ -3205,6 +3204,7 @@ body {
     /* ---------- Tax-Saving Opportunities: single column, reorder to match mockup ---------- */
     .tso-wrapper {
         padding: 40px 16px 32px;
+        background-image: none !important;
     }
 
     .tso-header {
@@ -3337,9 +3337,9 @@ body {
         height: 30px;
     }
 
-    /* ---------- Your refund, in three steps: plain stacked cards, image on top ---------- */
+    /* ---------- Your refund, in three steps: sticky stacking card animation on mobile ---------- */
     .rs-wrapper {
-        padding: 40px 16px 48px;
+        padding: 40px 16px 0px;
     }
 
     .rs-header {
@@ -3351,17 +3351,23 @@ body {
     }
 
     .rs-steps {
-        gap: 16px;
-        padding-bottom: 0;
+        gap: 36px;
+        padding-bottom: 60px;
+        position: relative;
     }
 
     .rs-card {
-        position: static;
+        position: sticky;
+        top: calc(68px + (var(--card-index, 1) - 1) * 16px);
+        z-index: var(--card-index, 1);
         flex-direction: column;
         gap: 12px;
-        padding: 16px;
-        border-radius: 18px;
+        padding: 20px 16px;
+        border-radius: 20px;
         text-align: left;
+        box-shadow: 0 10px 30px rgba(27, 46, 107, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+        transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+        will-change: transform;
     }
 
     .rs-card-visual {

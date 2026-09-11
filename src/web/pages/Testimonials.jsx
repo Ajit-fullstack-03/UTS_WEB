@@ -170,9 +170,8 @@ const Testimonials = () => {
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
     const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
-    const row1 = allTestimonials.slice(0, 4);
-    const row2 = allTestimonials.slice(4, 8);
-    const row3 = allTestimonials.slice(8, 12);
+    const row1 = allTestimonials.slice(0, 5);
+    const row2 = allTestimonials.slice(5, 10);
     return (
         <>
             <section className="tpg-hero-wrapper">
@@ -268,7 +267,7 @@ const Testimonials = () => {
 
             <section className="tpg-reviews-section">
                 <MarqueeRow items={row1} direction="left" speed={38} />
-                <MarqueeRow items={row3} direction="right" speed={40} />
+                <MarqueeRow items={row2} direction="right" speed={40} />
             </section>
 
             <section className="tpg-helpbar-section">

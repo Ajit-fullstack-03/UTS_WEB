@@ -1038,9 +1038,17 @@
     }
 
     .cr-hero-img {
-    height: 341px;
+    height: 340px;
+        position: relative;
+        
+        right: 10px;
+        width: 110%;
     }
 
+         .cr-hero-inner {
+        grid-template-columns: 1fr;
+        gap: 0px;
+    }
     .cr-hero-float--rocket {
       right: 19px;
         top: 63px;
@@ -1098,7 +1106,7 @@
         align-items: flex-start;
         gap: 16px;
         padding: 20px 22px;
-        border-radius: 14px 14px 0 0;
+       border-radius: 14px 14px 14px 14px;
     }
 
     .cr-faq-contact-btn {

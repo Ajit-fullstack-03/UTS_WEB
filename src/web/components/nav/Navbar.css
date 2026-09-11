@@ -397,18 +397,13 @@
         color: #222;
         font-size: 15px;
         font-weight: 500;
-        border-bottom: 1px solid #f5f5f5;
+      
         transition: .3s;
     }
 
     .mobile-menu > a:hover {
         background: #f7f9ff;
         color: #2446A6;
-    }
-
-    /* Mobile Services Accordion */
-    .mobile-services-group {
-        border-bottom: 1px solid #f5f5f5;
     }
 
     .mobile-services-trigger {
@@ -534,6 +529,8 @@
     .mobile-register {
 
         background: #2446A6;
+
+        border: none;
 
         color: #fff !important;
     }
