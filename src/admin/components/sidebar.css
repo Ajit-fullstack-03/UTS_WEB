@@ -76,29 +76,34 @@
         transform: translateX(0);
     }
 
+    .admin-sidebar-mobile-header {
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 8px 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
     .admin-sidebar-logo {
-        max-height: 32px;
+        max-height: 34px;
         width: auto;
         object-fit: contain;
     }
 
-    .btn-sidebar-close {
+    .admin-sidebar-mobile-header .btn-sidebar-close {
         background: none;
         border: none;
-        color: #ffffff;
+        color: #1b2e6b;
         padding: 6px;
-        border-radius: 8px;
+        border-radius: 6px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        opacity: 0.85;
-        transition: opacity 0.2s, background-color 0.2s;
+        transition: background-color 0.2s;
     }
 
-    .btn-sidebar-close:hover {
-        opacity: 1;
-        background-color: rgba(255, 255, 255, 0.1);
+    .admin-sidebar-mobile-header .btn-sidebar-close:hover {
+        background-color: #f1f5f9;
     }
 
     .sidebar-menu-item {

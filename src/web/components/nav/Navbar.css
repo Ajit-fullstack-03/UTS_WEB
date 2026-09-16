@@ -127,6 +127,7 @@
 }
 
 .nav-services-trigger:hover,
+.nav-services-trigger.active,
 .nav-services-wrapper--open .nav-services-trigger {
     color: #2446A6;
 }

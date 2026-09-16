@@ -43,7 +43,32 @@ const Register = () => {
         phone: false,
         email: false,
         confirmEmail: false,
+        password: false,
     });
+
+    // Inline paste error messages for Email and Confirm Email fields
+    const [emailPasteError, setEmailPasteError] = useState("");
+    const [confirmEmailPasteError, setConfirmEmailPasteError] = useState("");
+    const emailPasteTimer = useRef(null);
+    const confirmEmailPasteTimer = useRef(null);
+
+    const handleEmailPaste = (e) => {
+        e.preventDefault();
+        setEmailPasteError("Pasting is disabled for Email Id. Please type manually.");
+        clearTimeout(emailPasteTimer.current);
+        emailPasteTimer.current = setTimeout(() => {
+            setEmailPasteError("");
+        }, 4000);
+    };
+
+    const handleConfirmEmailPaste = (e) => {
+        e.preventDefault();
+        setConfirmEmailPasteError("Pasting is disabled for Confirm Email Id. Please type manually.");
+        clearTimeout(confirmEmailPasteTimer.current);
+        confirmEmailPasteTimer.current = setTimeout(() => {
+            setConfirmEmailPasteError("");
+        }, 4000);
+    };
 
     const effectivePhoneCode = phoneCodeSelect === "other" ? customPhoneCode.trim() : phoneCodeSelect;
 
@@ -53,19 +78,6 @@ const Register = () => {
         if (clean === "91") return "INDIA";
         if (clean === "44") return "UNITED KINGDOM";
         return "USA"; // Default fallback
-    };
-
-    const handlePreventPaste = (e, fieldName = "Email") => {
-        e.preventDefault();
-        Swal.fire({
-            toast: true,
-            position: "top-end",
-            icon: "warning",
-            title: `Pasting is disabled for ${fieldName}. Please type manually.`,
-            showConfirmButton: false,
-            timer: 2500,
-            timerProgressBar: true
-        });
     };
 
     // Validation helpers
@@ -113,9 +125,32 @@ const Register = () => {
         return "";
     };
 
+    const getPasswordError = () => {
+        if (!password) return "";
+        if (password.length < 8) {
+            return "Password must be at least 8 characters long.";
+        }
+        if (!/[0-9]/.test(password)) {
+            return "Password must contain at least 1 number.";
+        }
+        if (!/[a-zA-Z]/.test(password)) {
+            return "Password must contain at least 1 letter.";
+        }
+        if (!/[!@#$%^&*(),.?":{}|<>_\-+=[\]\\/`~;']/.test(password) && !/[^a-zA-Z0-9]/.test(password)) {
+            return "Password must contain at least 1 special character (e.g. !@#$%^&*).";
+        }
+        return "";
+    };
+
+    const isPasswordValid = password.length >= 8 &&
+        /[0-9]/.test(password) &&
+        /[a-zA-Z]/.test(password) &&
+        (/[^a-zA-Z0-9]/.test(password) || /[!@#$%^&*(),.?":{}|<>_\-+=[\]\\/`~;']/.test(password));
+
     const emailError = getEmailError();
     const { error: confirmEmailError, isMatch: isConfirmEmailMatch } = getConfirmEmailStatus();
     const phoneError = getPhoneError();
+    const passwordError = getPasswordError();
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -123,6 +158,7 @@ const Register = () => {
         // 1. Phone validation
         const phoneValidationErr = getPhoneError();
         if (phoneValidationErr || !phoneNumber.trim()) {
+            setTouched((prev) => ({ ...prev, phone: true }));
             Swal.fire({
                 title: "Invalid Phone Number",
                 text: phoneValidationErr || "Please enter a valid phone number.",
@@ -137,6 +173,7 @@ const Register = () => {
         const cleanConfirmEmail = confirmEmail.trim();
 
         if (!emailRegex.test(cleanEmail)) {
+            setTouched((prev) => ({ ...prev, email: true }));
             Swal.fire({
                 title: "Invalid Email",
                 text: "Please enter a valid email address.",
@@ -148,6 +185,7 @@ const Register = () => {
 
         // 3. Email matching validation
         if (cleanEmail.toLowerCase() !== cleanConfirmEmail.toLowerCase()) {
+            setTouched((prev) => ({ ...prev, confirmEmail: true }));
             Swal.fire({
                 title: "Emails Do Not Match",
                 text: "Email Id and Confirm Email Id must match exactly.",
@@ -157,11 +195,13 @@ const Register = () => {
             return;
         }
 
-        // 4. Password validation
-        if (!password || password.length < 6) {
+        // 4. Password validation (min 8 chars, 1 number, alphanumeric, special char)
+        const passwordValidationErr = getPasswordError();
+        if (passwordValidationErr || !password) {
+            setTouched((prev) => ({ ...prev, password: true }));
             Swal.fire({
                 title: "Weak Password",
-                text: "Password must be at least 6 characters long.",
+                text: passwordValidationErr || "Password must be at least 8 characters long and contain at least 1 number, 1 letter, and 1 special character.",
                 icon: "warning",
                 confirmButtonColor: "#1b3178"
             });
@@ -464,26 +504,31 @@ const Register = () => {
                                     </label>
                                     <input
                                         type="email"
-                                        className={`auth-input ${touched.email && emailError ? "auth-input-invalid" : ""}`}
+                                        className={`auth-input ${(emailPasteError || (touched.email && emailError)) ? "auth-input-invalid" : ""}`}
                                         placeholder="example@gmail.com"
                                         value={email}
                                         onChange={(e) => {
                                             setEmail(e.target.value);
+                                            setEmailPasteError("");
                                             setTouched((prev) => ({ ...prev, email: true }));
                                         }}
                                         onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
-                                        onPaste={(e) => handlePreventPaste(e, "Email Id")}
+                                        onPaste={handleEmailPaste}
                                         onCopy={(e) => e.preventDefault()}
                                         onCut={(e) => e.preventDefault()}
                                         onDrop={(e) => e.preventDefault()}
                                         autoComplete="email"
                                         required
                                     />
-                                    {touched.email && emailError && (
+                                    {emailPasteError ? (
+                                        <p className="auth-error-text">
+                                            <IoAlertCircleOutline size={14} /> {emailPasteError}
+                                        </p>
+                                    ) : touched.email && emailError ? (
                                         <p className="auth-error-text">
                                             <IoAlertCircleOutline size={14} /> {emailError}
                                         </p>
-                                    )}
+                                    ) : null}
                                 </div>
 
                                 {/* Confirm Email ID */}
@@ -493,30 +538,38 @@ const Register = () => {
                                     </label>
                                     <input
                                         type="email"
-                                        className={`auth-input ${confirmEmail && confirmEmailError ? "auth-input-invalid" : isConfirmEmailMatch ? "auth-input-valid" : ""}`}
+                                        className={`auth-input ${confirmEmailPasteError || (confirmEmail && confirmEmailError) ? "auth-input-invalid" : isConfirmEmailMatch ? "auth-input-valid" : ""}`}
                                         placeholder="Confirm example@gmail.com"
                                         value={confirmEmail}
                                         onChange={(e) => {
                                             setConfirmEmail(e.target.value);
+                                            setConfirmEmailPasteError("");
                                             setTouched((prev) => ({ ...prev, confirmEmail: true }));
                                         }}
                                         onBlur={() => setTouched((prev) => ({ ...prev, confirmEmail: true }))}
-                                        onPaste={(e) => handlePreventPaste(e, "Confirm Email Id")}
+                                        onPaste={handleConfirmEmailPaste}
                                         onDrop={(e) => e.preventDefault()}
                                         autoComplete="off"
                                         required
                                     />
-                                    {/* Instant red error message below confirm email */}
-                                    {confirmEmail && confirmEmailError && (
+                                    {/* Inline paste error or validation error */}
+                                    {confirmEmailPasteError ? (
                                         <p className="auth-error-text">
-                                            <IoAlertCircleOutline size={14} /> {confirmEmailError}
+                                            <IoAlertCircleOutline size={14} /> {confirmEmailPasteError}
                                         </p>
-                                    )}
-                                    {/* Instant green match message below confirm email */}
-                                    {confirmEmail && isConfirmEmailMatch && (
-                                        <p className="auth-success-text">
-                                            <IoCheckmarkCircleOutline size={14} /> Email Id and Confirm Email Id match!
-                                        </p>
+                                    ) : (
+                                        <>
+                                            {confirmEmail && confirmEmailError && (
+                                                <p className="auth-error-text">
+                                                    <IoAlertCircleOutline size={14} /> {confirmEmailError}
+                                                </p>
+                                            )}
+                                            {confirmEmail && isConfirmEmailMatch && (
+                                                <p className="auth-success-text">
+                                                    <IoCheckmarkCircleOutline size={14} /> Email Id and Confirm Email Id match!
+                                                </p>
+                                            )}
+                                        </>
                                     )}
                                 </div>
 
@@ -527,10 +580,14 @@ const Register = () => {
                                     <div className="input-group-auth">
                                         <input
                                             type={showPassword ? "text" : "password"}
-                                            className="auth-input pe-5"
-                                            placeholder="Password"
+                                            className={`auth-input pe-5 ${touched.password && passwordError ? "auth-input-invalid" : (touched.password && isPasswordValid) ? "auth-input-valid" : ""}`}
+                                            placeholder="Min. 8 chars (letters, 1 number, special char)"
                                             value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
+                                            onChange={(e) => {
+                                                setPassword(e.target.value);
+                                                setTouched((prev) => ({ ...prev, password: true }));
+                                            }}
+                                            onBlur={() => setTouched((prev) => ({ ...prev, password: true }))}
                                             required
                                         />
                                         <button
@@ -545,6 +602,16 @@ const Register = () => {
                                             )}
                                         </button>
                                     </div>
+                                    {touched.password && passwordError && (
+                                        <p className="auth-error-text">
+                                            <IoAlertCircleOutline size={14} /> {passwordError}
+                                        </p>
+                                    )}
+                                    {touched.password && isPasswordValid && (
+                                        <p className="auth-success-text">
+                                            <IoCheckmarkCircleOutline size={14} /> Strong password!
+                                        </p>
+                                    )}
                                 </div>
 
                                 {/* Submit Button */}

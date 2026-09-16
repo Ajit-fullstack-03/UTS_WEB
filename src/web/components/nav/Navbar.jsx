@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import { IoClose, IoChevronDownOutline } from "react-icons/io5";
@@ -33,22 +33,22 @@ const IndiaFlag = () => (
 const US_SERVICES = [
     {
         id: "us-1",
-        label: "US TAX Filling",
+        label: "Tax Filling",
         route: "/services/us-tax-filing",
     },
     {
         id: "us-2",
-        label: "TAX Planning",
+        label: "Tax Planning",
         route: "/services/tax-planning",
     },
     {
         id: "us-3",
-        label: "TAX Audit & Representation",
+        label: "Tax Audit & Representation",
         route: "/services/tax-audit",
     },
     {
         id: "us-4",
-        label: "Bookkeeping Services",
+        label: "Bookkeeping & Payrole Services",
         route: "/services/bookkeeping",
     },
 ];
@@ -61,9 +61,11 @@ const Navbar = () => {
     const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
     const closeMenu = () => setMenuOpen(false);
     const leaveTimer = useRef(null);
+    const servicesRef = useRef(null);
 
     const isUSActive = US_SERVICES.some((svc) => svc.route === location.pathname);
     const isIndiaActive = location.pathname === "/services/indian-service";
+    const isAnyServiceActive = isUSActive || isIndiaActive || location.pathname.startsWith("/services");
 
     const handleServicesEnter = () => {
         clearTimeout(leaveTimer.current);
@@ -71,8 +73,40 @@ const Navbar = () => {
     };
 
     const handleServicesLeave = () => {
-        leaveTimer.current = setTimeout(() => setServicesOpen(false), 400);
+        leaveTimer.current = setTimeout(() => {
+            setServicesOpen(false);
+            setActiveRegion(null);
+        }, 300);
     };
+
+    const handleTriggerClick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        clearTimeout(leaveTimer.current);
+        setServicesOpen((prev) => !prev);
+    };
+
+    // Close on outside click
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (servicesRef.current && !servicesRef.current.contains(event.target)) {
+                setServicesOpen(false);
+                setActiveRegion(null);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    // Close on route change
+    useEffect(() => {
+        setServicesOpen(false);
+        setActiveRegion(null);
+        setMenuOpen(false);
+    }, [location.pathname]);
 
     return (
         <header className="custom-navbar">
@@ -88,26 +122,35 @@ const Navbar = () => {
 
                     {/* Services with dropdown */}
                     <div
+                        ref={servicesRef}
                         className={`nav-services-wrapper ${servicesOpen ? "nav-services-wrapper--open" : ""}`}
                         onMouseEnter={handleServicesEnter}
-                        onMouseLeave={() => { handleServicesLeave(); setActiveRegion(null); }}
+                        onMouseLeave={handleServicesLeave}
                     >
-                        <NavLink to="/services" className="nav-services-trigger" onClick={() => setServicesOpen(false)}>
+                        <button
+                            type="button"
+                            className={`nav-services-trigger ${isAnyServiceActive ? "active" : ""}`}
+                            onClick={handleTriggerClick}
+                            aria-expanded={servicesOpen}
+                            aria-haspopup="true"
+                        >
                             Services
                             <IoChevronDownOutline className="nav-services-chevron" />
-                        </NavLink>
+                        </button>
 
                         {/* Mega dropdown */}
                         <div className={`nav-services-dropdown ${servicesOpen ? "nav-services-dropdown--open" : ""} ${activeRegion === "us" ? "nav-services-dropdown--expanded" : ""}`}>
                             {/* Left panel — region selector */}
                             <div className="nav-sd-left">
-                                {/* US Service — hover reveals right panel */}
+                                {/* US Service — hover & click reveals right panel */}
                                 <button
+                                    type="button"
                                     className={`nav-sd-region ${activeRegion === "us" || (activeRegion === null && isUSActive) ? "nav-sd-region--active" : ""}`}
                                     onMouseEnter={() => setActiveRegion("us")}
+                                    onClick={() => setActiveRegion((prev) => (prev === "us" ? null : "us"))}
                                 >
                                     <span className="nav-sd-flag"><USFlag /></span>
-                                    <span className="nav-sd-region-label">US Service</span>
+                                    <span className="nav-sd-region-label">US Tax Services</span>
                                 </button>
 
                                 {/* Indian Service — direct navigation link, no sub-items */}
@@ -115,14 +158,17 @@ const Navbar = () => {
                                     to="/services/indian-service"
                                     className={`nav-sd-region nav-sd-region-link ${isIndiaActive ? "nav-sd-region--active" : ""}`}
                                     onMouseEnter={() => setActiveRegion(null)}
-                                    onClick={() => setServicesOpen(false)}
+                                    onClick={() => {
+                                        setServicesOpen(false);
+                                        setActiveRegion(null);
+                                    }}
                                 >
                                     <span className="nav-sd-flag"><IndiaFlag /></span>
-                                    <span className="nav-sd-region-label">Indian Service</span>
+                                    <span className="nav-sd-region-label">Indian Tax Services</span>
                                 </Link>
                             </div>
 
-                            {/* Right panel — only shown when US Service is hovered */}
+                            {/* Right panel — only shown when US Service is hovered or clicked */}
                             <div className={`nav-sd-right ${activeRegion === "us" ? "nav-sd-right--open" : ""}`}>
                                 {US_SERVICES.map((svc) => {
                                     const isActive = location.pathname === svc.route;
@@ -131,7 +177,10 @@ const Navbar = () => {
                                             key={svc.id}
                                             to={svc.route}
                                             className={`nav-sd-item ${isActive ? "nav-sd-item--active" : ""}`}
-                                            onClick={() => setServicesOpen(false)}
+                                            onClick={() => {
+                                                setServicesOpen(false);
+                                                setActiveRegion(null);
+                                            }}
                                         >
                                             <span className="nav-sd-item-label">{svc.label}</span>
                                             <svg className="nav-sd-item-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -197,7 +246,7 @@ const Navbar = () => {
                                 {svc.label}
                             </Link>
                         ))}
-                        
+
                         {/* Indian Service — single direct link, exactly like desktop */}
                         <Link
                             to="/services/indian-service"

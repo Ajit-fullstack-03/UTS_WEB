@@ -63,11 +63,11 @@ const Footer = () => {
                     <div className="ftr-col">
                         <h3 className="ftr-col-title">Services</h3>
                         <ul className="ftr-link-list">
-                            <li><Link to="/services/us-tax-filling">US TAX Filling</Link></li>
+                            <li><Link to="/services/us-tax-filling">Tax Filling</Link></li>
                             <li><Link to="/services/indian-service">Indian Tax Filing</Link></li>
-                            <li><Link to="/services/tax-planning">TAX Planning</Link></li>
-                            <li><Link to="/services/tax-audit">TAX Audit & Representation</Link></li>
-                            <li><Link to="/services/bookkeeping">Bookkeeping Services</Link></li>
+                            <li><Link to="/services/tax-planning">Tax Planning</Link></li>
+                            <li><Link to="/services/tax-audit">Tax Audit & Representation</Link></li>
+                            <li><Link to="/services/bookkeeping">Bookkeeping & Payrole Services</Link></li>
                         </ul>
                     </div>
 
@@ -94,7 +94,7 @@ const Footer = () => {
                                         <path d="M3 7l9 6 9-6" stroke="#1B2E6B" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
                                     </svg>
                                 </span>
-                                <a href="mailto:hello@umpirtaxsolutions.com">hello@umpirtaxsolutions.com</a>
+                                <a href="mailto:hello@umpirtaxsolutions.com">hello@umpiretaxsolutions.com</a>
                             </li>
 
                             <li>

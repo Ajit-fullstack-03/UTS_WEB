@@ -20,16 +20,16 @@ import Tax_planning_2 from "../../assets/image/Tax_planning_2.png";
 import Book_keeping_4 from "../../assets/image/Book_keeping_4.png";
 import wcuwrapperimg from "../../assets/image/Frame_12.png";
 import { ArrowLeft, ArrowRight } from "iconsax-reactjs";
-import dollar_bag from "../../assets/image/Dollar_bag.png"; 
+import dollar_bag from "../../assets/image/Dollar_bag.png";
 
 
 const services = [
     { id: 1, image: onePlatformImg1, label: "Free Tax Estimate" },
     { id: 2, image: weFileImg1, label: "One Platform. Every Tax Need." },
     { id: 3, image: taxEstimateImg2, label: "We File. You Relax." },
-    { id: 4, image: srf1, label: "Individual & Corporate Tax Filing" },
+    { id: 4, image: srf1, label: "Individual Tax Filing" },
     { id: 5, image: Tax_planning_2, label: "Business Tax Returns." },
-    { id: 6, image: Book_keeping_4, label: "Accounts Payable/Receivable." },
+    { id: 6, image: Book_keeping_4, label: "Tax Audit." },
 ];
 
 const testimonials = [
@@ -322,7 +322,7 @@ const Home = () => {
                                     <rect width="2964" height="2100" fill="#3C3B6E" />
                                 </svg>
                             </span>
-                            <span>+1 (515)686-4275</span>
+                            <span>+1 (515) 686-4275</span>
                         </div>
 
                         <div className="hero-topbar-item">
@@ -350,7 +350,7 @@ const Home = () => {
                                     <path d="M2 6a2 2 0 012-2h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm2 0l8 6 8-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
                                 </svg>
                             </span>
-                            <span>hello@umpirtaxsolutions.com</span>
+                            <span>hello@umpiretaxsolutions.com</span>
                         </div>
                     </div>
                 </div>
@@ -368,7 +368,7 @@ const Home = () => {
 
                         <h1 className="hero-heading">
                             <span className="hero-heading-accent">Tax Filing, Done </span>
-                            <br/>
+                            <br />
                             <span className="hero-heading-dark"> right. Every Time.</span>
                         </h1>
 
@@ -472,7 +472,7 @@ const Home = () => {
                                         <path d="M9 12l2 2 4-4" stroke="#1B2E6B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
                                     </svg>
                                 </span>
-                                <span>CPA certified experts</span>
+                                <span>Certified Tax Experts</span>
                             </div>
 
                             {/* Floating badge - middle left */}

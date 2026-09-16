@@ -3,7 +3,7 @@
 .admin-header {
     height: 72px;
     min-height: 72px;
-    padding: 0 28px;
+    padding: 0 20px;
     position: relative;
     z-index: 100;
     background-color: #ffffff;
@@ -36,28 +36,33 @@
 
 .logo-text-bottom {
     font-size: 0.72rem;
-    color: #c98b27 !important; /* Gold text */
+    color: #c98b27 !important;
+    /* Gold text */
     letter-spacing: 1.5px;
     font-weight: 600;
 }
 
 /* Navigation Pills */
 .header-nav-pills {
-    max-width: 62%;
-    scrollbar-width: none; /* Hide scrollbar Firefox */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    scrollbar-width: none;
+    /* Hide scrollbar Firefox */
 }
 
 .header-nav-pills::-webkit-scrollbar {
-    display: none; /* Hide scrollbar Chrome/Safari */
+    display: none;
+    /* Hide scrollbar Chrome/Safari */
 }
 
 .btn-nav-pill {
     background-color: #ffffff !important;
     color: #334155 !important;
     border: 1.5px solid #e2e8f0 !important;
-    font-size: 0.88rem !important;
+    font-size: 0.84rem !important;
     font-weight: 500 !important;
-    padding: 7px 20px !important;
+    padding: 6px 14px !important;
     border-radius: 30px !important;
     transition: all 0.2s ease-in-out !important;
     cursor: pointer;
@@ -114,6 +119,7 @@
         opacity: 0;
         transform: translateY(-6px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -196,7 +202,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #06b6d4 !important; /* Cyan badge */
+    background-color: #06b6d4 !important;
+    /* Cyan badge */
     color: #ffffff !important;
     border: 2px solid #ffffff;
     font-weight: 700;
@@ -340,12 +347,6 @@
     background-color: #f1f5f9;
 }
 
-@media (max-width: 1200px) {
-    .header-nav-pills {
-        max-width: 55%;
-    }
-}
-
 /* Tablet & Mobile Responsive Header */
 @media (max-width: 991.98px) {
     .admin-header {
@@ -386,9 +387,27 @@
         right: 0 !important;
     }
 
-    .tax-year-dropdown-menu {
-        max-width: calc(100vw - 20px) !important;
-        left: 0 !important;
+    .tax-year-dropdown-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.25);
+        z-index: 9998;
+    }
+
+    .admin-header-nav-strip .tax-year-dropdown-menu {
+        position: fixed !important;
+        top: 104px !important;
+        left: 14px !important;
+        right: auto !important;
+        min-width: 210px !important;
+        max-width: calc(100vw - 28px) !important;
+        z-index: 9999 !important;
+        background-color: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22) !important;
     }
 
     /* Sub-nav horizontal scrolling strip */
@@ -413,6 +432,12 @@
 }
 
 @media (max-width: 576px) {
+    .admin-header-nav-strip .tax-year-dropdown-menu {
+        top: 96px !important;
+        left: 10px !important;
+        min-width: 195px !important;
+    }
+
     .admin-header-main {
         height: 52px;
         padding: 6px 10px;
@@ -438,4 +463,3 @@
         padding: 4px 12px !important;
     }
 }
-

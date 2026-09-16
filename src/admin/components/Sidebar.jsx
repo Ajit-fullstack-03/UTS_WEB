@@ -152,7 +152,7 @@ const Sidebar = ({ isOpen = false, onClose }) => {
     return (
         <aside className={`admin-sidebar d-flex flex-column text-white ${isOpen ? "mobile-open" : ""}`}>
             {/* Mobile Drawer Header */}
-            <div className="admin-sidebar-mobile-header d-lg-none d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-white border-opacity-10">
+            <div className="admin-sidebar-mobile-header d-lg-none d-flex align-items-center justify-content-between mb-3">
                 <img src={logoImg} alt="UTS Logo" className="admin-sidebar-logo" />
                 <button
                     type="button"

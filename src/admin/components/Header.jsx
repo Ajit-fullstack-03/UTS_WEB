@@ -39,7 +39,7 @@ const Header = ({ onToggleSidebar }) => {
         return name.slice(0, 2).toUpperCase();
     };
 
-    // Fetch dynamic tax years master data from API
+    // Fetch dynamic tax years master data from API (POST /member/utstaxyears)
     useEffect(() => {
         const fetchTaxYears = async () => {
             try {
@@ -57,9 +57,38 @@ const Header = ({ onToggleSidebar }) => {
                 }
 
                 const res = await adminServices.utstaxyears({ user_id: userId });
-                if (res && res.data && Array.isArray(res.data.taxyears) && res.data.taxyears.length > 0) {
-                    setTaxYearsList(res.data.taxyears);
-                    setStoredTaxYearsList(res.data.taxyears);
+                if (res && res.data) {
+                    let years = [];
+                    if (Array.isArray(res.data.taxyears)) {
+                        years = res.data.taxyears;
+                    } else if (Array.isArray(res.data.data)) {
+                        years = res.data.data;
+                    } else if (Array.isArray(res.data.tax_years)) {
+                        years = res.data.tax_years;
+                    } else if (Array.isArray(res.data.taxYears)) {
+                        years = res.data.taxYears;
+                    } else if (Array.isArray(res.data.years)) {
+                        years = res.data.years;
+                    } else if (Array.isArray(res.data)) {
+                        years = res.data;
+                    }
+
+                    if (years.length > 0) {
+                        const normalizedYears = years.map((y) => {
+                            if (typeof y === "object" && y !== null) {
+                                const utstaxyear = String(y.utstaxyear || y.taxyear || y.year || y.value || "").trim();
+                                const dutstaxyear = y.dutstaxyear || y.label || (utstaxyear ? `TY ${utstaxyear}` : "");
+                                return { ...y, utstaxyear, dutstaxyear };
+                            }
+                            const val = String(y).trim();
+                            return { utstaxyear: val, dutstaxyear: `TY ${val}` };
+                        }).filter((y) => y.utstaxyear && y.utstaxyear !== "undefined" && y.utstaxyear !== "null");
+
+                        if (normalizedYears.length > 0) {
+                            setTaxYearsList(normalizedYears);
+                            setStoredTaxYearsList(normalizedYears);
+                        }
+                    }
                 }
             } catch (err) {
                 console.warn("utstaxyears API call error:", err);
@@ -80,22 +109,24 @@ const Header = ({ onToggleSidebar }) => {
         };
     }, []);
 
-    // Close dropdowns on outside click
+    // Close dropdowns on outside click safely using event target closest check
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            if (!event.target.closest(".tax-year-dropdown-wrapper")) {
                 setIsDropdownOpen(false);
             }
-            if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+            if (!event.target.closest(".profile-dropdown-wrapper")) {
                 setIsProfileDropdownOpen(false);
             }
         };
 
         if (isDropdownOpen || isProfileDropdownOpen) {
             document.addEventListener("mousedown", handleClickOutside);
+            document.addEventListener("touchstart", handleClickOutside);
         }
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener("touchstart", handleClickOutside);
         };
     }, [isDropdownOpen, isProfileDropdownOpen]);
 
@@ -203,40 +234,26 @@ const Header = ({ onToggleSidebar }) => {
     };
 
     const handleSelectTaxYear = (yearItem) => {
-        const yearVal = String(yearItem.utstaxyear);
+        const yearVal = typeof yearItem === "object" && yearItem !== null
+            ? String(yearItem.utstaxyear || yearItem.taxyear || yearItem.year || yearItem.value || "")
+            : String(yearItem || "");
+
+        if (!yearVal || yearVal === "undefined" || yearVal === "null") return;
+
         setStoredTaxYear(yearVal);
         setSelectedTaxYear(yearVal);
         setIsDropdownOpen(false);
 
-        // Notify entire app of tax year change
+        // Notify entire app of tax year change to internally re-fetch API data
         window.dispatchEvent(new Event("taxYearChanged"));
-
-        const defaultLandingPage = isAnalyst ? `${prefix}/assigned-file-number` : `${prefix}/all-records`;
-
-        // If on another tab or records, ensure records route
-        if (
-            location.pathname !== `${prefix}/all-records` &&
-            location.pathname !== `${prefix}/assigned-file-number` &&
-            !location.pathname.startsWith(`${prefix}/login-history`) &&
-            !location.pathname.startsWith(`${prefix}/payments`) &&
-            !location.pathname.startsWith(`${prefix}/referrals`) &&
-            !location.pathname.startsWith(`${prefix}/comments`) &&
-            !location.pathname.startsWith(`${prefix}/emails`) &&
-            !location.pathname.startsWith(`${prefix}/call-us`) &&
-            !location.pathname.startsWith(`${prefix}/careers`) &&
-            !location.pathname.startsWith(`${prefix}/registration`) &&
-            !location.pathname.startsWith(`${prefix}/settings`)
-        ) {
-            navigate(defaultLandingPage);
-        }
     };
 
     // Find display label for the currently selected tax year from dynamic API list
     const matchedTaxYear = taxYearsList.find(
-        (t) => String(t.utstaxyear) === String(selectedTaxYear)
+        (t) => String(t.utstaxyear || t.taxyear || t.year) === String(selectedTaxYear)
     );
     const selectedDisplayLabel = matchedTaxYear
-        ? matchedTaxYear.dutstaxyear
+        ? (matchedTaxYear.dutstaxyear || matchedTaxYear.label || `TY ${matchedTaxYear.utstaxyear || matchedTaxYear.taxyear}`)
         : (selectedTaxYear ? `TY ${selectedTaxYear}` : "Select TY");
 
     return (
@@ -268,8 +285,8 @@ const Header = ({ onToggleSidebar }) => {
                         </div>
                     </div>
 
-                    {/* Navigation Tabs in Center-Right (Desktop only) */}
-                    <div className="header-nav-pills d-none d-lg-flex align-items-center gap-2 overflow-visible py-1">
+                    {/* Navigation Tabs in Center (Desktop only) */}
+                    <div className="header-nav-pills d-none d-lg-flex align-items-center justify-content-center gap-2 mx-auto overflow-visible py-1">
                         {navItems.map((item, idx) => {
                             const active = isTabActive(item);
 
@@ -303,19 +320,20 @@ const Header = ({ onToggleSidebar }) => {
                                                 </div>
                                                 <div className="tax-year-list-scroll">
                                                     {taxYearsList.length > 0 ? (
-                                                        taxYearsList.map((tYear) => {
-                                                            const isSelected =
-                                                                String(tYear.utstaxyear) === String(selectedTaxYear);
+                                                        taxYearsList.map((tYear, i) => {
+                                                            const yearVal = String(tYear.utstaxyear || tYear.taxyear || tYear.year || tYear);
+                                                            const isSelected = yearVal === String(selectedTaxYear);
+                                                            const displayYear = tYear.dutstaxyear || tYear.label || (tYear.utstaxyear ? `TY ${tYear.utstaxyear}` : yearVal);
                                                             return (
                                                                 <button
-                                                                    key={tYear.utstaxyear}
+                                                                    key={tYear.utstaxyear || tYear.taxyear || i}
                                                                     type="button"
                                                                     onClick={() => handleSelectTaxYear(tYear)}
                                                                     className={`dropdown-item-year d-flex align-items-center justify-content-between px-3 py-2 w-100 border-0 bg-transparent text-start ${isSelected ? "selected fw-bold" : ""
                                                                         }`}
                                                                 >
                                                                     <span className="year-label">
-                                                                        {tYear.dutstaxyear || tYear.utstaxyear}
+                                                                        {displayYear}
                                                                     </span>
                                                                     {isSelected && (
                                                                         <FiCheck className="text-primary ms-2 check-icon" />
@@ -349,7 +367,7 @@ const Header = ({ onToggleSidebar }) => {
                     </div>
 
                     {/* Right Actions: Profile Dropdown */}
-                    <div className="header-right-actions d-flex align-items-center gap-2 ms-auto">
+                    <div className="header-right-actions d-flex align-items-center gap-2">
                         <div className="profile-dropdown-wrapper position-relative" ref={profileDropdownRef}>
                             <button
                                 type="button"
@@ -462,39 +480,49 @@ const Header = ({ onToggleSidebar }) => {
                                     </button>
 
                                     {isDropdownOpen && (
-                                        <div className="tax-year-dropdown-menu shadow-lg rounded-3 py-2 animate-fade-in">
-                                            <div className="dropdown-menu-header px-3 py-1 mb-1 border-bottom text-muted small fw-bold">
-                                                SELECT TAX YEAR
+                                        <>
+                                            <div
+                                                className="tax-year-dropdown-backdrop d-lg-none"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setIsDropdownOpen(false);
+                                                }}
+                                            />
+                                            <div className="tax-year-dropdown-menu shadow-lg rounded-3 py-2 animate-fade-in">
+                                                <div className="dropdown-menu-header px-3 py-1 mb-1 border-bottom text-muted small fw-bold">
+                                                    SELECT TAX YEAR
+                                                </div>
+                                                <div className="tax-year-list-scroll">
+                                                    {taxYearsList.length > 0 ? (
+                                                        taxYearsList.map((tYear, i) => {
+                                                            const yearVal = String(tYear.utstaxyear || tYear.taxyear || tYear.year || tYear);
+                                                            const isSelected = yearVal === String(selectedTaxYear);
+                                                            const displayYear = tYear.dutstaxyear || tYear.label || (tYear.utstaxyear ? `TY ${tYear.utstaxyear}` : yearVal);
+                                                            return (
+                                                                <button
+                                                                    key={tYear.utstaxyear || tYear.taxyear || i}
+                                                                    type="button"
+                                                                    onClick={() => handleSelectTaxYear(tYear)}
+                                                                    className={`dropdown-item-year d-flex align-items-center justify-content-between px-3 py-2 w-100 border-0 bg-transparent text-start ${isSelected ? "selected fw-bold" : ""
+                                                                        }`}
+                                                                >
+                                                                    <span className="year-label">
+                                                                        {displayYear}
+                                                                    </span>
+                                                                    {isSelected && (
+                                                                        <FiCheck className="text-primary ms-2 check-icon" />
+                                                                    )}
+                                                                </button>
+                                                            );
+                                                        })
+                                                    ) : (
+                                                        <div className="px-3 py-2 text-muted small">
+                                                            Loading tax years...
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div className="tax-year-list-scroll">
-                                                {taxYearsList.length > 0 ? (
-                                                    taxYearsList.map((tYear) => {
-                                                        const isSelected =
-                                                            String(tYear.utstaxyear) === String(selectedTaxYear);
-                                                        return (
-                                                            <button
-                                                                key={tYear.utstaxyear}
-                                                                type="button"
-                                                                onClick={() => handleSelectTaxYear(tYear)}
-                                                                className={`dropdown-item-year d-flex align-items-center justify-content-between px-3 py-2 w-100 border-0 bg-transparent text-start ${isSelected ? "selected fw-bold" : ""
-                                                                    }`}
-                                                            >
-                                                                <span className="year-label">
-                                                                    {tYear.dutstaxyear || tYear.utstaxyear}
-                                                                </span>
-                                                                {isSelected && (
-                                                                    <FiCheck className="text-primary ms-2 check-icon" />
-                                                                )}
-                                                            </button>
-                                                        );
-                                                    })
-                                                ) : (
-                                                    <div className="px-3 py-2 text-muted small">
-                                                        Loading tax years...
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
+                                        </>
                                     )}
                                 </div>
                             );
