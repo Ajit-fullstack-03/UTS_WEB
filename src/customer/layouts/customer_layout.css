@@ -6,13 +6,15 @@
     overflow-x: hidden;
 }
 
-/* Offset for fixed sidebar (260px wide) */
+/* Offset for fixed sidebar (260px wide on desktop) */
 .customer-main-area {
     min-height: 100vh;
     background-color: #f4f6fa;
     display: flex;
     flex-direction: column;
     margin-left: 260px;
+    width: calc(100% - 260px);
+    transition: margin-left 0.25s ease, width 0.25s ease;
 }
 
 .customer-page-content {
@@ -21,9 +23,38 @@
     flex: 1;
 }
 
-/* Responsive: when sidebar collapses to 80px icon-only */
-@media (max-width: 767.98px) {
-    .customer-main-area {
-        margin-left: 80px;
+/* Backdrop for mobile drawer */
+.customer-sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1040;
+    animation: fadeInBackdrop 0.2s ease;
+}
+
+@keyframes fadeInBackdrop {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
     }
 }
+
+/* Responsive: Mobile & Tablet */
+@media (max-width: 991.98px) {
+    .customer-main-area {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .customer-page-content {
+        padding: 16px 12px !important;
+    }
+}
+

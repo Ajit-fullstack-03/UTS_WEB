@@ -529,3 +529,71 @@
     transform: none;
     box-shadow: none;
 }
+
+/* ════════════════════════════════════════
+   MOBILE RESPONSIVE ENHANCEMENTS
+   ════════════════════════════════════════ */
+@media (max-width: 767.98px) {
+    .customer-payments-container {
+        padding: 12px 6px;
+    }
+
+    .cp-title {
+        font-size: 1.4rem;
+    }
+
+    .cp-card-header {
+        padding: 14px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .cp-filter-tabs {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 2px;
+    }
+
+    .cp-tab-btn {
+        flex-shrink: 0;
+        padding: 6px 14px;
+        font-size: 0.8rem;
+    }
+
+    .order-summary-modal-card {
+        max-width: 95vw !important;
+        margin: 10px auto !important;
+        padding: 20px 16px !important;
+        border-radius: 16px !important;
+    }
+
+    .order-summary-body {
+        padding: 14px 0 !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .cp-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .cp-stat-card {
+        padding: 14px 16px;
+    }
+
+    .cp-stat-value {
+        font-size: 1.25rem;
+    }
+
+    .trust-badges-row {
+        gap: 6px;
+    }
+
+    .trust-badge-item span {
+        font-size: 0.65rem;
+    }
+}
+

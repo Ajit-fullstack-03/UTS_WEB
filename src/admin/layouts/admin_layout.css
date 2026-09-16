@@ -28,9 +28,61 @@
     padding: 24px;
 }
 
-@media (max-width: 991.98px) {
-    .admin-body-area {
-        padding: 16px;
-        gap: 16px;
+/* Backdrop for mobile drawer */
+.admin-sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1040;
+    animation: fadeInBackdrop 0.2s ease;
+}
+
+@keyframes fadeInBackdrop {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
     }
 }
+
+/* Tablet & Mobile Responsive */
+@media (max-width: 991.98px) {
+    .admin-layout-wrapper {
+        height: auto;
+        min-height: 100vh;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .admin-body-area {
+        flex-direction: column;
+        padding: 12px;
+        gap: 12px;
+        overflow: visible;
+    }
+
+    .admin-page-content {
+        border-radius: 16px;
+        padding: 16px 12px;
+        overflow-y: visible;
+    }
+}
+
+@media (max-width: 576px) {
+    .admin-body-area {
+        padding: 8px;
+        gap: 8px;
+    }
+
+    .admin-page-content {
+        border-radius: 12px;
+        padding: 14px 10px;
+    }
+}
+

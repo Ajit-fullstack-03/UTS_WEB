@@ -1744,9 +1744,10 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
             : allSubTabs;
 
         return (
-            <div className="client-details-workspace d-flex flex-column gap-4">
-                <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                    <div className="d-flex align-items-center gap-3 flex-wrap">
+            <div className="client-details-workspace d-flex flex-column gap-3 gap-md-4">
+                {/* Header Summary & Actions Bar */}
+                <div className="client-details-top-bar d-flex justify-content-between align-items-center flex-wrap gap-3 pb-3 border-bottom">
+                    <div className="d-flex align-items-center gap-2 gap-md-3 flex-wrap">
                         <button
                             onClick={() => setSelectedClient(null)}
                             className="btn btn-back-dashboard d-flex align-items-center gap-2"
@@ -1754,17 +1755,17 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
                             <FiArrowLeft />
                             <span>Back to List</span>
                         </button>
-                        <div className="client-header-summary d-flex align-items-center gap-2">
+                        <div className="client-header-summary d-flex align-items-center gap-2 flex-wrap">
                             <span className="client-header-summary-name">
                                 {selectedClient.name || basicInfo?.u_name || "Client"}
                             </span>
-                            <span className="client-header-summary-divider">|</span>
+                            <span className="client-header-summary-divider d-none d-sm-inline">|</span>
                             <span className="client-header-summary-fileno">
                                 {selectedClient.filenumber ? `#${selectedClient.filenumber}` : (selectedClient.id ? `#${selectedClient.id}` : "")}
                             </span>
                         </div>
                     </div>
-                    <div className="d-flex align-items-center gap-2">
+                    <div className="d-flex align-items-center gap-2 flex-wrap ms-auto ms-sm-0">
                         <button
                             className="btn btn-sm btn-primary d-flex align-items-center gap-1 shadow-sm"
                             onClick={handleSendClientNotification}
@@ -1780,7 +1781,8 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
                             ) : (
                                 <>
                                     <FiSend size={13} />
-                                    <span>Send Notification</span>
+                                    <span className="d-none d-sm-inline">Send Notification</span>
+                                    <span className="d-inline d-sm-none">Notify</span>
                                 </>
                             )}
                         </button>
@@ -1791,56 +1793,62 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
                             title="Refresh Details"
                         >
                             <FiRefreshCw className={(detailsLoading || docsLoading) ? "spinner-border spinner-border-sm" : ""} />
-                            <span>Refresh</span>
+                            <span className="d-none d-sm-inline">Refresh</span>
                         </button>
-                        <div className="status-indicator-badge px-3 py-2 rounded">
+                        <div className="status-indicator-badge px-2.5 py-1.5 rounded">
                             Status: <span className="text-danger fw-bold">{selectedClient.status}</span>
                         </div>
                     </div>
                 </div>
 
                 <div className="card shadow-sm border-0 rounded-3 overflow-hidden">
-                    <div className="border-bottom bg-light px-4 py-2">
+                    {/* Responsive Scrollable Inner Tab Bar */}
+                    <div className="client-details-tabs-header border-bottom bg-light px-3 px-md-4 py-2.5">
                         <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                            <ul className="nav nav-pills inner-tabs-nav gap-2">
-                                {subTabs.map(tab => (
-                                    <li key={tab.id} className="nav-item">
-                                        <button
-                                            onClick={() => setActiveInnerTab(tab.id)}
-                                            className={`nav-link rounded-pill px-3 py-1.5 fw-semibold ${activeInnerTab === tab.id ? "active" : ""
-                                                }`}
-                                        >
-                                            {tab.label}
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
+                            <div className="client-details-tabs-scroll-wrapper flex-grow-1 overflow-auto">
+                                <ul className="nav nav-pills inner-tabs-nav gap-2 flex-nowrap mb-0">
+                                    {subTabs.map(tab => (
+                                        <li key={tab.id} className="nav-item flex-shrink-0">
+                                            <button
+                                                type="button"
+                                                onClick={() => setActiveInnerTab(tab.id)}
+                                                className={`nav-link rounded-pill px-3 py-1.5 fw-semibold ${activeInnerTab === tab.id ? "active" : ""
+                                                    }`}
+                                            >
+                                                {tab.label}
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
 
-                            {(activeInnerTab === "basic_info" || activeInnerTab === "other_info") && (
-                                <button
-                                    className="btn btn-action-top-right d-flex align-items-center gap-2"
-                                    onClick={handleExportClientDetailsPDF}
-                                    disabled={exportingPdf || detailsLoading}
-                                    title="Download complete profile & other info as PDF"
-                                >
-                                    <FiDownload />
-                                    <span>{exportingPdf ? "Exporting PDF..." : "Export PDF"}</span>
-                                </button>
-                            )}
-                            {activeInnerTab === "download_docs" && (
-                                <button
-                                    className="btn btn-action-top-right d-flex align-items-center gap-2"
-                                    onClick={handleDownloadZip}
-                                    disabled={zipDownloading || uploadedFiles.length === 0}
-                                >
-                                    <FiPackage />
-                                    <span>{zipDownloading ? "Bundling..." : "Download All (ZIP)"}</span>
-                                </button>
-                            )}
+                            <div className="d-flex align-items-center gap-2 ms-auto ms-md-0 flex-shrink-0">
+                                {(activeInnerTab === "basic_info" || activeInnerTab === "other_info") && (
+                                    <button
+                                        className="btn btn-action-top-right d-flex align-items-center gap-2"
+                                        onClick={handleExportClientDetailsPDF}
+                                        disabled={exportingPdf || detailsLoading}
+                                        title="Download complete profile & other info as PDF"
+                                    >
+                                        <FiDownload />
+                                        <span>{exportingPdf ? "Exporting PDF..." : "Export PDF"}</span>
+                                    </button>
+                                )}
+                                {activeInnerTab === "download_docs" && (
+                                    <button
+                                        className="btn btn-action-top-right d-flex align-items-center gap-2"
+                                        onClick={handleDownloadZip}
+                                        disabled={zipDownloading || uploadedFiles.length === 0}
+                                    >
+                                        <FiPackage />
+                                        <span>{zipDownloading ? "Bundling..." : "Download All (ZIP)"}</span>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
 
-                    <div className="p-4 bg-white">
+                    <div className="p-3 p-md-4 bg-white">
                         {detailsLoading ? (
                             <div className="text-center py-5">
                                 <div className="spinner-border text-primary me-2" role="status"></div>

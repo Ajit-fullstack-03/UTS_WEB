@@ -5,6 +5,8 @@ import WebsiteLayout from "../../layouts/WebsiteLayout";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import ResetPassword from "../pages/ResetPassword";
+import NotFound from "../pages/NotFound";
 import Career from "../pages/Career";
 import Contact from "../pages/Contact";
 import Testimonials from "../pages/Testimonials";
@@ -34,8 +36,13 @@ const WebsiteRoutes = () => {
             </Route>
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
+            <Route path="resetpasswordlink/:token" element={<ResetPassword />} />
+            <Route path="resetpasswordlink" element={<ResetPassword />} />
+            {/* 404 Catch-All */}
+            <Route path="*" element={<NotFound />} />
         </Routes>
     );
 };
 
 export default WebsiteRoutes;
+

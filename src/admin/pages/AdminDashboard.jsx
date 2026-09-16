@@ -517,18 +517,18 @@ const AdminDashboard = () => {
             <div className="client-details-workspace d-flex flex-column gap-4">
                 {/* Back button and status banner */}
                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                    <div className="d-flex align-items-center gap-3 flex-wrap">
+                    <div className="d-flex align-items-center gap-2 gap-md-3 flex-wrap">
                         <button onClick={handleBackToDashboard} className="btn btn-back-dashboard d-flex align-items-center gap-2">
                             <FiArrowLeft />
                             <span>Back to List</span>
                         </button>
-                        <div className="client-header-summary d-flex align-items-center gap-2">
+                        <div className="client-header-summary d-flex align-items-center gap-2 flex-wrap">
                             <span className="client-header-summary-name">{clientDetailFields.name}</span>
-                            <span className="client-header-summary-divider">|</span>
+                            <span className="client-header-summary-divider d-none d-sm-inline">|</span>
                             <span className="client-header-summary-fileno">#{clientDetailFields.id}</span>
                         </div>
                     </div>
-                    <div className="status-indicator-badge px-3 py-2 rounded">
+                    <div className="status-indicator-badge px-2.5 py-1.5 rounded">
                         Status: <span className="text-danger fw-bold">{clientDetailFields.status}</span>
                     </div>
                 </div>
@@ -536,41 +536,46 @@ const AdminDashboard = () => {
                 {/* Main details container card */}
                 <div className="card shadow-sm border-0 rounded-3 overflow-hidden">
                     {/* Horizontal Inner Tab Bar */}
-                    <div className="border-bottom bg-light px-4 py-2">
+                    <div className="client-details-tabs-header border-bottom bg-light px-3 px-md-4 py-2.5">
                         <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                            <ul className="nav nav-pills inner-tabs-nav gap-2">
-                                {subTabs.map(tab => (
-                                    <li key={tab.id} className="nav-item">
-                                        <button
-                                            onClick={() => setActiveInnerTab(tab.id)}
-                                            className={`nav-link rounded-pill px-3 py-1.5 fw-semibold ${
-                                                activeInnerTab === tab.id ? "active" : ""
-                                            }`}
-                                        >
-                                            {tab.label}
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
+                            <div className="client-details-tabs-scroll-wrapper flex-grow-1 overflow-auto">
+                                <ul className="nav nav-pills inner-tabs-nav gap-2 flex-nowrap mb-0">
+                                    {subTabs.map(tab => (
+                                        <li key={tab.id} className="nav-item flex-shrink-0">
+                                            <button
+                                                type="button"
+                                                onClick={() => setActiveInnerTab(tab.id)}
+                                                className={`nav-link rounded-pill px-3 py-1.5 fw-semibold ${
+                                                    activeInnerTab === tab.id ? "active" : ""
+                                                }`}
+                                            >
+                                                {tab.label}
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                             
                             {/* Action button on top-right of tab area */}
-                            {(activeInnerTab === "basic_info" || activeInnerTab === "other_info") && (
-                                <button className="btn btn-action-top-right d-flex align-items-center gap-2" onClick={() => triggerUpdateAlert("Exporting Data", "Initiated data sheet export.")}>
-                                    <FiDownload />
-                                    <span>Export</span>
-                                </button>
-                            )}
-                            {activeInnerTab === "download_docs" && (
-                                <button className="btn btn-action-top-right d-flex align-items-center gap-2" onClick={() => triggerUpdateAlert("Downloading All", "Initiated bulk download for all documents.")}>
-                                    <FiDownload />
-                                    <span>Download</span>
-                                </button>
-                            )}
+                            <div className="d-flex align-items-center gap-2 ms-auto ms-md-0 flex-shrink-0">
+                                {(activeInnerTab === "basic_info" || activeInnerTab === "other_info") && (
+                                    <button className="btn btn-action-top-right d-flex align-items-center gap-2" onClick={() => triggerUpdateAlert("Exporting Data", "Initiated data sheet export.")}>
+                                        <FiDownload />
+                                        <span>Export</span>
+                                    </button>
+                                )}
+                                {activeInnerTab === "download_docs" && (
+                                    <button className="btn btn-action-top-right d-flex align-items-center gap-2" onClick={() => triggerUpdateAlert("Downloading All", "Initiated bulk download for all documents.")}>
+                                        <FiDownload />
+                                        <span>Download</span>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
 
                     {/* Tab Body Contents */}
-                    <div className="p-4 bg-white">
+                    <div className="p-3 p-md-4 bg-white">
                         {activeInnerTab === "basic_info" && (
                             <form onSubmit={handleUpdateClientDetails}>
                                 <div className="row g-4">

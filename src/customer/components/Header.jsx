@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FiBell, FiGift, FiChevronDown, FiLogOut, FiCheckCircle, FiInfo, FiCheck } from "react-icons/fi";
+import { FiBell, FiGift, FiChevronDown, FiLogOut, FiMenu, FiInfo } from "react-icons/fi";
 import Swal from "sweetalert2";
 import { webservices } from "../servics/CustomerServices";
 import { getStoredTaxYear } from "../../utils/taxYear";
 import { getUserInfo } from "../../utils/userRole";
+import logoImg from "../../assets/image/umpire_tax_logo.png";
 import "./header.css";
 
-const Header = () => {
+const Header = ({ onToggleSidebar }) => {
     const navigate = useNavigate();
     const profileDropdownRef = useRef(null);
     const notifDropdownRef = useRef(null);
@@ -256,233 +257,262 @@ const Header = () => {
     }, [fetchNotifications]);
 
     return (
-        <header className="customer-header py-3 px-4 d-flex align-items-center justify-content-between bg-white">
-            {/* Status Badges on Left */}
-            <div className="header-status-group d-flex align-items-center gap-2 flex-wrap">
-                <div className="header-status-badge d-flex align-items-center gap-2 px-3 py-2 rounded-pill">
-                    <span className="status-dot"></span>
-                    <span className="status-text fw-semibold small">
-                        File status: {statusName.toLowerCase()}
-                    </span>
-                </div>
-                {displayFileNumber && (
-                    <div className="header-filenumber-badge d-flex align-items-center gap-2 px-3 py-2 rounded-pill">
-                        <span className="file-dot"></span>
-                        <span className="status-text fw-semibold small">
-                            File Number: ({displayFileNumber})
-                        </span>
+        <header className="customer-header bg-white">
+            {/* Top Main Navigation Bar */}
+            <div className="customer-header-main d-flex align-items-center justify-content-between px-3 px-lg-4">
+                {/* Left: Mobile Toggle & Desktop Status Badges */}
+                <div className="header-left-group d-flex align-items-center gap-2 gap-md-3">
+                    {/* Mobile Drawer Hamburger Button */}
+                    <button
+                        type="button"
+                        className="btn-header-hamburger d-lg-none"
+                        onClick={onToggleSidebar}
+                        aria-label="Toggle navigation menu"
+                    >
+                        <FiMenu size={22} />
+                    </button>
+
+                    {/* Mobile Brand Logo */}
+                    <div className="d-flex align-items-center d-lg-none">
+                        <img src={logoImg} alt="UTS Logo" className="mobile-header-logo" />
                     </div>
-                )}
-            </div>
 
-            {/* Actions on Right */}
-            <div className="header-actions d-flex align-items-center gap-2 ms-auto">
-                {/* Make Payment button */}
-                <Link to="/customer/payments" className="btn btn-make-payment fw-semibold text-decoration-none">
-                    Make Payment
-                </Link>
-
-                {/* Refer and Earn button */}
-                <Link to="/customer/referrals" className="btn btn-refer-earn fw-semibold d-flex align-items-center gap-2 text-decoration-none">
-                    <FiGift className="refer-icon" />
-                    <span>Refer & Earn</span>
-                </Link>
-
-                {/* Notification Bell with Dropdown */}
-                <div className="notification-bell-wrapper position-relative" ref={notifDropdownRef}>
-                    <button
-                        type="button"
-                        className="btn btn-bell p-2 border-0 bg-transparent text-muted position-relative"
-                        title="Notifications"
-                        onClick={() => setIsNotifDropdownOpen(prev => !prev)}
-                    >
-                        <FiBell size={20} className="bell-icon" />
-                        {unreadCount > 0 && (
-                            <span className="notification-badge position-absolute translate-middle badge rounded-pill bg-danger">
-                                {unreadCount > 99 ? "99+" : unreadCount}
+                    {/* Desktop Status Badges */}
+                    <div className="header-status-group d-none d-lg-flex align-items-center gap-2">
+                        <div className="header-status-badge d-flex align-items-center gap-2 px-3 py-2 rounded-pill">
+                            <span className="status-dot"></span>
+                            <span className="status-text fw-semibold small">
+                                File status: {statusName.toLowerCase()}
                             </span>
-                        )}
-                    </button>
-
-                    {isNotifDropdownOpen && (
-                        <div className="customer-notif-dropdown-menu shadow-lg rounded-3 animate-fade-in" style={{
-                            position: "absolute",
-                            top: "calc(100% + 8px)",
-                            right: 0,
-                            width: "320px",
-                            backgroundColor: "#ffffff",
-                            border: "1px solid #e2e8f0",
-                            borderRadius: "14px",
-                            zIndex: 1060,
-                            boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08)",
-                            overflow: "hidden"
-                        }}>
-                            <div className="d-flex align-items-center justify-content-between px-3 py-2.5 border-bottom bg-light">
-                                <div className="d-flex align-items-center gap-2">
-                                    <span className="fw-bold text-dark small">Notifications</span>
-                                    {unreadCount > 0 && (
-                                        <span className="badge bg-danger rounded-pill" style={{ fontSize: "0.68rem" }}>
-                                            {unreadCount} new
-                                        </span>
-                                    )}
-                                </div>
-                                {notifications.length > 0 && unreadCount > 0 && (
-                                    <button
-                                        type="button"
-                                        className="btn btn-link btn-sm p-0 text-decoration-none text-primary fw-semibold"
-                                        style={{ fontSize: "0.76rem" }}
-                                        onClick={handleMarkAllRead}
-                                    >
-                                        Mark all read
-                                    </button>
-                                )}
-                            </div>
-
-                            <div className="customer-notif-scroll-body" style={{ maxHeight: "320px", overflowY: "auto" }}>
-                                {notifLoading ? (
-                                    <div className="text-center py-4 text-muted small">
-                                        <div className="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-                                        Loading notifications...
-                                    </div>
-                                ) : notifications.length === 0 ? (
-                                    <div className="text-center py-4 px-3 text-muted small">
-                                        <FiBell size={24} className="text-muted mb-2 opacity-50" />
-                                        <p className="mb-0">No notifications yet</p>
-                                    </div>
-                                ) : (
-                                    notifications.map((n, idx) => {
-                                        const isUnread = String(n.readStatus) === "0" || n.readStatus === 0 || n.readStatus === false;
-                                        return (
-                                            <div
-                                                key={n.notificationId || idx}
-                                                className={`p-3 border-bottom d-flex align-items-start gap-2.5 transition-all ${isUnread ? "bg-white fw-medium" : "bg-light text-muted"}`}
-                                                style={{ cursor: "pointer", transition: "background 0.15s" }}
-                                                onClick={() => {
-                                                    if (isUnread && n.notificationId) {
-                                                        handleMarkSingleRead(n.notificationId);
-                                                    }
-                                                }}
-                                            >
-                                                <div className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 mt-0.5" style={{
-                                                    width: "28px",
-                                                    height: "28px",
-                                                    background: isUnread ? "rgba(27, 46, 107, 0.1)" : "#e2e8f0",
-                                                    color: isUnread ? "#1b2e6b" : "#64748b"
-                                                }}>
-                                                    <FiInfo size={14} />
-                                                </div>
-                                                <div className="flex-grow-1 min-w-0">
-                                                    <p className={`mb-1 small ${isUnread ? "text-dark" : "text-secondary"}`} style={{ fontSize: "0.82rem", lineHeight: "1.35" }}>
-                                                        {n.message}
-                                                    </p>
-                                                    <div className="d-flex align-items-center justify-content-between">
-                                                        <span className="text-muted" style={{ fontSize: "0.7rem" }}>
-                                                            {n.analystName ? `${n.analystName} • ` : ""}{n.createdOn ? new Date(n.createdOn).toLocaleDateString() : ""}
-                                                        </span>
-                                                        {isUnread && (
-                                                            <span className="badge rounded-pill bg-primary" style={{ width: "6px", height: "6px", padding: 0 }}></span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })
-                                )}
-                            </div>
                         </div>
-                    )}
+                        {displayFileNumber && (
+                            <div className="header-filenumber-badge d-flex align-items-center gap-2 px-3 py-2 rounded-pill">
+                                <span className="file-dot"></span>
+                                <span className="status-text fw-semibold small">
+                                    File Number: ({displayFileNumber})
+                                </span>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                {/* Customer Profile Trigger with Dropdown */}
-                <div className="customer-profile-dropdown-wrapper position-relative ms-1" ref={profileDropdownRef}>
-                    <button
-                        type="button"
-                        onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
-                        className={`btn btn-customer-profile-trigger d-flex align-items-center gap-2 py-1 px-2 rounded-pill ${isProfileDropdownOpen ? "active" : ""}`}
-                        title="User Account"
-                    >
-                        <div className="customer-avatar-circle d-flex align-items-center justify-content-center">
-                            {getInitials(userName)}
-                        </div>
-                        <div className="customer-user-info d-none d-md-flex flex-column text-start">
-                            <span className="customer-user-name fw-semibold text-truncate">{userName}</span>
-                            <span className="customer-user-role text-muted">Customer</span>
-                        </div>
-                        <FiChevronDown
-                            className={`dropdown-chevron-icon transition-transform ms-1 ${isProfileDropdownOpen ? "rotate-180" : ""}`}
-                            size={15}
-                        />
-                    </button>
+                {/* Right: Actions */}
+                <div className="header-actions d-flex align-items-center gap-2 ms-auto">
+                    {/* Make Payment button (Desktop only) */}
+                    <Link to="/customer/payments" className="btn btn-make-payment fw-semibold text-decoration-none d-none d-lg-inline-flex align-items-center">
+                        <span>Make Payment</span>
+                    </Link>
 
-                    {isProfileDropdownOpen && (
-                        <div className="customer-profile-dropdown-menu shadow-lg rounded-3 py-2 animate-fade-in">
-                            {/* Profile Header */}
-                            <div className="profile-menu-header px-3 py-2 border-bottom">
-                                <div className="d-flex align-items-center gap-2 mb-1">
-                                    <div className="customer-avatar-circle-lg d-flex align-items-center justify-content-center">
-                                        {getInitials(userName)}
-                                    </div>
-                                    <div className="d-flex flex-column overflow-hidden">
-                                        <span className="fw-bold text-dark text-truncate" title={userName}>
-                                            {userName}
-                                        </span>
-                                        {userEmail && (
-                                            <span className="small text-muted text-truncate" title={userEmail}>
-                                                {userEmail}
+                    {/* Refer and Earn button (Desktop only) */}
+                    <Link to="/customer/referrals" className="btn btn-refer-earn fw-semibold d-none d-lg-inline-flex align-items-center gap-2 text-decoration-none" title="Refer & Earn">
+                        <FiGift className="refer-icon" />
+                        <span className="refer-text">Refer & Earn</span>
+                    </Link>
+
+                    {/* Notification Bell with Dropdown */}
+                    <div className="notification-bell-wrapper position-relative" ref={notifDropdownRef}>
+                        <button
+                            type="button"
+                            className="btn btn-bell p-2 border-0 bg-transparent text-muted position-relative"
+                            title="Notifications"
+                            onClick={() => setIsNotifDropdownOpen(prev => !prev)}
+                        >
+                            <FiBell size={20} className="bell-icon" />
+                            {unreadCount > 0 && (
+                                <span className="notification-badge position-absolute translate-middle badge rounded-pill bg-danger">
+                                    {unreadCount > 99 ? "99+" : unreadCount}
+                                </span>
+                            )}
+                        </button>
+
+                        {isNotifDropdownOpen && (
+                            <div className="customer-notif-dropdown-menu shadow-lg rounded-3 animate-fade-in">
+                                <div className="d-flex align-items-center justify-content-between px-3 py-2.5 border-bottom bg-light">
+                                    <div className="d-flex align-items-center gap-2">
+                                        <span className="fw-bold text-dark small">Notifications</span>
+                                        {unreadCount > 0 && (
+                                            <span className="badge bg-danger rounded-pill" style={{ fontSize: "0.68rem" }}>
+                                                {unreadCount} new
                                             </span>
                                         )}
                                     </div>
+                                    {notifications.length > 0 && unreadCount > 0 && (
+                                        <button
+                                            type="button"
+                                            className="btn btn-link btn-sm p-0 text-decoration-none text-primary fw-semibold"
+                                            style={{ fontSize: "0.76rem" }}
+                                            onClick={handleMarkAllRead}
+                                        >
+                                            Mark all read
+                                        </button>
+                                    )}
                                 </div>
-                                {displayFileNumber && (
-                                    <div className="mt-1 d-flex align-items-center justify-content-between bg-light px-2 py-1 rounded">
-                                        <span className="badge-filenumber-sub">File No:</span>
-                                        <span className="fw-bold text-primary small">#{displayFileNumber}</span>
+
+                                <div className="customer-notif-scroll-body">
+                                    {notifLoading ? (
+                                        <div className="text-center py-4 text-muted small">
+                                            <div className="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                                            Loading notifications...
+                                        </div>
+                                    ) : notifications.length === 0 ? (
+                                        <div className="text-center py-4 px-3 text-muted small">
+                                            <FiBell size={24} className="text-muted mb-2 opacity-50" />
+                                            <p className="mb-0">No notifications yet</p>
+                                        </div>
+                                    ) : (
+                                        notifications.map((n, idx) => {
+                                            const isUnread = String(n.readStatus) === "0" || n.readStatus === 0 || n.readStatus === false;
+                                            return (
+                                                <div
+                                                    key={n.notificationId || idx}
+                                                    className={`p-3 border-bottom d-flex align-items-start gap-2.5 transition-all ${isUnread ? "bg-white fw-medium" : "bg-light text-muted"}`}
+                                                    style={{ cursor: "pointer", transition: "background 0.15s" }}
+                                                    onClick={() => {
+                                                        if (isUnread && n.notificationId) {
+                                                            handleMarkSingleRead(n.notificationId);
+                                                        }
+                                                    }}
+                                                >
+                                                    <div className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 mt-0.5" style={{
+                                                        width: "28px",
+                                                        height: "28px",
+                                                        background: isUnread ? "rgba(27, 46, 107, 0.1)" : "#e2e8f0",
+                                                        color: isUnread ? "#1b2e6b" : "#64748b"
+                                                    }}>
+                                                        <FiInfo size={14} />
+                                                    </div>
+                                                    <div className="flex-grow-1 min-w-0">
+                                                        <p className={`mb-1 small ${isUnread ? "text-dark" : "text-secondary"}`} style={{ fontSize: "0.82rem", lineHeight: "1.35" }}>
+                                                            {n.message}
+                                                        </p>
+                                                        <div className="d-flex align-items-center justify-content-between">
+                                                            <span className="text-muted" style={{ fontSize: "0.7rem" }}>
+                                                                {n.analystName ? `${n.analystName} • ` : ""}{n.createdOn ? new Date(n.createdOn).toLocaleDateString() : ""}
+                                                            </span>
+                                                            {isUnread && (
+                                                                <span className="badge rounded-pill bg-primary" style={{ width: "6px", height: "6px", padding: 0 }}></span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Customer Profile Trigger with Dropdown */}
+                    <div className="customer-profile-dropdown-wrapper position-relative ms-1" ref={profileDropdownRef}>
+                        <button
+                            type="button"
+                            onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
+                            className={`btn btn-customer-profile-trigger d-flex align-items-center gap-2 py-1 px-2 rounded-pill ${isProfileDropdownOpen ? "active" : ""}`}
+                            title="User Account"
+                        >
+                            <div className="customer-avatar-circle d-flex align-items-center justify-content-center">
+                                {getInitials(userName)}
+                            </div>
+                            <div className="customer-user-info d-none d-md-flex flex-column text-start">
+                                <span className="customer-user-name fw-semibold text-truncate">{userName}</span>
+                                <span className="customer-user-role text-muted">Customer</span>
+                            </div>
+                            <FiChevronDown
+                                className={`dropdown-chevron-icon transition-transform ms-1 d-none d-md-block ${isProfileDropdownOpen ? "rotate-180" : ""}`}
+                                size={15}
+                            />
+                        </button>
+
+                        {isProfileDropdownOpen && (
+                            <div className="customer-profile-dropdown-menu shadow-lg rounded-3 py-2 animate-fade-in">
+                                {/* Profile Header */}
+                                <div className="profile-menu-header px-3 py-2 border-bottom">
+                                    <div className="d-flex align-items-center gap-2 mb-1">
+                                        <div className="customer-avatar-circle-lg d-flex align-items-center justify-content-center">
+                                            {getInitials(userName)}
+                                        </div>
+                                        <div className="d-flex flex-column overflow-hidden">
+                                            <span className="fw-bold text-dark text-truncate" title={userName}>
+                                                {userName}
+                                            </span>
+                                            {userEmail && (
+                                                <span className="small text-muted text-truncate" title={userEmail}>
+                                                    {userEmail}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
-                                )}
-                            </div>
+                                    {displayFileNumber && (
+                                        <div className="mt-1 d-flex align-items-center justify-content-between bg-light px-2 py-1 rounded">
+                                            <span className="badge-filenumber-sub">File No:</span>
+                                            <span className="fw-bold text-primary small">#{displayFileNumber}</span>
+                                        </div>
+                                    )}
+                                </div>
 
-                            {/* Menu Options */}
-                            <div className="profile-menu-items py-1">
-                                <Link
-                                    to="/customer/profile"
-                                    onClick={() => setIsProfileDropdownOpen(false)}
-                                    className="customer-menu-item d-flex align-items-center px-3 py-2 text-dark"
-                                >
-                                    <span>Profile Details</span>
-                                </Link>
-                                <Link
-                                    to="/customer/documents"
-                                    onClick={() => setIsProfileDropdownOpen(false)}
-                                    className="customer-menu-item d-flex align-items-center px-3 py-2 text-dark"
-                                >
-                                    <span>Uploaded Documents</span>
-                                </Link>
-                                <Link
-                                    to="/customer/payments"
-                                    onClick={() => setIsProfileDropdownOpen(false)}
-                                    className="customer-menu-item d-flex align-items-center px-3 py-2 text-dark"
-                                >
-                                    <span>Payments</span>
-                                </Link>
-                            </div>
+                                {/* Menu Options */}
+                                <div className="profile-menu-items py-1">
+                                    <Link
+                                        to="/customer/profile"
+                                        onClick={() => setIsProfileDropdownOpen(false)}
+                                        className="customer-menu-item d-flex align-items-center px-3 py-2 text-dark"
+                                    >
+                                        <span>Profile Details</span>
+                                    </Link>
+                                    <Link
+                                        to="/customer/documents"
+                                        onClick={() => setIsProfileDropdownOpen(false)}
+                                        className="customer-menu-item d-flex align-items-center px-3 py-2 text-dark"
+                                    >
+                                        <span>Uploaded Documents</span>
+                                    </Link>
+                                    <Link
+                                        to="/customer/payments"
+                                        onClick={() => setIsProfileDropdownOpen(false)}
+                                        className="customer-menu-item d-flex align-items-center px-3 py-2 text-dark"
+                                    >
+                                        <span>Payments</span>
+                                    </Link>
+                                </div>
 
-                            {/* Logout Action */}
-                            <div className="profile-menu-footer border-top pt-1 mt-1">
-                                <button
-                                    type="button"
-                                    onClick={handleLogout}
-                                    className="customer-menu-item customer-logout-item d-flex align-items-center gap-2 px-3 py-2 text-danger w-100 border-0 bg-transparent text-start"
-                                >
-                                    <FiLogOut size={16} />
-                                    <span className="fw-semibold">Logout</span>
-                                </button>
+                                {/* Logout Action */}
+                                <div className="profile-menu-footer border-top pt-1 mt-1">
+                                    <button
+                                        type="button"
+                                        onClick={handleLogout}
+                                        className="customer-menu-item customer-logout-item d-flex align-items-center gap-2 px-3 py-2 text-danger w-100 border-0 bg-transparent text-start"
+                                    >
+                                        <FiLogOut size={16} />
+                                        <span className="fw-semibold">Logout</span>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
+            </div>
+
+            {/* Mobile Status Sub-bar: dedicated clean status row for mobile screens */}
+            <div className="customer-header-status-strip d-lg-none d-flex align-items-center gap-2 px-3 py-2">
+                <div className="header-status-badge d-flex align-items-center gap-2 px-3 py-1.5 rounded-pill">
+                    <span className="status-dot"></span>
+                    <span className="status-text fw-semibold">
+                        Status: {statusName.toLowerCase()}
+                    </span>
+                </div>
+                {displayFileNumber && (
+                    <div className="header-filenumber-badge d-flex align-items-center gap-2 px-3 py-1.5 rounded-pill">
+                        <span className="file-dot"></span>
+                        <span className="status-text fw-semibold">
+                            File No: {displayFileNumber}
+                        </span>
+                    </div>
+                )}
             </div>
         </header>
     );
 };
 
 export default Header;
+

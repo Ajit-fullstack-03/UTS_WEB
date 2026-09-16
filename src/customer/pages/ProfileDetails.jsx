@@ -387,7 +387,7 @@ const ProfileDetails = () => {
 
                                     <div className="profile-form-row">
                                         <div className="profile-field">
-                                            <label className="profile-label">SSN/ITIN</label>
+                                            <label className="profile-label">SSN/ITIN <span className="req">*</span></label>
                                             <input
                                                 type="text"
                                                 name="ssnItin"
@@ -395,6 +395,7 @@ const ProfileDetails = () => {
                                                 onChange={handleTaxpayerChange}
                                                 className="profile-input"
                                                 placeholder="Enter SSN/ITIN"
+                                                required
                                             />
                                         </div>
                                         <div className="profile-field">

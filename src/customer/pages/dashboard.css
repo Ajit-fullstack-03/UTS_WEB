@@ -615,3 +615,94 @@
 .db-task-item.disabled-task input[type="checkbox"] {
     cursor: default;
 }
+
+/* ════════════════════════════════════════
+   MOBILE RESPONSIVE ENHANCEMENTS
+   ════════════════════════════════════════ */
+@media (max-width: 767.98px) {
+    .db-greeting {
+        font-size: 1.5rem;
+    }
+
+    .db-progress-card {
+        padding: 20px 18px 16px;
+        border-radius: 14px;
+    }
+
+    .db-progress-val {
+        font-size: 1.7rem;
+    }
+
+    .track_com {
+        font-size: 16px;
+    }
+
+    .db-timeline {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .db-panel {
+        padding: 18px 16px;
+        border-radius: 14px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .db-greeting {
+        font-size: 1.35rem;
+    }
+
+    .db-progress-card {
+        padding: 16px 14px;
+    }
+
+    .db-progress-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .db-status-badge {
+        padding: 5px 12px;
+        font-size: 0.72rem;
+    }
+
+    .db-timeline {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .db-step span {
+        font-size: 0.72rem;
+        white-space: normal;
+        line-height: 1.2;
+    }
+
+    .db-stat-card {
+        padding: 16px;
+        min-height: auto;
+    }
+
+    .db-stat-num {
+        font-size: 22px;
+    }
+
+    .db-stat-title {
+        font-size: 1.25rem;
+    }
+
+    .db-panel {
+        padding: 16px 14px;
+    }
+
+    .db-notif-item {
+        padding: 9px 10px;
+        gap: 8px;
+    }
+
+    .db-notif-icon {
+        width: 30px;
+        height: 30px;
+    }
+}

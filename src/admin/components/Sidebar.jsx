@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { FiX } from "react-icons/fi";
 import Swal from "sweetalert2";
+import logoImg from "../../assets/image/umpire_tax_logo.png";
 import { adminServices } from "../services/AdminServices";
 import { getStoredTaxYear } from "../../utils/taxYear";
 import { isAnalystUser, getRolePrefix } from "../../utils/userRole";
 import "./sidebar.css";
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen = false, onClose }) => {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -113,6 +115,9 @@ const Sidebar = () => {
     const sidebarItems = allSidebarItems;
 
     const handleNavigation = (path) => {
+        if (typeof onClose === "function" && window.innerWidth <= 991.98) {
+            onClose();
+        }
         navigate(path);
     };
 
@@ -145,7 +150,20 @@ const Sidebar = () => {
     };
 
     return (
-        <aside className="admin-sidebar d-flex flex-column text-white">
+        <aside className={`admin-sidebar d-flex flex-column text-white ${isOpen ? "mobile-open" : ""}`}>
+            {/* Mobile Drawer Header */}
+            <div className="admin-sidebar-mobile-header d-lg-none d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-white border-opacity-10">
+                <img src={logoImg} alt="UTS Logo" className="admin-sidebar-logo" />
+                <button
+                    type="button"
+                    className="btn-sidebar-close"
+                    onClick={onClose}
+                    aria-label="Close navigation"
+                >
+                    <FiX size={20} />
+                </button>
+            </div>
+
             {/* Nav Menu Options */}
             <nav className="sidebar-nav flex-grow-1">
                 <ul className="list-unstyled sidebar-menu-list">
@@ -191,3 +209,4 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
+

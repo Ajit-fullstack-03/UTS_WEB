@@ -22,6 +22,7 @@ import AdminEmails from "../pages/AdminEmails";
 import AdminCareers from "../pages/AdminCareers";
 import AdminRegistration from "../pages/AdminRegistration";
 import AdminSettings from "../pages/AdminSettings";
+import NotFound from "../../web/pages/NotFound";
 
 import { isAnalystUser } from "../../utils/userRole";
 
@@ -55,6 +56,7 @@ const AdminRoutes = () => {
                 <Route path="synopsys-pending" element={<SynopsysPending />} />
                 <Route path="payment-pending" element={<PaymentPending />} />
                 <Route path="review-upload-pending" element={<ReviewUploadPending />} />
+                <Route path="*" element={<NotFound />} />
             </Route>
         </Routes>
     );

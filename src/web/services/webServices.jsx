@@ -33,6 +33,8 @@ const postNoAuthUrl = (uri, data) => {
 const login = (data) => postNoAuthUrl(`${API_URL}login/check`, data);
 const register = (data) => postNoAuthUrl(`${API_URL}login/register`, data);
 const verifyregister = (data) => postNoAuthUrl(`${API_URL}login/cregisterverify`, data);
+const resetpasswordlink = (data) => postNoAuthUrl(`${API_URL}user/resetpasswordlink`, data);
+const changeresetpassword = (data) => postNoAuthUrl(`${API_URL}user/changeresetpassword`, data);
 const careerssubmit = (formData) => {
     return axios.post(`${API_URL}settings/careerssubmit`, formData, {
         headers: {
@@ -47,6 +49,8 @@ export const webservices = {
     login,
     register,
     verifyregister,
+    resetpasswordlink,
+    changeresetpassword,
     careerssubmit,
     savecontactinfo
-};
+};

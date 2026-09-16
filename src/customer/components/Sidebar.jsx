@@ -7,24 +7,42 @@ import {
     FiFileText,
     FiCreditCard,
     FiGift,
-    FiLogOut
+    FiLogOut,
+    FiX
 } from "react-icons/fi";
 import logoImg from "../../assets/image/umpire_tax_logo.png";
 
 import "./sidebar.css";
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen = false, onClose }) => {
     const navigate = useNavigate();
+
+    const handleItemClick = () => {
+        if (typeof onClose === "function" && window.innerWidth <= 991.98) {
+            onClose();
+        }
+    };
+
     return (
-        <aside className="customer-sidebar d-flex flex-column text-white">
-            {/* Logo Header */}
-            <div className="sidebar-logo-wrapper text-center">
+        <aside className={`customer-sidebar d-flex flex-column text-white ${isOpen ? "mobile-open" : ""}`}>
+            {/* Logo Header & Mobile Close */}
+            <div className="sidebar-logo-wrapper d-flex align-items-center justify-content-between">
                 <img
                     src={logoImg}
                     alt="Umpire Tax Solutions Logo"
                     className="sidebar-logo img-fluid"
                 />
+                {/* Close button for mobile drawer */}
+                <button
+                    type="button"
+                    className="btn-sidebar-close d-lg-none"
+                    onClick={onClose}
+                    aria-label="Close Sidebar"
+                >
+                    <FiX size={20} />
+                </button>
             </div>
+
 
             {/* Nav Menu Options */}
             <nav className="sidebar-nav flex-grow-1">
@@ -33,6 +51,7 @@ const Sidebar = () => {
                         <NavLink
                             to="/customer"
                             end
+                            onClick={handleItemClick}
                             className={({ isActive }) =>
                                 `sidebar-menu-item d-flex align-items-center gap-3 text-decoration-none ${isActive ? "active" : ""
                                 }`
@@ -45,6 +64,7 @@ const Sidebar = () => {
                     <li>
                         <NavLink
                             to="/customer/profile"
+                            onClick={handleItemClick}
                             className={({ isActive }) =>
                                 `sidebar-menu-item d-flex align-items-center gap-3 text-decoration-none ${isActive ? "active" : ""
                                 }`
@@ -57,6 +77,7 @@ const Sidebar = () => {
                     <li>
                         <NavLink
                             to="/customer/documents"
+                            onClick={handleItemClick}
                             className={({ isActive }) =>
                                 `sidebar-menu-item d-flex align-items-center gap-3 text-decoration-none ${isActive ? "active" : ""
                                 }`
@@ -69,6 +90,7 @@ const Sidebar = () => {
                     <li>
                         <NavLink
                             to="/customer/payments"
+                            onClick={handleItemClick}
                             className={({ isActive }) =>
                                 `sidebar-menu-item d-flex align-items-center gap-3 text-decoration-none ${isActive ? "active" : ""
                                 }`
@@ -81,6 +103,7 @@ const Sidebar = () => {
                     <li>
                         <NavLink
                             to="/customer/referrals"
+                            onClick={handleItemClick}
                             className={({ isActive }) =>
                                 `sidebar-menu-item d-flex align-items-center gap-3 text-decoration-none ${isActive ? "active" : ""
                                 }`

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FiChevronDown, FiCheck, FiLogOut, FiSettings } from "react-icons/fi";
+import { FiChevronDown, FiCheck, FiLogOut, FiSettings, FiMenu } from "react-icons/fi";
 import Swal from "sweetalert2";
 import logoImg from "../../assets/image/umpire_tax_logo.png";
 import { adminServices } from "../services/AdminServices";
@@ -9,11 +9,12 @@ import { getUserInfo, isAnalystUser, getRolePrefix } from "../../utils/userRole"
 import AdminOtpModal from "./AdminOtpModal";
 import "./header.css";
 
-const Header = () => {
+const Header = ({ onToggleSidebar }) => {
     const location = useLocation();
     const navigate = useNavigate();
     const dropdownRef = useRef(null);
     const profileDropdownRef = useRef(null);
+
 
     const isAnalyst = isAnalystUser();
     const prefix = getRolePrefix();
@@ -240,21 +241,199 @@ const Header = () => {
 
     return (
         <>
-            <header className="admin-header px-4 d-flex align-items-center justify-content-between bg-white">
-                {/* Logo on Left */}
-                <div
-                    className="header-logo-container d-flex align-items-center"
-                    onClick={() => navigate(isAnalyst ? `${prefix}/assigned-file-number` : `${prefix}/all-records`)}
-                >
-                    <img
-                        src={logoImg}
-                        alt="Umpire Tax Solutions Logo"
-                        className="header-logo img-fluid"
-                    />
+            <header className="admin-header bg-white">
+                {/* Main Header Bar */}
+                <div className="admin-header-main d-flex align-items-center justify-content-between px-3 px-lg-4">
+                    {/* Left: Hamburger & Logo */}
+                    <div className="header-left-group d-flex align-items-center gap-2 gap-md-3">
+                        {/* Mobile Drawer Hamburger Button */}
+                        <button
+                            type="button"
+                            className="btn-admin-hamburger d-lg-none"
+                            onClick={onToggleSidebar}
+                            aria-label="Toggle navigation menu"
+                        >
+                            <FiMenu size={22} />
+                        </button>
+
+                        <div
+                            className="header-logo-container d-flex align-items-center"
+                            onClick={() => navigate(isAnalyst ? `${prefix}/assigned-file-number` : `${prefix}/all-records`)}
+                        >
+                            <img
+                                src={logoImg}
+                                alt="Umpire Tax Solutions Logo"
+                                className="header-logo img-fluid"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Navigation Tabs in Center-Right (Desktop only) */}
+                    <div className="header-nav-pills d-none d-lg-flex align-items-center gap-2 overflow-visible py-1">
+                        {navItems.map((item, idx) => {
+                            const active = isTabActive(item);
+
+                            if (item.isDropdown) {
+                                return (
+                                    <div
+                                        key={idx}
+                                        className="tax-year-dropdown-wrapper position-relative"
+                                        ref={dropdownRef}
+                                    >
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setIsDropdownOpen((prev) => !prev);
+                                                setIsProfileDropdownOpen(false);
+                                            }}
+                                            className={`btn btn-nav-pill tax-year-dropdown-btn px-3 py-2 rounded-pill fw-semibold text-nowrap d-flex align-items-center gap-2 ${active || isDropdownOpen ? "active" : ""
+                                                }`}
+                                        >
+                                            <span>{selectedDisplayLabel}</span>
+                                            <FiChevronDown
+                                                className={`dropdown-chevron-icon transition-transform ${isDropdownOpen ? "rotate-180" : ""
+                                                    }`}
+                                            />
+                                        </button>
+
+                                        {isDropdownOpen && (
+                                            <div className="tax-year-dropdown-menu shadow-lg rounded-3 py-2 animate-fade-in">
+                                                <div className="dropdown-menu-header px-3 py-1 mb-1 border-bottom text-muted small fw-bold">
+                                                    SELECT TAX YEAR
+                                                </div>
+                                                <div className="tax-year-list-scroll">
+                                                    {taxYearsList.length > 0 ? (
+                                                        taxYearsList.map((tYear) => {
+                                                            const isSelected =
+                                                                String(tYear.utstaxyear) === String(selectedTaxYear);
+                                                            return (
+                                                                <button
+                                                                    key={tYear.utstaxyear}
+                                                                    type="button"
+                                                                    onClick={() => handleSelectTaxYear(tYear)}
+                                                                    className={`dropdown-item-year d-flex align-items-center justify-content-between px-3 py-2 w-100 border-0 bg-transparent text-start ${isSelected ? "selected fw-bold" : ""
+                                                                        }`}
+                                                                >
+                                                                    <span className="year-label">
+                                                                        {tYear.dutstaxyear || tYear.utstaxyear}
+                                                                    </span>
+                                                                    {isSelected && (
+                                                                        <FiCheck className="text-primary ms-2 check-icon" />
+                                                                    )}
+                                                                </button>
+                                                            );
+                                                        })
+                                                    ) : (
+                                                        <div className="px-3 py-2 text-muted small">
+                                                            Loading tax years...
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            }
+
+                            return (
+                                <button
+                                    key={idx}
+                                    onClick={() => handleNavClick(item)}
+                                    className={`btn btn-nav-pill px-3 py-2 rounded-pill fw-semibold text-nowrap ${active ? "active" : ""
+                                        }`}
+                                >
+                                    {item.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* Right Actions: Profile Dropdown */}
+                    <div className="header-right-actions d-flex align-items-center gap-2 ms-auto">
+                        <div className="profile-dropdown-wrapper position-relative" ref={profileDropdownRef}>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsProfileDropdownOpen((prev) => !prev);
+                                    setIsDropdownOpen(false);
+                                }}
+                                className={`btn btn-profile-trigger d-flex align-items-center gap-2 py-1 px-2 rounded-pill ${isProfileDropdownOpen ? "active" : ""}`}
+                                title="User Profile & Menu"
+                            >
+                                <div className="profile-avatar-circle d-flex align-items-center justify-content-center">
+                                    {getInitials(userName)}
+                                </div>
+                                <div className="profile-user-info d-none d-md-flex flex-column text-start">
+                                    <span className="profile-user-name fw-semibold text-truncate">{userName}</span>
+                                    <span className="profile-user-role text-muted">{isAnalyst ? "Analyst" : "Admin"}</span>
+                                </div>
+                                <FiChevronDown
+                                    className={`dropdown-chevron-icon transition-transform ms-1 d-none d-md-block ${isProfileDropdownOpen ? "rotate-180" : ""}`}
+                                    size={15}
+                                />
+                            </button>
+
+                            {isProfileDropdownOpen && (
+                                <div className="profile-dropdown-menu shadow-lg rounded-3 py-2 animate-fade-in">
+                                    {/* Profile Header */}
+                                    <div className="profile-menu-header px-3 py-2 border-bottom">
+                                        <div className="d-flex align-items-center gap-2 mb-1">
+                                            <div className="profile-avatar-circle-lg d-flex align-items-center justify-content-center">
+                                                {getInitials(userName)}
+                                            </div>
+                                            <div className="d-flex flex-column overflow-hidden">
+                                                <span className="fw-bold text-dark text-truncate" title={userName}>
+                                                    {userName}
+                                                </span>
+                                                {userEmail && (
+                                                    <span className="small text-muted text-truncate" title={userEmail}>
+                                                        {userEmail}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="mt-2">
+                                            <span className={`badge ${isAnalyst ? "bg-info text-dark" : "badge-admin-role"}`}>
+                                                {isAnalyst ? "ANALYST" : "ADMINISTRATOR"}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Menu Items */}
+                                    <div className="profile-menu-body py-1">
+                                        {/* Setting button - ONLY in admin section */}
+                                        {!isAnalyst && (
+                                            <button
+                                                type="button"
+                                                onClick={handleOpenSettings}
+                                                className="profile-menu-item d-flex align-items-center gap-2 px-3 py-2 w-100 border-0 bg-transparent text-start"
+                                            >
+                                                <FiSettings className="menu-item-icon text-primary" size={17} />
+                                                <div className="d-flex flex-column">
+                                                    <span className="fw-semibold text-dark">Settings</span>
+                                                    <span className="profile-item-hint text-muted">System & portal settings</span>
+                                                </div>
+                                            </button>
+                                        )}
+
+                                        {/* Logout option - in all (admin & analyst) */}
+                                        <button
+                                            type="button"
+                                            onClick={handleLogout}
+                                            className="profile-menu-item profile-logout-item d-flex align-items-center gap-2 px-3 py-2 w-100 border-0 bg-transparent text-start text-danger"
+                                        >
+                                            <FiLogOut className="menu-item-icon text-danger" size={17} />
+                                            <span className="fw-semibold">Logout</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
-                {/* Navigation Tabs in Center-Right */}
-                <div className="header-nav-pills d-flex align-items-center gap-2 overflow-visible py-1">
+                {/* Mobile Sub-Nav Pills Scrollable Strip (Mobile & Tablet only) */}
+                <div className="admin-header-nav-strip d-lg-none d-flex align-items-center gap-2 px-3 py-2 border-top">
                     {navItems.map((item, idx) => {
                         const active = isTabActive(item);
 
@@ -262,7 +441,7 @@ const Header = () => {
                             return (
                                 <div
                                     key={idx}
-                                    className="tax-year-dropdown-wrapper position-relative"
+                                    className="tax-year-dropdown-wrapper position-relative flex-shrink-0"
                                     ref={dropdownRef}
                                 >
                                     <button
@@ -271,13 +450,14 @@ const Header = () => {
                                             setIsDropdownOpen((prev) => !prev);
                                             setIsProfileDropdownOpen(false);
                                         }}
-                                        className={`btn btn-nav-pill tax-year-dropdown-btn px-3 py-2 rounded-pill fw-semibold text-nowrap d-flex align-items-center gap-2 ${active || isDropdownOpen ? "active" : ""
+                                        className={`btn btn-nav-pill tax-year-dropdown-btn px-3 py-1.5 rounded-pill fw-semibold text-nowrap d-flex align-items-center gap-1.5 ${active || isDropdownOpen ? "active" : ""
                                             }`}
                                     >
                                         <span>{selectedDisplayLabel}</span>
                                         <FiChevronDown
                                             className={`dropdown-chevron-icon transition-transform ${isDropdownOpen ? "rotate-180" : ""
                                                 }`}
+                                            size={14}
                                         />
                                     </button>
 
@@ -324,98 +504,13 @@ const Header = () => {
                             <button
                                 key={idx}
                                 onClick={() => handleNavClick(item)}
-                                className={`btn btn-nav-pill px-3 py-2 rounded-pill fw-semibold text-nowrap ${active ? "active" : ""
+                                className={`btn btn-nav-pill px-3 py-1.5 rounded-pill fw-semibold text-nowrap flex-shrink-0 ${active ? "active" : ""
                                     }`}
                             >
                                 {item.label}
                             </button>
                         );
                     })}
-                </div>
-
-                {/* Right Actions: Profile Dropdown */}
-                <div className="header-right-actions d-flex align-items-center gap-2 ms-3">
-
-                    {/* Profile Dropdown */}
-                    <div className="profile-dropdown-wrapper position-relative" ref={profileDropdownRef}>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setIsProfileDropdownOpen((prev) => !prev);
-                                setIsDropdownOpen(false);
-                            }}
-                            className={`btn btn-profile-trigger d-flex align-items-center gap-2 py-1 px-2 rounded-pill ${isProfileDropdownOpen ? "active" : ""}`}
-                            title="User Profile & Menu"
-                        >
-                            <div className="profile-avatar-circle d-flex align-items-center justify-content-center">
-                                {getInitials(userName)}
-                            </div>
-                            <div className="profile-user-info d-none d-md-flex flex-column text-start">
-                                <span className="profile-user-name fw-semibold text-truncate">{userName}</span>
-                                <span className="profile-user-role text-muted">{isAnalyst ? "Analyst" : "Admin"}</span>
-                            </div>
-                            <FiChevronDown
-                                className={`dropdown-chevron-icon transition-transform ms-1 ${isProfileDropdownOpen ? "rotate-180" : ""}`}
-                                size={15}
-                            />
-                        </button>
-
-                        {isProfileDropdownOpen && (
-                            <div className="profile-dropdown-menu shadow-lg rounded-3 py-2 animate-fade-in">
-                                {/* Profile Header */}
-                                <div className="profile-menu-header px-3 py-2 border-bottom">
-                                    <div className="d-flex align-items-center gap-2 mb-1">
-                                        <div className="profile-avatar-circle-lg d-flex align-items-center justify-content-center">
-                                            {getInitials(userName)}
-                                        </div>
-                                        <div className="d-flex flex-column overflow-hidden">
-                                            <span className="fw-bold text-dark text-truncate" title={userName}>
-                                                {userName}
-                                            </span>
-                                            {userEmail && (
-                                                <span className="small text-muted text-truncate" title={userEmail}>
-                                                    {userEmail}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="mt-2">
-                                        <span className={`badge ${isAnalyst ? "bg-info text-dark" : "badge-admin-role"}`}>
-                                            {isAnalyst ? "ANALYST" : "ADMINISTRATOR"}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* Menu Items */}
-                                <div className="profile-menu-body py-1">
-                                    {/* Setting button - ONLY in admin section */}
-                                    {!isAnalyst && (
-                                        <button
-                                            type="button"
-                                            onClick={handleOpenSettings}
-                                            className="profile-menu-item d-flex align-items-center gap-2 px-3 py-2 w-100 border-0 bg-transparent text-start"
-                                        >
-                                            <FiSettings className="menu-item-icon text-primary" size={17} />
-                                            <div className="d-flex flex-column">
-                                                <span className="fw-semibold text-dark">Settings</span>
-                                                <span className="profile-item-hint text-muted">System & portal settings</span>
-                                            </div>
-                                        </button>
-                                    )}
-
-                                    {/* Logout option - in all (admin & analyst) */}
-                                    <button
-                                        type="button"
-                                        onClick={handleLogout}
-                                        className="profile-menu-item profile-logout-item d-flex align-items-center gap-2 px-3 py-2 w-100 border-0 bg-transparent text-start text-danger"
-                                    >
-                                        <FiLogOut className="menu-item-icon text-danger" size={17} />
-                                        <span className="fw-semibold">Logout</span>
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
                 </div>
             </header>
 
@@ -434,3 +529,4 @@ const Header = () => {
 };
 
 export default Header;
+

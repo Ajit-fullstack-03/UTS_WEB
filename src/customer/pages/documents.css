@@ -492,3 +492,83 @@
     cursor: pointer;
     user-select: none;
 }
+
+/* ════════════════════════════════════════
+   MOBILE RESPONSIVE ENHANCEMENTS
+   ════════════════════════════════════════ */
+@media (max-width: 767.98px) {
+    .docs-title {
+        font-size: 1.5rem;
+    }
+
+    .docs-tabs-list {
+        flex-wrap: nowrap !important;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 4px;
+        gap: 6px;
+    }
+
+    .docs-tabs-list::-webkit-scrollbar {
+        height: 3px;
+    }
+
+    .docs-tabs-list::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    .docs-tab-btn {
+        flex-shrink: 0;
+        padding: 8px 12px;
+        font-size: 0.86rem;
+        white-space: nowrap;
+    }
+
+    .docs-empty-state-box {
+        padding: 36px 18px !important;
+    }
+
+    .empty-state-img {
+        max-width: 200px !important;
+    }
+
+    .docs-modal-card {
+        padding: 20px 16px !important;
+        max-width: 95vw !important;
+        margin: 10px auto !important;
+    }
+
+    .docs-file-dropzone {
+        padding: 24px 14px !important;
+    }
+
+    .docs-category-chips {
+        gap: 6px;
+    }
+
+    .docs-cat-chip {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .docs-title {
+        font-size: 1.35rem;
+    }
+
+    .btn-upload-top {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+    }
+
+    .docs-done-checkbox-card {
+        padding: 12px !important;
+    }
+
+    .done-uploads-label {
+        font-size: 0.85rem;
+    }
+}
+

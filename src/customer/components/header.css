@@ -9,6 +9,11 @@
     z-index: 99;
 }
 
+.customer-header-main {
+    height: 100%;
+    width: 100%;
+}
+
 /* Make Payment Button */
 .btn-make-payment {
     background-color: #1b2e6b !important;
@@ -26,6 +31,7 @@
 .btn-make-payment:hover {
     background-color: #13214e !important;
     box-shadow: 0 4px 12px rgba(27, 46, 107, 0.15);
+    color: #ffffff !important;
 }
 
 /* Refer & Earn Button */
@@ -235,10 +241,139 @@
     transform: rotate(180deg);
 }
 
-@media (max-width: 768px) {
+.btn-header-hamburger {
+    background: none;
+    border: none;
+    color: #1b2e6b;
+    padding: 6px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-header-hamburger:hover {
+    background-color: #f1f5f9;
+}
+
+.mobile-header-logo {
+    height: 30px;
+    width: auto;
+    object-fit: contain;
+}
+
+.customer-notif-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 320px;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    z-index: 1060;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    animation: fadeInMenu 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.customer-notif-scroll-body {
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+/* Mobile & Tablet Responsive Header */
+@media (max-width: 991.98px) {
     .customer-header {
         height: auto;
-        padding-top: 12px;
-        padding-bottom: 12px;
+        min-height: unset;
+        padding: 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .customer-header-main {
+        height: 58px;
+        padding: 8px 12px;
+    }
+
+    .customer-header-status-strip {
+        background-color: #f8fafc;
+        border-top: 1px solid #f1f5f9;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .customer-header-status-strip::-webkit-scrollbar {
+        display: none;
+    }
+
+    .customer-header-status-strip .header-status-badge,
+    .customer-header-status-strip .header-filenumber-badge {
+        font-size: 0.74rem !important;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .header-actions {
+        gap: 6px;
+    }
+
+    .customer-user-info {
+        display: none !important;
+    }
+
+    .btn-customer-profile-trigger {
+        padding: 3px 5px !important;
+        border-radius: 50% !important;
+        border: none !important;
+        background: transparent !important;
+    }
+
+    .btn-customer-profile-trigger:hover,
+    .btn-customer-profile-trigger.active {
+        background: rgba(0, 0, 0, 0.04) !important;
+        box-shadow: none !important;
+    }
+
+    .customer-profile-dropdown-menu,
+    .customer-notif-dropdown-menu {
+        max-width: calc(100vw - 20px) !important;
+        right: 0 !important;
+    }
+
+    .btn-bell {
+        width: 36px;
+        height: 36px;
     }
 }
+
+/* Extra small mobile devices (e.g. phones <= 480px) */
+@media (max-width: 480px) {
+    .customer-header-main {
+        height: 54px;
+        padding: 6px 12px;
+    }
+
+    .mobile-header-logo {
+        height: 28px;
+    }
+
+    .header-actions {
+        gap: 6px;
+    }
+
+    .btn-bell {
+        width: 34px;
+        height: 34px;
+    }
+
+    .customer-avatar-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.78rem;
+    }
+}
+

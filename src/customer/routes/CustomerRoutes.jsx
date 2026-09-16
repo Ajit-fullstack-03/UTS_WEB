@@ -7,6 +7,7 @@ import Documents from "../pages/Documents";
 import Referrals from "../pages/Referrals";
 import CustomerPayments from "../pages/CustomerPayments";
 import AuthGuard from "../guards/AuthGuard";
+import NotFound from "../../web/pages/NotFound";
 
 const CustomerRoutes = () => {
     return (
@@ -19,6 +20,7 @@ const CustomerRoutes = () => {
                     <Route path="documents" element={<Documents />} />
                     <Route path="referrals" element={<Referrals />} />
                     <Route path="payments" element={<CustomerPayments />} />
+                    <Route path="*" element={<NotFound />} />
                 </Route>
             </Route>
         </Routes>

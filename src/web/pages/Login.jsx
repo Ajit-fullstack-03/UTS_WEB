@@ -17,6 +17,78 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [rememberMe, setRememberMe] = useState(false);
 
+    const [forgotLoading, setForgotLoading] = useState(false);
+
+    const handleForgotPassword = async (e) => {
+        if (e) e.preventDefault();
+        const trimmedEmail = email ? email.trim() : "";
+
+        if (!trimmedEmail) {
+            Swal.fire({
+                title: "Email Required",
+                text: "Please enter your registered email address to receive a password reset link.",
+                icon: "warning",
+                confirmButtonColor: "#1b3178"
+            }).then(() => {
+                const emailInput = document.getElementById("login-email-input");
+                if (emailInput) emailInput.focus();
+            });
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(trimmedEmail)) {
+            Swal.fire({
+                title: "Invalid Email",
+                text: "Please enter a valid email address.",
+                icon: "error",
+                confirmButtonColor: "#1b3178"
+            });
+            return;
+        }
+
+        try {
+            setForgotLoading(true);
+            Swal.fire({
+                title: "Sending Reset Link...",
+                text: "Please wait while we process your request.",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const response = await webservices.resetpasswordlink({ email: trimmedEmail });
+            const data = response?.data;
+
+            if (data?.http_code === 200 || data?.status === 200 || response?.status === 200) {
+                Swal.fire({
+                    title: "Reset Link Sent!",
+                    text: data?.status_smessage || data?.message || "A password reset link has been sent to your email address. Please check your inbox.",
+                    icon: "success",
+                    confirmButtonColor: "#1b3178"
+                });
+            } else {
+                Swal.fire({
+                    title: "Request Failed",
+                    text: data?.status_smessage || data?.message || "Unable to send reset link. Please check if this email is registered.",
+                    icon: "error",
+                    confirmButtonColor: "#1b3178"
+                });
+            }
+        } catch (error) {
+            console.error("Forgot password error:", error);
+            Swal.fire({
+                title: "Error!",
+                text: error?.response?.data?.status_smessage || error?.response?.data?.message || "An error occurred while sending the reset link. Please try again.",
+                icon: "error",
+                confirmButtonColor: "#1b3178"
+            });
+        } finally {
+            setForgotLoading(false);
+        }
+    };
+
     const handleLogin = async (e) => {
         e.preventDefault();
         const payload = {
@@ -127,10 +199,11 @@ const Login = () => {
                             {/* Form */}
                             <form onSubmit={handleLogin}>
                                 <div className="auth-input-group">
-                                    <label className="auth-input-label">
-                                        Email
+                                    <label className="auth-input-label" htmlFor="login-email-input">
+                                        Email <span className="text-danger">*</span>
                                     </label>
                                     <input
+                                        id="login-email-input"
                                         type="email"
                                         className="auth-input"
                                         placeholder="example@gmail.com"
@@ -184,12 +257,14 @@ const Login = () => {
                                             Remember Me
                                         </label>
                                     </div>
-                                    <a
-                                        href="#forgot-password"
-                                        className="auth-link text-decoration-none"
+                                    <button
+                                        type="button"
+                                        onClick={handleForgotPassword}
+                                        disabled={forgotLoading}
+                                        className="auth-link text-decoration-none border-0 bg-transparent p-0 cursor-pointer"
                                     >
-                                        Forget Password?
-                                    </a>
+                                        {forgotLoading ? "Sending Link..." : "Forget Password?"}
+                                    </button>
                                 </div>
 
                                 {/* Submit Button */}

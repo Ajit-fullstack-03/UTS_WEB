@@ -318,17 +318,124 @@
     color: #dc2626 !important;
 }
 
+.admin-header-main {
+    height: 100%;
+    width: 100%;
+}
+
+.btn-admin-hamburger {
+    background: none;
+    border: none;
+    color: #1b2e6b;
+    padding: 6px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-admin-hamburger:hover {
+    background-color: #f1f5f9;
+}
+
 @media (max-width: 1200px) {
     .header-nav-pills {
         max-width: 55%;
     }
 }
 
+/* Tablet & Mobile Responsive Header */
 @media (max-width: 991.98px) {
-    .header-logo-text {
+    .admin-header {
+        height: auto;
+        min-height: unset;
+        padding: 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .admin-header-main {
+        height: 58px;
+        padding: 8px 12px;
+    }
+
+    .header-logo {
+        max-height: 36px;
+    }
+
+    .profile-user-info {
         display: none !important;
     }
-    .header-nav-pills {
-        max-width: 65%;
+
+    .btn-profile-trigger {
+        padding: 3px 5px !important;
+        border-radius: 50% !important;
+        border: none !important;
+        background: transparent !important;
+    }
+
+    .btn-profile-trigger:hover,
+    .btn-profile-trigger.active {
+        background: rgba(0, 0, 0, 0.04) !important;
+        box-shadow: none !important;
+    }
+
+    .profile-dropdown-menu {
+        max-width: calc(100vw - 20px) !important;
+        right: 0 !important;
+    }
+
+    .tax-year-dropdown-menu {
+        max-width: calc(100vw - 20px) !important;
+        left: 0 !important;
+    }
+
+    /* Sub-nav horizontal scrolling strip */
+    .admin-header-nav-strip {
+        background-color: #f8fafc;
+        border-top: 1px solid #f1f5f9;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 6px 12px;
+    }
+
+    .admin-header-nav-strip::-webkit-scrollbar {
+        display: none;
+    }
+
+    .admin-header-nav-strip .btn-nav-pill {
+        font-size: 0.8rem !important;
+        padding: 5px 14px !important;
     }
 }
+
+@media (max-width: 576px) {
+    .admin-header-main {
+        height: 52px;
+        padding: 6px 10px;
+    }
+
+    .header-logo {
+        max-height: 30px;
+    }
+
+    .profile-avatar-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.78rem;
+    }
+
+    .admin-header-nav-strip {
+        padding: 5px 8px;
+        gap: 6px;
+    }
+
+    .admin-header-nav-strip .btn-nav-pill {
+        font-size: 0.76rem !important;
+        padding: 4px 12px !important;
+    }
+}
+

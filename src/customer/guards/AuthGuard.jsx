@@ -1,23 +1,29 @@
 import React from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { getUserTypeId, isAuthenticated, getDefaultDashboardPath } from "../../utils/userRole";
 
 /**
- * AuthGuard component (similar to Angular CanActivate Guard)
- * Checks if the user is authenticated (by checking if 'currentUser' exists in localStorage).
+ * AuthGuard component for Customer routes
+ * Checks if the user is authenticated and has customer role (user_type_id = 2).
  * If not authenticated, redirects to the login page.
- * If authenticated, renders the child routes via React Router's Outlet.
+ * If authenticated with a different role, redirects to their authorized dashboard.
+ * If customer, renders the child routes via Outlet.
  */
 const AuthGuard = () => {
-    // In this app, we check if 'currentUser' (token/user data) exists in localStorage
-    const isAuthenticated = localStorage.getItem("currentUser");
+    const location = useLocation();
+    const isAuthed = isAuthenticated();
+    const userTypeId = getUserTypeId();
 
-    if (!isAuthenticated) {
-        // Redirect to login page and keep the history clean (replace: true)
-        return <Navigate to="/login" replace />;
+    if (!isAuthed || !userTypeId) {
+        return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    // Render the nested protected components
+    if (userTypeId !== 2) {
+        return <Navigate to={getDefaultDashboardPath(userTypeId)} replace />;
+    }
+
     return <Outlet />;
 };
 
 export default AuthGuard;
+

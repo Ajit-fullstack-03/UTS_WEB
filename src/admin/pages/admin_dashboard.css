@@ -321,27 +321,59 @@
     font-weight: 500;
 }
 
-/* Sub tabs Menu */
+/* Sub tabs Menu & Horizontal Scroll Track */
+.client-details-tabs-scroll-wrapper {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+}
+
+.client-details-tabs-scroll-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.inner-tabs-nav {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+}
+
+.inner-tabs-nav .nav-item {
+    flex-shrink: 0;
+}
+
 .inner-tabs-nav .nav-link {
-    background-color: transparent !important;
+    background-color: #ffffff !important;
     color: #475569 !important;
-    border: 1px solid transparent !important;
+    border: 1.5px solid #e2e8f0 !important;
     font-size: 0.85rem;
     padding: 6px 16px !important;
+    border-radius: 30px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0;
     transition: all 0.15s ease-in-out;
+    cursor: pointer;
+    font-weight: 500;
 }
 
 .inner-tabs-nav .nav-link:hover {
     color: #1b2e6b !important;
-    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    background-color: #f8fafc !important;
 }
 
 .inner-tabs-nav .nav-link.active {
-    background-color: #ffffff !important;
-    color: #1b2e6b !important;
-    border-color: #e2e8f0 !important;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05) !important;
+    background-color: #1b2e6b !important;
+    color: #ffffff !important;
+    border-color: #1b2e6b !important;
+    box-shadow: 0 2px 8px rgba(27, 46, 107, 0.25) !important;
+    font-weight: 600 !important;
 }
+
 
 .btn-action-top-right {
     background-color: #1b2e6b !important;
@@ -676,4 +708,127 @@
     color: #ffffff !important;
     border-color: #3b82f6 !important;
 }
+
+/* Responsive Overrides for Admin & Analyst Dashboard */
+@media (max-width: 991.98px) {
+    .dashboard-header-row {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 12px;
+    }
+
+    .dashboard-actions-group {
+        flex-wrap: wrap;
+        width: 100%;
+        justify-content: flex-start;
+        gap: 8px;
+    }
+
+    .search-bar-wrapper {
+        min-width: 100% !important;
+        width: 100% !important;
+    }
+
+    .admin-records-table th,
+    .admin-records-table td {
+        padding: 10px 12px !important;
+        font-size: 0.84rem;
+        white-space: nowrap;
+    }
+
+    .other-info-subnav {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 6px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .other-info-subnav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .other-info-card {
+        padding: 16px;
+    }
+
+    .figma-table-container {
+        overflow-x: auto;
+    }
+
+    .client-details-top-bar {
+        gap: 10px;
+    }
+
+    .client-header-summary {
+        font-size: 0.88rem;
+        padding: 5px 10px;
+    }
+
+    .client-header-summary-name {
+        font-size: 0.88rem;
+    }
+
+    .inner-tabs-nav .nav-link {
+        font-size: 0.8rem !important;
+        padding: 5px 14px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-main-title {
+        font-size: 1.25rem !important;
+    }
+
+    .btn-filter-adjust {
+        font-size: 0.82rem !important;
+        padding: 6px 12px !important;
+    }
+
+    .search-input {
+        height: 38px !important;
+        font-size: 0.85rem !important;
+    }
+
+    .status-pill-badge {
+        font-size: 0.7rem !important;
+        padding: 4px 8px !important;
+    }
+
+    .admin-records-table th {
+        font-size: 0.74rem;
+        padding: 8px 10px !important;
+    }
+
+    .admin-records-table td {
+        font-size: 0.8rem;
+        padding: 8px 10px !important;
+    }
+
+    .other-info-subnav-btn {
+        font-size: 0.78rem;
+        padding: 5px 12px;
+    }
+
+    .client-details-workspace {
+        gap: 12px !important;
+    }
+
+    .btn-back-dashboard {
+        font-size: 0.8rem !important;
+        padding: 6px 10px !important;
+    }
+
+    .inner-tabs-nav .nav-link {
+        font-size: 0.76rem !important;
+        padding: 4px 12px !important;
+    }
+
+    .btn-action-top-right {
+        font-size: 0.78rem !important;
+        padding: 5px 10px !important;
+    }
+}
+
+
 

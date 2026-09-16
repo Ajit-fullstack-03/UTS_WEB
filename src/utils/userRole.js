@@ -4,7 +4,7 @@
 
 export const getUserInfo = () => {
     try {
-        const userInfoStr = localStorage.getItem("userInfo") || localStorage.getItem("currentUser");
+        const userInfoStr = localStorage.getItem("userInfo");
         if (userInfoStr) {
             const parsed = JSON.parse(userInfoStr);
             if (typeof parsed === "object" && parsed !== null) {
@@ -19,20 +19,34 @@ export const getUserInfo = () => {
 
 export const getUserTypeId = () => {
     const userInfo = getUserInfo();
-    const typeId = userInfo.user_type_id || userInfo.userTypeId || userInfo.user_type;
-    return typeId !== undefined && typeId !== null ? Number(typeId) : null;
+    const typeId = userInfo.user_type_id ?? userInfo.userTypeId ?? userInfo.user_type;
+    return typeId !== undefined && typeId !== null && !isNaN(Number(typeId)) ? Number(typeId) : null;
+};
+
+export const isAuthenticated = () => {
+    const userInfo = getUserInfo();
+    const typeId = getUserTypeId();
+    const currentUser = localStorage.getItem("currentUser");
+    return Boolean((currentUser || userInfo.user_id) && typeId !== null);
+};
+
+export const getDefaultDashboardPath = (userTypeId) => {
+    const roleId = Number(userTypeId);
+    switch (roleId) {
+        case 1:
+            return "/admin";
+        case 2:
+            return "/customer";
+        case 3:
+            return "/analyst";
+        default:
+            return "/login";
+    }
 };
 
 export const isAnalystUser = () => {
     const typeId = getUserTypeId();
-    if (typeId === 3) return true;
-    if (typeof window !== "undefined" && window.location) {
-        const path = window.location.pathname;
-        if (path.startsWith("/analyst") || path.startsWith("/analysist")) {
-            return true;
-        }
-    }
-    return false;
+    return typeId === 3;
 };
 
 export const isAdminUser = () => {
@@ -42,11 +56,7 @@ export const isAdminUser = () => {
 
 export const isCustomerUser = () => {
     const typeId = getUserTypeId();
-    if (typeId === 2) return true;
-    if (typeof window !== "undefined" && window.location) {
-        return window.location.pathname.startsWith("/customer");
-    }
-    return false;
+    return typeId === 2;
 };
 
 export const getRolePrefix = () => {
@@ -58,3 +68,4 @@ export const getRolePrefix = () => {
     if (isAnalystUser()) return "/analyst";
     return "/admin";
 };
+
