@@ -3,7 +3,8 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import { IoClose, IoChevronDownOutline } from "react-icons/io5";
 import "./Navbar.css";
-import logo from "../../../assets/image/umpire_tax_logo.png";
+import logo from "../../../assets/image/umpire_tax_logo.svg";
+import gameiconscash from "../../../assets/image/game-icons_cash.png"
 
 /* ── Flag SVGs ── */
 const USFlag = () => (
@@ -205,6 +206,10 @@ const Navbar = () => {
                     </Link>
                     <Link to="/register" className="nav-btn nav-btn-primary">
                         Register
+                    </Link>
+                    <Link to="/login" className="nav-btn nav-btn-primary" style={{ width: "120px" }}>
+                        <img src={gameiconscash} alt="" className="image-icon" style={{ paddingRight: "3px", height: "24px" }} />
+                        Refer & Earn
                     </Link>
                 </div>
 

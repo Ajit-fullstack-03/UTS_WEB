@@ -2,14 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import {
     FiUploadCloud,
     FiTrash2,
-    FiEdit3,
     FiEye,
     FiAlertTriangle,
     FiX,
-    FiChevronDown,
     FiFileText,
     FiPlus,
-    FiCheckCircle,
     FiDownload
 } from "react-icons/fi";
 import noDataImg from "../../assets/image/no_data.png";
@@ -271,6 +268,77 @@ const Documents = () => {
         return true;
     });
 
+    const [isDragging, setIsDragging] = useState(false);
+
+    // Toast notification helper
+    const showToast = (icon, title) => {
+        Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 6000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+        }).fire({
+            icon: icon,
+            title: title
+        });
+    };
+
+    // Validate and process selected files
+    const processSelectedFiles = (files) => {
+        const allowedExtensions = ["pdf", "jpg", "jpeg", "png"];
+        const MAX_SIZE = 10 * 1024 * 1024; // 10 MB in bytes
+
+        const validFiles = [];
+        let hasOversized = false;
+        let hasInvalidType = false;
+
+        files.forEach((file, index) => {
+            const ext = file.name ? file.name.split(".").pop().toLowerCase() : "";
+
+            if (!allowedExtensions.includes(ext)) {
+                hasInvalidType = true;
+                return;
+            }
+
+            if (file.size > MAX_SIZE) {
+                hasOversized = true;
+                return;
+            }
+
+            // format size to human-readable
+            const sizeInKb = Math.round(file.size / 1024);
+            const sizeStr = sizeInKb > 1000
+                ? `${(sizeInKb / 1024).toFixed(1)} MB`
+                : `${sizeInKb} KB`;
+
+            validFiles.push({
+                id: Date.now() + index + Math.random(),
+                name: file.name,
+                size: sizeStr,
+                rawFile: file,
+                selectedType: activeTab === "all" ? "Other documents" : getCategoryLabel(activeTab),
+                selectedYear: String(new Date().getFullYear())
+            });
+        });
+
+        if (hasOversized) {
+            showToast("warning", "The uploaded file is more than 10 MB, please send the doc via email");
+        }
+
+        if (hasInvalidType) {
+            showToast("error", "Invalid file type. Only PDF, JPG, and PNG files are allowed.");
+        }
+
+        if (validFiles.length > 0) {
+            setPendingFiles(prev => [...prev, ...validFiles]);
+        }
+    };
+
     // Handle drag and drop zone click
     const handleDragZoneClick = () => {
         if (fileInputRef.current) {
@@ -278,29 +346,36 @@ const Documents = () => {
         }
     };
 
+    // Handle drag events
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            processSelectedFiles(Array.from(e.dataTransfer.files));
+        }
+    };
+
     // Handle file selection in modal
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files);
         if (files.length === 0) return;
-
-        const newPending = files.map((file, index) => {
-            // format size to human-readable
-            const sizeInKb = Math.round(file.size / 1024);
-            const sizeStr = sizeInKb > 1000
-                ? `${(sizeInKb / 1024).toFixed(1)} MB`
-                : `${sizeInKb} KB`;
-
-            return {
-                id: Date.now() + index,
-                name: file.name,
-                size: sizeStr,
-                rawFile: file,
-                selectedType: activeTab === "all" ? "Other documents" : getCategoryLabel(activeTab),
-                selectedYear: String(new Date().getFullYear())
-            };
-        });
-
-        setPendingFiles(prev => [...prev, ...newPending]);
+        processSelectedFiles(files);
+        if (e.target) {
+            e.target.value = "";
+        }
     };
 
     const getCategoryLabel = (tabKey) => {
@@ -326,6 +401,24 @@ const Documents = () => {
     // Submit pending files and add to uploaded list
     const handleUploadSubmit = async () => {
         if (pendingFiles.length === 0) return;
+
+        const allowedExtensions = ["pdf", "jpg", "jpeg", "png"];
+        const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
+
+        const oversizedFile = pendingFiles.find(f => f.rawFile && f.rawFile.size > MAX_SIZE);
+        if (oversizedFile) {
+            showToast("warning", "The uploaded file is more than 10 MB, please send the doc via email");
+            return;
+        }
+
+        const invalidTypeFile = pendingFiles.find(f => {
+            const ext = f.rawFile && f.rawFile.name ? f.rawFile.name.split(".").pop().toLowerCase() : "";
+            return !allowedExtensions.includes(ext);
+        });
+        if (invalidTypeFile) {
+            showToast("error", "Invalid file type. Only PDF, JPG, and PNG files are allowed.");
+            return;
+        }
 
         const userInfoStr = localStorage.getItem("userInfo");
         if (!userInfoStr) {
@@ -774,14 +867,18 @@ const Documents = () => {
                             {/* Drag & Drop Zone */}
                             <div className="modal-field-group mb-4">
                                 <div
-                                    className="upload-drag-zone d-flex flex-column align-items-center justify-content-center p-4 border-dashed rounded text-center"
+                                    className={`upload-drag-zone d-flex flex-column align-items-center justify-content-center p-4 border-dashed rounded text-center ${isDragging ? "dragover" : ""}`}
                                     onClick={handleDragZoneClick}
+                                    onDragOver={handleDragOver}
+                                    onDragLeave={handleDragLeave}
+                                    onDrop={handleDrop}
                                 >
                                     <input
                                         type="file"
                                         ref={fileInputRef}
                                         className="d-none"
                                         multiple
+                                        accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
                                         onChange={handleFileChange}
                                     />
                                     <div className="upload-cloud-icon-container mb-3">
@@ -884,7 +981,7 @@ const Documents = () => {
                             <div className="modal-warning-footer p-3 bg-light border-top rounded d-flex align-items-start gap-3 text-start">
                                 <FiAlertTriangle className="warning-icon text-warning mt-1 flex-shrink-0" size={20} />
                                 <p className="warning-text mb-0 small text-muted leading-sm">
-                                    Note: If the Upload size document is more than 06MB, Kindly mail the documents to <a href="mailto:Hello@umpiretaxsolutions.com" className="text-decoration-none">Hello@umpiretaxsolutions.com</a>
+                                    Note: If the Upload size document is more than 10MB, Kindly mail the documents to <a href="mailto:Hello@umpiretaxsolutions.com" className="text-decoration-none">Hello@umpiretaxsolutions.com</a>
                                 </p>
                             </div>
                         </div>

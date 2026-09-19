@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FiChevronDown, FiCheck, FiLogOut, FiSettings, FiMenu } from "react-icons/fi";
 import Swal from "sweetalert2";
-import logoImg from "../../assets/image/umpire_tax_logo.png";
+import logoImg from "../../assets/image/umpire_tax_logo.svg";
 import { adminServices } from "../services/AdminServices";
 import { getStoredTaxYear, setStoredTaxYear, getStoredTaxYearsList, setStoredTaxYearsList } from "../../utils/taxYear";
 import { getUserInfo, isAnalystUser, getRolePrefix } from "../../utils/userRole";
@@ -182,7 +182,7 @@ const Header = ({ onToggleSidebar }) => {
     ];
 
     const navItems = isAnalyst
-        ? allNavItems.filter((item) => item.label !== "Payments")
+        ? allNavItems.filter((item) => item.label !== "Payments" && item.label !== "Registration")
         : allNavItems;
 
     const isTabActive = (item) => {

@@ -345,9 +345,11 @@
     transition: all 0.2s ease;
 }
 
-.upload-drag-zone:hover {
+.upload-drag-zone:hover,
+.upload-drag-zone.dragover {
     border-color: #1b3178 !important;
-    background-color: #f1f5f9;
+    background-color: #eff6ff;
+    transform: scale(1.005);
 }
 
 .upload-cloud-icon-container {

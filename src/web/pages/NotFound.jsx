@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiHome, FiArrowLeft, FiHelpCircle, FiSearch, FiFileText } from "react-icons/fi";
 import { IoCompassOutline } from "react-icons/io5";
-import logoImg from "../../assets/image/umpire_tax_logo.png";
+import logoImg from "../../assets/image/umpire_tax_logo.svg";
 import ellipseImg from "../../assets/image/Object.png";
 import { getUserTypeId, isAuthenticated, getDefaultDashboardPath } from "../../utils/userRole";
 import "./notFound.css";

@@ -10,7 +10,7 @@ import {
     FiLogOut,
     FiX
 } from "react-icons/fi";
-import logoImg from "../../assets/image/umpire_tax_logo.png";
+import logoImg from "../../assets/image/umpire_tax_logo.svg";
 
 import "./sidebar.css";
 

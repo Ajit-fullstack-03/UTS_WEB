@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { IoCheckmarkCircle, IoAlertCircle, IoCloseCircle, IoLogInOutline, IoArrowForward } from "react-icons/io5";
-import logoImg from "../../assets/image/umpire_tax_logo.png";
+import logoImg from "../../assets/image/umpire_tax_logo.svg";
 import ellipseImg from "../../assets/image/Object.png";
 import { webservices } from "../services/webServices";
 import "./accountVerifyUser.css";

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { FiArrowLeft } from "react-icons/fi";
-import logoImg from "../../assets/image/umpire_tax_logo.png";
+import logoImg from "../../assets/image/umpire_tax_logo.svg";
 import loginCollabImg from "../../assets/image/frame1l.png";
 import ellipseImg from "../../assets/image/Object.png";
 import "./login.css";

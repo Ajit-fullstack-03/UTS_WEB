@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FiX } from "react-icons/fi";
 import Swal from "sweetalert2";
-import logoImg from "../../assets/image/umpire_tax_logo.png";
+import logoImg from "../../assets/image/umpire_tax_logo.svg";
 import { adminServices } from "../services/AdminServices";
 import { getStoredTaxYear } from "../../utils/taxYear";
 import { isAnalystUser, getRolePrefix } from "../../utils/userRole";
@@ -183,9 +183,8 @@ const Sidebar = ({ isOpen = false, onClose }) => {
                             <li key={item.id}>
                                 <div
                                     onClick={() => handleNavigation(item.path)}
-                                    className={`sidebar-menu-item d-flex align-items-center ${
-                                        isActive ? "active" : ""
-                                    }`}
+                                    className={`sidebar-menu-item d-flex align-items-center ${isActive ? "active" : ""
+                                        }`}
                                 >
                                     <span className="sidebar-item-label">
                                         {item.label} {item.count !== null ? `(${item.count})` : ""}

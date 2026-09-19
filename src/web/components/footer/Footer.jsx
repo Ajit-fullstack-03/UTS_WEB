@@ -1,6 +1,6 @@
 import React from "react";
 import "./Footer.css";
-import logoImage from "../../../assets/image/umpire_tax_logo.png";
+import logoImage from "../../../assets/image/umpire_tax_logo.svg";
 import heroBg from "../../../assets/image/BACKGROUD.jpeg";
 import { Link } from "react-router-dom";
 

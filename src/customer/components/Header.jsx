@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 import { webservices } from "../servics/CustomerServices";
 import { getStoredTaxYear } from "../../utils/taxYear";
 import { getUserInfo } from "../../utils/userRole";
-import logoImg from "../../assets/image/umpire_tax_logo.png";
+import logoImg from "../../assets/image/umpire_tax_logo.svg";
 import "./header.css";
 
 const Header = ({ onToggleSidebar }) => {
