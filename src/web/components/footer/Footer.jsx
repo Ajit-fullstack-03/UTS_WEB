@@ -16,8 +16,7 @@ const Footer = () => {
                         <img src={logoImage} alt="Umpire Tax Solutions" className="ftr-logo" />
 
                         <p className="ftr-brand-desc">
-                            Umpire Tax Solutions, is a Accounting and Taxation Company Providing various Financial Services in
-                            International Taxation, Accounting, Incorporations and Payroll Services.
+                            Umpire Tax Solutions is an accounting and taxation company providing a range of financial services, including international taxation, accounting, incorporation, and payroll services.
                         </p>
 
                         <div className="ftr-socials">
@@ -94,7 +93,7 @@ const Footer = () => {
                                         <path d="M3 7l9 6 9-6" stroke="#1B2E6B" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
                                     </svg>
                                 </span>
-                                <a href="mailto:hello@umpirtaxsolutions.com">hello@umpiretaxsolutions.com</a>
+                                <a href="mailto:hello@umpiretaxsolutions.com">hello@umpiretaxsolutions.com</a>
                             </li>
 
                             <li>
@@ -145,7 +144,7 @@ const Footer = () => {
 
                 <div className="ftr-divider" />
                 <div className="ftr-bottom">
-                    <p className="ftr-copyright">2026 Copyright, All rights reserved by Umpire Tax Solutions</p>
+                    <p className="ftr-copyright">© {new Date().getFullYear()} Umpire Tax Solutions. All rights reserved.</p>
                 </div>
             </div>
         </footer>

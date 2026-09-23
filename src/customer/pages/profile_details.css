@@ -34,15 +34,14 @@
     gap: 0;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 .profile-tab-bar::-webkit-scrollbar {
-    height: 3px;
-}
-
-.profile-tab-bar::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
+    display: none;
+    width: 0;
+    height: 0;
 }
 
 

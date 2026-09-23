@@ -5,8 +5,8 @@ import "./contact.css";
 
 /* ── FAQ data ─────────────────────────────────────────────────── */
 const faqs = [
-    { id: 1, question: "What is Umpire Tax Solution?", answer: "Umpire Tax Solution is a modern tax service platform offering accurate preparation, filing support, and practical tax guidance for individuals, freelancers, and growing businesses." },
-    { id: 2, question: "Who can use Umpire Tax Solution?", answer: "Individuals, freelancers, and growing businesses looking for accurate, reliable, and hassle-free tax preparation and filing support can use Umpire Tax Solution." },
+    { id: 1, question: "What is Umpire Tax Solutions?", answer: "Umpire Tax Solutions is a modern tax service platform offering accurate preparation, filing support, and practical tax guidance for individuals, freelancers, and growing businesses." },
+    { id: 2, question: "Who can use Umpire Tax Solutions?", answer: "Individuals, freelancers, and growing businesses looking for accurate, reliable, and hassle-free tax preparation and filing support can use Umpire Tax Solutions." },
     { id: 3, question: "How easy is it to get started?", answer: "Getting started takes just a few minutes — create your account, upload your documents securely, and our team takes care of the rest." },
     { id: 4, question: "Are there any hidden fees?", answer: "No. Our pricing is transparent and shown upfront before you file, with no hidden charges added later." },
     { id: 5, question: "How does customer support work?", answer: "Our support team is available via phone and chat to answer questions and guide you through every step of the filing process." },
@@ -234,20 +234,20 @@ const Contact = () => {
             {/* ── Top Contact Bar ─────────────────────────────────── */}
             <div className="ct-topbar">
                 <div className="ct-topbar-inner">
-                    <div className="ct-topbar-item">
+                    <a href="tel:+15156864275" className="ct-topbar-item">
                         <span className="ct-topbar-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z" fill="currentColor" /></svg></span>
                         <span className="ct-topbar-flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" width="22" height="12" style={{ borderRadius: "2px", display: "block" }}><rect width="7410" height="3900" fill="#B22234" /><rect y="300" width="7410" height="300" fill="white" /><rect y="900" width="7410" height="300" fill="white" /><rect y="1500" width="7410" height="300" fill="white" /><rect y="2100" width="7410" height="300" fill="white" /><rect y="2700" width="7410" height="300" fill="white" /><rect y="3300" width="7410" height="300" fill="white" /><rect width="2964" height="2100" fill="#3C3B6E" /></svg></span>
                         <span>+1 (515) 686-4275</span>
-                    </div>
-                    <div className="ct-topbar-item">
+                    </a>
+                    <a href="tel:+918186051040" className="ct-topbar-item">
                         <span className="ct-topbar-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z" fill="currentColor" /></svg></span>
                         <span className="ct-topbar-flag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="22" height="12" style={{ borderRadius: "2px", display: "block" }}><rect width="900" height="200" fill="#FF9933" /><rect y="200" width="900" height="200" fill="#FFFFFF" /><rect y="400" width="900" height="200" fill="#138808" /><circle cx="450" cy="300" r="60" fill="none" stroke="#000080" strokeWidth="6" /><circle cx="450" cy="300" r="8" fill="#000080" /></svg></span>
                         <span>+91 81860-51040</span>
-                    </div>
-                    <div className="ct-topbar-item">
+                    </a>
+                    <a href="mailto:hello@umpiretaxsolutions.com" className="ct-topbar-item">
                         <span className="ct-topbar-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M2 6a2 2 0 012-2h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm2 0l8 6 8-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg></span>
-                        <span>hello@umpirtaxsolutions.com</span>
-                    </div>
+                        <span>hello@umpiretaxsolutions.com</span>
+                    </a>
                 </div>
             </div>
 
@@ -265,12 +265,41 @@ const Contact = () => {
                                     <span className="ct-contact-icon">{item.icon}</span>
                                     <div className="ct-contact-body">
                                         <span className="ct-contact-label">{item.label}</span>
-                                        {item.lines.map((line, i) => (
-                                            <span className="ct-contact-value" key={i} style={{ display: "flex", alignItems: "center" }}>
-                                                {item.flags ? item.flags[i] : null}
-                                                {line}
-                                            </span>
-                                        ))}
+                                        {item.lines.map((line, i) => {
+                                            if (item.id === "email") {
+                                                return (
+                                                    <a
+                                                        href={`mailto:${line}`}
+                                                        className="ct-contact-value"
+                                                        key={i}
+                                                        style={{ display: "flex", alignItems: "center" }}
+                                                    >
+                                                        {item.flags ? item.flags[i] : null}
+                                                        {line}
+                                                    </a>
+                                                );
+                                            }
+                                            if (item.id === "phone") {
+                                                const phoneHref = line.includes("515") ? "tel:+15156864275" : "tel:+918186051040";
+                                                return (
+                                                    <a
+                                                        href={phoneHref}
+                                                        className="ct-contact-value"
+                                                        key={i}
+                                                        style={{ display: "flex", alignItems: "center" }}
+                                                    >
+                                                        {item.flags ? item.flags[i] : null}
+                                                        {line}
+                                                    </a>
+                                                );
+                                            }
+                                            return (
+                                                <span className="ct-contact-value" key={i} style={{ display: "flex", alignItems: "center" }}>
+                                                    {item.flags ? item.flags[i] : null}
+                                                    {line}
+                                                </span>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             ))}
@@ -506,7 +535,7 @@ const Contact = () => {
                         <div className="ct-faq-content">
                             <div className="ct-faq-badge">FAQ</div>
                             <h2 className="ct-faq-heading">Frequently Asked Questions</h2>
-                            <p className="ct-faq-description">Umpire Tax Solution helps individuals and businesses prepare accurate returns, stay compliant, and navigate tax season with confidence through reliable guidance and responsive support.</p>
+                            <p className="ct-faq-description">Umpire Tax Solutions helps individuals and businesses prepare accurate returns, stay compliant, and navigate tax season with confidence through reliable guidance and responsive support.</p>
                         </div>
                         <div className="ct-faq-accordion">
                             {faqs.map((faq) => {

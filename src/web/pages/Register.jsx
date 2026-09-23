@@ -581,7 +581,7 @@ const Register = () => {
                                         <input
                                             type={showPassword ? "text" : "password"}
                                             className={`auth-input pe-5 ${touched.password && passwordError ? "auth-input-invalid" : (touched.password && isPasswordValid) ? "auth-input-valid" : ""}`}
-                                            placeholder="Min. 8 chars (letters, 1 number, special char)"
+                                            placeholder="Min. 8 chars (alphanumeric and special character)"
                                             value={password}
                                             onChange={(e) => {
                                                 setPassword(e.target.value);

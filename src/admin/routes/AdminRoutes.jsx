@@ -28,7 +28,7 @@ import { isAnalystUser } from "../../utils/userRole";
 
 const AdminRoutes = () => {
     const isAnalyst = isAnalystUser();
-    const defaultLanding = isAnalyst ? "assigned-file-number" : "all-records";
+    const defaultLanding = isAnalyst ? "all-records" : "all-records";
 
     return (
         <Routes>

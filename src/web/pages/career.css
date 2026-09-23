@@ -37,6 +37,14 @@
     font-weight: 400;
     letter-spacing: 0.01em;
     white-space: nowrap;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.cr-topbar-item:hover,
+.ct-topbar-item:hover {
+    color: #fff;
+    opacity: 0.85;
 }
 
 .cr-topbar-icon,

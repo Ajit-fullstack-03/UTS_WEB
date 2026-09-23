@@ -24,12 +24,12 @@ import dollar_bag from "../../assets/image/Dollar_bag.png";
 
 
 const services = [
-    { id: 1, image: onePlatformImg1, label: "Free Tax Estimate" },
+    { id: 1, image: onePlatformImg1, label: "Free Tax Estimate." },
     { id: 2, image: weFileImg1, label: "One Platform. Every Tax Need." },
     { id: 3, image: taxEstimateImg2, label: "We File. You Relax." },
-    { id: 4, image: srf1, label: "Individual Tax Filing" },
-    { id: 5, image: Tax_planning_2, label: "Business Tax Returns." },
-    { id: 6, image: Book_keeping_4, label: "Tax Audit." },
+    { id: 4, image: srf1, label: "Individual Tax Filing." },
+    { id: 5, image: Tax_planning_2, label: "Business Tax Filing." },
+    { id: 6, image: Book_keeping_4, label: "Audit Representation." },
 ];
 
 const testimonials = [
@@ -124,10 +124,10 @@ const steps = [
     {
         id: 3,
         label: "Step 03",
-        title: "Get Tax Report on Email",
+        title: "Get Tax Report via Email",
         description: "Once completed, our analyst will send your Tax Report (PDF) directly to your email.",
         image: step3Image,
-        imageAlt: "Receive your tax report on email",
+        imageAlt: "Receive your tax report via email",
     },
 ];
 
@@ -303,13 +303,13 @@ const Home = () => {
                 {/* Top contact bar */}
                 <div className="hero-topbar">
                     <div className="hero-topbar-inner">
-                        <div className="hero-topbar-item">
+                        <a href="tel:+15156864275" className="hero-topbar-item">
                             <span className="hero-topbar-icon">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z" fill="currentColor" />
                                 </svg>
                             </span>
-                            {/* USA Flag SVG */}
+                            {/* US Flag SVG */}
                             <span className="hero-topbar-flag">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" width="22" height="12" style={{ borderRadius: "2px", display: "block" }}>
                                     <rect width="7410" height="3900" fill="#B22234" />
@@ -323,9 +323,9 @@ const Home = () => {
                                 </svg>
                             </span>
                             <span>+1 (515) 686-4275</span>
-                        </div>
+                        </a>
 
-                        <div className="hero-topbar-item">
+                        <a href="tel:+918186051040" className="hero-topbar-item">
                             <span className="hero-topbar-icon">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z" fill="currentColor" />
@@ -342,16 +342,16 @@ const Home = () => {
                                 </svg>
                             </span>
                             <span>+91 81860-51040</span>
-                        </div>
+                        </a>
 
-                        <div className="hero-topbar-item">
+                        <a href="mailto:hello@umpiretaxsolutions.com" className="hero-topbar-item">
                             <span className="hero-topbar-icon">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M2 6a2 2 0 012-2h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm2 0l8 6 8-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
                                 </svg>
                             </span>
                             <span>hello@umpiretaxsolutions.com</span>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
@@ -399,8 +399,8 @@ const Home = () => {
                                     </svg>
                                 </div>
                                 <div className="hero-float-card-text">
-                                    <span className="hero-float-card-label">This Season</span>
-                                    <span className="hero-float-card-value">1,200+</span>
+                                    {/* <span className="hero-float-card-label">This Season</span> */}
+                                    <span className="hero-float-card-value">10,000+</span>
                                     <span className="hero-float-card-sub">Returns Filed</span>
                                 </div>
                                 <div className="hero-float-card-progress">
@@ -408,7 +408,7 @@ const Home = () => {
                                         <div className="hero-float-card-progress-fill" style={{ width: "80%" }} />
                                     </div>
                                     <div className="hero-float-card-progress-labels">
-                                        <span>Target: 1,500</span>
+                                        <span>Target: 15,000</span>
                                         <span>80%</span>
                                     </div>
                                 </div>
@@ -516,7 +516,7 @@ const Home = () => {
                         </h2>
 
                         <p className="wcu-description">
-                            Trusted tax professionals using smart technology for accurate, hassle-free tax filing
+                            Trusted tax professionals using smart technology for accurate, hassle-free tax filing.
                         </p>
                     </div>
                 </div>
@@ -673,7 +673,7 @@ const Home = () => {
                             <div className="fs-badge">Max Refund. Zero Stress.</div>
 
                             <h2 className="fs-heading">
-                                <span className="fs-heading-dark">File Smart.</span>
+                                <span className="fs-heading-dark">File Smart. </span>
 
                                 <span className="fs-heading-accent">Get More Back.</span>
                             </h2>
@@ -752,7 +752,7 @@ const Home = () => {
                         </svg>
                         <span>Step by step</span>
                     </div>
-                    <h2 className="rs-heading">Your refund, in three steps</h2>
+                    <h2 className="rs-heading">Your Refund in Three Steps</h2>
                 </div>
 
                 <div className="rs-steps">
@@ -795,7 +795,7 @@ const Home = () => {
                         <div className="tm-rating">
                             <span>4.8/5</span>
                             <StarIcon />
-                            <span>Based on 123 reviews</span>
+                            <span>Based on 267 reviews</span>
                         </div>
                     </div>
 
@@ -953,7 +953,7 @@ const Home = () => {
                             <span className="faq-contact-text">Need help with your Financial &amp; Tax services?</span>
                         </div>
 
-                        <Link to="/contact" className="faq-contact-btn">
+                        <a href="tel:+15156864275" className="faq-contact-btn">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z"
@@ -961,7 +961,7 @@ const Home = () => {
                                 />
                             </svg>
                             +1 (515) 686-4275
-                        </Link>
+                        </a>
                     </div>
                 </div>
             </section>

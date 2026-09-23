@@ -236,6 +236,9 @@ const ProfileDetails = () => {
                     dob: formatToAPIDate(spouse.dob),
                     occupation: spouse.occupation,
                     ssn: spouse.ssnItin,
+                    email: spouse.email,
+                    phoneext: spouse.mobileCode,
+                    phone: spouse.mobilePhone,
                     visa_type: spouse.visaType || ""
                 };
                 response = await webservices.saveSpouseInfo(payload);
@@ -497,12 +500,12 @@ const ProfileDetails = () => {
                                 <fieldset disabled={!isEditable} style={{ border: "none", padding: 0, margin: 0, width: "100%" }}>
                                     <div className="profile-form-row">
                                         <div className="profile-field">
-                                            <label className="profile-label">First Name</label>
-                                            <input type="text" name="firstName" value={spouse.firstName} onChange={handleSpouseChange} className="profile-input" placeholder="Enter First Name" />
+                                            <label className="profile-label">First Name <span className="req">*</span></label>
+                                            <input type="text" name="firstName" value={spouse.firstName} onChange={handleSpouseChange} className="profile-input" placeholder="Enter First Name" required />
                                         </div>
                                         <div className="profile-field">
-                                            <label className="profile-label">Last Name</label>
-                                            <input type="text" name="lastName" value={spouse.lastName} onChange={handleSpouseChange} className="profile-input" placeholder="Enter Last Name" />
+                                            <label className="profile-label">Last Name <span className="req">*</span></label>
+                                            <input type="text" name="lastName" value={spouse.lastName} onChange={handleSpouseChange} className="profile-input" placeholder="Enter Last Name" required />
                                         </div>
                                     </div>
                                     <div className="profile-form-row">
@@ -517,22 +520,22 @@ const ProfileDetails = () => {
                                     </div>
                                     <div className="profile-form-row">
                                         <div className="profile-field">
-                                            <label className="profile-label">Date Of Birth (MM/DD/YYYY)</label>
-                                            <input type="text" name="dob" value={spouse.dob} onChange={handleSpouseChange} className="profile-input" placeholder="MM/DD/YYYY" maxLength={10} />
+                                            <label className="profile-label">Date Of Birth (MM/DD/YYYY) <span className="req">*</span></label>
+                                            <input type="text" name="dob" value={spouse.dob} onChange={handleSpouseChange} className="profile-input" placeholder="MM/DD/YYYY" maxLength={10} required />
                                         </div>
                                         <div className="profile-field">
-                                            <label className="profile-label">Email</label>
-                                            <input type="email" name="email" value={spouse.email} onChange={handleSpouseChange} className="profile-input" placeholder="Example@gmail.com" />
+                                            <label className="profile-label">Email <span className="req">*</span></label>
+                                            <input type="email" name="email" value={spouse.email} onChange={handleSpouseChange} className="profile-input" placeholder="Example@gmail.com" required />
                                         </div>
                                     </div>
                                     <div className="profile-form-row full-width">
                                         <div className="profile-field">
-                                            <label className="profile-label">Mobile Phone</label>
+                                            <label className="profile-label">Mobile Phone <span className="req">*</span></label>
                                             <div className="profile-phone-group">
                                                 <select name="mobileCode" value={spouse.mobileCode} onChange={handleSpouseChange} className="profile-phone-prefix">
                                                     {countryCodes.map(c => <option key={c} value={c}>{c}</option>)}
                                                 </select>
-                                                <input type="text" name="mobilePhone" value={spouse.mobilePhone} onChange={handleSpouseChange} className="profile-input profile-phone-main" placeholder="Enter Mobile Phone" />
+                                                <input type="text" name="mobilePhone" value={spouse.mobilePhone} onChange={handleSpouseChange} className="profile-input profile-phone-main" placeholder="Enter Mobile Phone" required />
                                             </div>
                                         </div>
                                     </div>

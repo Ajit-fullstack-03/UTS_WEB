@@ -23,10 +23,10 @@ const services = [
         title: "Individual Tax Planning",
         description: "Smart tax planning for individuals goes beyond just filing returns. We analyze your income, investments, and deductions to design a personalized strategy that minimizes your tax burden throughout the year.",
         bullets: [
-            "Deduction optimization for W-2, freelance, and NRI individuals",
+            "Deduction optimization for W-2 employees, freelancers, and NRI individuals",
             "Retirement contribution planning (IRA, 401k, HSA)",
             "Capital gains timing and harvesting strategies",
-            "Advance guidance on quarterly estimated tax payments",
+            "Advanced guidance on quarterly estimated tax payments",
         ],
         image: img1,
         imageAlt: "Individual tax planning — financial advisor with client",
@@ -48,7 +48,7 @@ const services = [
     },
     {
         id: 3,
-        title: "Tax Saving Strategies",
+        title: "Tax-Saving Strategies",
         description: "Beyond basic filing, we implement proactive strategies that create measurable long-term savings. Our advisors identify opportunities in your financial landscape that most taxpayers miss.",
         bullets: [
             "Investment tax planning and portfolio structuring",
@@ -89,16 +89,16 @@ const TaxPlanning = () => {
             <section className="srv-hero-wrapper" style={{ backgroundImage: `url(${backusa})` }}>
                 <div className="hero-topbar">
                     <div className="hero-topbar-inner">
-                        <div className="hero-topbar-item">
+                        <a href="tel:+15156864275" className="hero-topbar-item">
                             <span className="hero-topbar-icon">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z" fill="currentColor" /></svg>
                             </span>
                             <span className="hero-topbar-flag">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" width="22" height="12" style={{ borderRadius: "2px", display: "block" }}><rect width="7410" height="3900" fill="#B22234" /><rect y="300" width="7410" height="300" fill="white" /><rect y="900" width="7410" height="300" fill="white" /><rect y="1500" width="7410" height="300" fill="white" /><rect y="2100" width="7410" height="300" fill="white" /><rect y="2700" width="7410" height="300" fill="white" /><rect y="3300" width="7410" height="300" fill="white" /><rect width="2964" height="2100" fill="#3C3B6E" /></svg>
                             </span>
-                            <span>+1 (515)686-4275</span>
-                        </div>
-                        <div className="hero-topbar-item">
+                            <span>+1 (515) 686-4275</span>
+                        </a>
+                        <a href="tel:+918186051040" className="hero-topbar-item">
                             <span className="hero-topbar-icon">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.57.57 1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.57 1 1 0 01-.25 1.01l-2.2 2.21z" fill="currentColor" /></svg>
                             </span>
@@ -106,13 +106,13 @@ const TaxPlanning = () => {
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="22" height="12" style={{ borderRadius: "2px", display: "block" }}><rect width="900" height="200" fill="#FF9933" /><rect y="200" width="900" height="200" fill="#FFFFFF" /><rect y="400" width="900" height="200" fill="#138808" /><circle cx="450" cy="300" r="60" fill="none" stroke="#000080" strokeWidth="6" /><circle cx="450" cy="300" r="8" fill="#000080" /></svg>
                             </span>
                             <span>+91 81860-51040</span>
-                        </div>
-                        <div className="hero-topbar-item">
+                        </a>
+                        <a href="mailto:hello@umpiretaxsolutions.com" className="hero-topbar-item">
                             <span className="hero-topbar-icon">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M2 6a2 2 0 012-2h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm2 0l8 6 8-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
                             </span>
-                            <span>hello@umpirtaxsolutions.com</span>
-                        </div>
+                            <span>hello@umpiretaxsolutions.com</span>
+                        </a>
                     </div>
                 </div>
 
