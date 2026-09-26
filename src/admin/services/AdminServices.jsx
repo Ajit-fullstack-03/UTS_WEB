@@ -87,6 +87,7 @@ const processingstatushistory = (data) => postUrl(`${API_URL}member/processingst
 // ==========================================
 const allrefferalslist = (data) => postUrl(`${API_URL}member/allrefferalslist`, data);
 const refferalslist = (data) => postUrl(`${API_URL}member/refferalslist`, data);
+const updatereferralstatus = (data) => postUrl(`${API_URL}member/updatereferralstatus`, data);
 
 // ==========================================
 // 7. Login History & Payments & Call Us & Comments & Emails & Careers
@@ -132,6 +133,8 @@ const getanalystusers = (data) => postUrl(`${API_URL}member/getanalystusers`, da
 const registerMemberAdmin = (data) => postUrl(`${API_URL}login/register-analyst-user`, data);
 const forceverifycustomer = (data) => postUrl(`${API_URL}member/forceverifycustomer`, data);
 const pushUserVerification = (data) => postUrl(`${API_URL}member/forceverifycustomer`, data);
+const deleteuser = (data) => postUrl(`${API_URL}member/deleteuser`, data);
+const blockuser = (data) => postUrl(`${API_URL}member/blockuser`, data);
 
 // Notification APIs
 const sendUserNotification = (data) => postUrl(`${API_URL}member/sendnotification`, data);
@@ -181,6 +184,7 @@ export const adminServices = {
     // Referrals
     allrefferalslist,
     refferalslist,
+    updatereferralstatus,
 
     // Login History & Payments & Call Us & Comments & Emails & Careers
     loginshistory,
@@ -222,6 +226,8 @@ export const adminServices = {
     registerMemberAdmin,
     forceverifycustomer,
     pushUserVerification,
+    deleteuser,
+    blockuser,
 
     // User Notifications
     sendUserNotification,

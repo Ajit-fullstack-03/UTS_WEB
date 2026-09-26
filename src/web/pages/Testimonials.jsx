@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
 import "./testimonials.css";
-import heroBg from "../../assets/image/BACKGROUD.jpeg";
 import heroImage from "../../assets/image/track.png";
 import { QuoteDown, People, DocumentText, ShieldTick } from "iconsax-reactjs";
-
+import { allTestimonials, googleReviewsStats } from "../data/testimonialsData";
 
 const StarIcon = () => (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="#F5B400" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 2.5l2.9 6.3 6.9.7-5.2 4.6 1.6 6.8L12 17.6 5.8 20.9l1.6-6.8-5.2-4.6 6.9-.7L12 2.5z" />
     </svg>
 );
-
 
 const PersonAvatar = () => (
     <div className="tpg-avatar tpg-avatar--person">
@@ -29,89 +27,6 @@ const BrandAvatar = () => (
         </svg>
     </div>
 );
-
-const allTestimonials = [
-    {
-        id: 1,
-        text: "I highly recommend Umpire Tax Solutions! They were incredibly helpful, not only during the tax filing process but also with any questions or support I needed afterward. Their team guided me through every step, making sure I understood my options. Even after my taxes were filed, they stayed responsive, answering follow-up questions and providing valuable advice. Their commitment to excellent service and ongoing support makes them stand out.",
-        rating: 5,
-        name: "Yasaswi Sykam",
-        time: "10 days ago",
-        avatarType: "person"
-    },
-    {
-        id: 2,
-        text: "I have been using Umpire Tax Solutions for the past three years. They have a fantastic team with extensive knowledge, providing excellent service. They help me understand the filing process and ensure all paperwork is filed correctly. I highly recommend them.",
-        rating: 5,
-        name: "Gangadhar Kondati",
-        time: "1 week ago",
-        avatarType: "person"
-    },
-    {
-        id: 3,
-        text: "I have been doing my taxes with Umpire Tax for quite some time now. They have been really helpful in assessing the documents and filing them correctly. Vinay, especially, has helped me for the past two years by being available on the phone and answering emails promptly.",
-        rating: 5,
-        name: "Kalasamudram Kavya",
-        time: "12 days ago",
-        avatarType: "person"
-    },
-    {
-        id: 4,
-        text: "I have been using Umpire Tax Solutions services for the last 4 years. They do a tremendous job in explaining things and providing services to customers. I am satisfied with their prompt response through calls and emails. Thanks team for all you have done for me. I definitely recommend this consultant to anyone looking for tax filings.",
-        rating: 5,
-        name: "Motupalli Chaitanya",
-        time: "1 month ago",
-        avatarType: "person"
-    },
-    {
-        id: 5,
-        text: "The level of service provided is exceptional! The team's responsiveness to my phone calls and inquiries is nearly instantaneous. Additionally, they possess a wealth of knowledge when it comes to taxes and the intricacies of the rules involved. Their expertise in navigating tax regulations and rules is truly commendable. I appreciate the team's prompt assistance and their ability to offer comprehensive information. Thank you.",
-        rating: 5,
-        name: "Nanda Pai",
-        time: "3 weeks ago",
-        avatarType: "person"
-    },
-    {
-        id: 6,
-        text: "Have had a great experience with Umpire Tax. Have been filing my tax returns with them for the past 3 years and there has been no problems at all. The entire team is very responsive and make the process smooth. They are also always available for questions.",
-        rating: 5,
-        name: "Renuka Rao",
-        time: "1 month ago",
-        avatarType: "person"
-    },
-    {
-        id: 7,
-        text: "I'll definitely recommend Umpire Tax Solutions to my friends and colleagues. The team is friendly, they respond on time, and their price is better when compared with other tax solutions. As I'm new to the USA, they've guided me step by step and it made my life easier.",
-        rating: 5,
-        name: "Madhu C",
-        time: "2 weeks ago",
-        avatarType: "person"
-    },
-    {
-        id: 8,
-        text: "Firstly, I would like to thank Umpire Tax Solutions for what they have been doing. I had a very good experience filing tax with these guys for the last 6 to 7 years and absolutely zero issues. Very responsive, very reasonable price, very talented team. I recommend Umpire Tax Solutions as your next tax filing company.",
-        rating: 5,
-        name: "Jayaprakash Kottapalli",
-        time: "5 days ago",
-        avatarType: "person"
-    },
-    {
-        id: 9,
-        text: "Excellent service! The team at Umpire Tax Solutions are very knowledgeable. They have good insight into technical questions which arise from time to time. They also make sure clients are filing on time and remind us of deadlines. Kudos to all!",
-        rating: 5,
-        name: "Chaitanya Sai",
-        time: "1 week ago",
-        avatarType: "person"
-    },
-    {
-        id: 10,
-        text: "Return process was very smooth with these folks, they are very professional. I have received the return as well within a few weeks. I would definitely recommend Umpire Tax Solutions if you are struggling with filing tax returns.",
-        rating: 5,
-        name: "Ankita Singh",
-        time: "10 days ago",
-        avatarType: "person"
-    }
-];
 
 const TestimonialCard = ({ t }) => (
     <div className="tpg-card">
@@ -139,7 +54,7 @@ const MarqueeRow = ({ items, direction = "left", speed = 40 }) => {
 
     // Repeat items until one "base" set is wider than any viewport
     const repeatCount = Math.ceil(MIN_FILL_PX / (items.length * CARD_WIDTH));
-    const base = Array.from({ length: repeatCount }, () => items).flat();
+    const base = Array.from({ length: Math.max(repeatCount, 2) }, () => items).flat();
     // Double the base so we can animate -50% seamlessly back to start
     const seamless = [...base, ...base];
 
@@ -170,8 +85,9 @@ const Testimonials = () => {
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
     const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
-    const row1 = allTestimonials.slice(0, 5);
-    const row2 = allTestimonials.slice(5, 10);
+    const half = Math.ceil(allTestimonials.length / 2);
+    const row1 = allTestimonials.slice(0, half);
+    const row2 = allTestimonials.slice(half);
     return (
         <>
             <section className="tpg-hero-wrapper">
@@ -220,8 +136,8 @@ const Testimonials = () => {
                                     <People size="20" color="#1B2E6B" variant="Outline" />
                                 </div>
                                 <div>
-                                    <span className="tpg-hero-stat-value">1000+</span>
-                                    <span className="tpg-hero-stat-label">Happy Clients</span>
+                                    <span className="tpg-hero-stat-value">{googleReviewsStats.totalReviews}+</span>
+                                    <span className="tpg-hero-stat-label">Google Reviews ({googleReviewsStats.averageRating}★)</span>
                                 </div>
                             </div>
                             <div className="tpg-hero-stat-divider" />

@@ -16,7 +16,7 @@ const Footer = () => {
                         <img src={logoImage} alt="Umpire Tax Solutions" className="ftr-logo" />
 
                         <p className="ftr-brand-desc">
-                            Umpire Tax Solutions is an accounting and taxation company providing a range of financial services, including international taxation, accounting, incorporation, and payroll services.
+                            Umpire Tax Solutions is an accounting and taxation company providing financial services in international taxation, accounting, incorporation, and payroll.
                         </p>
 
                         <div className="ftr-socials">
@@ -62,11 +62,11 @@ const Footer = () => {
                     <div className="ftr-col">
                         <h3 className="ftr-col-title">Services</h3>
                         <ul className="ftr-link-list">
-                            <li><Link to="/services/us-tax-filling">Tax Filling</Link></li>
+                            <li><Link to="/services/us-tax-filling">Tax Filing</Link></li>
                             <li><Link to="/services/indian-service">Indian Tax Filing</Link></li>
                             <li><Link to="/services/tax-planning">Tax Planning</Link></li>
                             <li><Link to="/services/tax-audit">Tax Audit & Representation</Link></li>
-                            <li><Link to="/services/bookkeeping">Bookkeeping & Payrole Services</Link></li>
+                            <li><Link to="/services/bookkeeping">Bookkeeping & Payroll Services</Link></li>
                         </ul>
                     </div>
 
@@ -136,7 +136,7 @@ const Footer = () => {
                                         <circle cx="12" cy="9.5" r="2.3" stroke="#1B2E6B" strokeWidth="1.6" fill="none" />
                                     </svg>
                                 </span>
-                                <span className="ftr-contact-address">4-7-18/B Raghavendra Nagar, Nacharam Hyd 500076</span>
+                                <span className="ftr-contact-address">4-7 10/8 Raghavendra Nagar, Nacharam Hyderabad 500076</span>
                             </li>
                         </ul>
                     </div>

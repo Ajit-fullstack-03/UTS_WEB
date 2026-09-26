@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
     FiUserPlus,
     FiUsers,
-    FiUserCheck,
     FiSend,
     FiSearch,
     FiRefreshCw,
@@ -17,7 +16,7 @@ import {
     FiShield,
     FiBriefcase,
     FiCheck,
-    FiFileText
+    FiTrash2
 } from "react-icons/fi";
 import Swal from "sweetalert2";
 import { adminServices } from "../services/AdminServices";
@@ -60,6 +59,7 @@ const AdminRegistration = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [pushingVerificationId, setPushingVerificationId] = useState(null);
+    const [deletingId, setDeletingId] = useState(null);
 
     const effectivePhoneCode = phoneCodeSelect === "other" ? customPhoneCode.trim() : phoneCodeSelect;
 
@@ -168,15 +168,6 @@ const AdminRegistration = () => {
         return name.slice(0, 2).toUpperCase();
     };
 
-    // Format phone helper
-    const formatPhoneNumber = (phone, ext = "+1") => {
-        if (!phone) return "-";
-        const cleaned = ("" + phone).replace(/\D/g, "");
-        if (cleaned.length === 10) {
-            return `${ext} (${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
-        }
-        return `${ext} ${phone}`;
-    };
 
     // Load records from backend APIs:
     // 1. member/getUnverifiedUserList for User tab
@@ -450,6 +441,82 @@ const AdminRegistration = () => {
                 });
             } finally {
                 setPushingVerificationId(null);
+            }
+        }
+    };
+
+    // Handle "Delete User" -> Calls POST member/deleteuser { user_id: userId }
+    const handleDeleteUser = async (record, roleLabel = "User") => {
+        const userId = record.user_id || record.id || record.client_id;
+        const displayName = record.user_name || `${record.first_name || ""} ${record.last_name || ""}`.trim() || record.email || `ID: ${userId}`;
+
+        const result = await Swal.fire({
+            title: `Delete ${roleLabel}?`,
+            text: `Are you sure you want to delete ${displayName} (${record.email || "ID: " + userId})? This action cannot be undone.`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#ef4444",
+            cancelButtonColor: "#94a3b8",
+            confirmButtonText: "Yes, Delete",
+            cancelButtonText: "Cancel"
+        });
+
+        if (result.isConfirmed) {
+            setDeletingId(userId);
+            try {
+                const response = await adminServices.deleteuser({
+                    user_id: userId
+                });
+
+                if (
+                    response?.status === 200 ||
+                    response?.data?.http_code === 200 ||
+                    response?.data?.status === true ||
+                    response?.data?.status === 1
+                ) {
+                    const successMsg =
+                        response?.data?.status_smessage ||
+                        response?.data?.message ||
+                        `${roleLabel} deleted successfully.`;
+
+                    Swal.fire({
+                        title: "Deleted!",
+                        text: successMsg,
+                        icon: "success",
+                        confirmButtonColor: "#1b2e6b"
+                    });
+
+                    // Refresh table data
+                    loadRecords();
+                } else {
+                    const errorMsg =
+                        response?.data?.status_smessage ||
+                        response?.data?.message ||
+                        `Failed to delete ${roleLabel.toLowerCase()}.`;
+
+                    Swal.fire({
+                        title: "Delete Failed",
+                        text: errorMsg,
+                        icon: "error",
+                        confirmButtonColor: "#1b2e6b"
+                    });
+                }
+            } catch (err) {
+                console.error("Delete user error:", err);
+                const errMsg =
+                    err?.response?.data?.status_smessage ||
+                    err?.response?.data?.message ||
+                    err?.response?.data?.error ||
+                    `Could not delete ${roleLabel.toLowerCase()}. Please check backend service.`;
+
+                Swal.fire({
+                    title: "Action Failed",
+                    text: errMsg,
+                    icon: "error",
+                    confirmButtonColor: "#1b2e6b"
+                });
+            } finally {
+                setDeletingId(null);
             }
         }
     };
@@ -862,7 +929,7 @@ const AdminRegistration = () => {
                                     <th>Email Address</th>
                                     <th>User ID</th>
                                     <th>Verification Status</th>
-                                    <th style={{ textAlign: "center", width: "180px" }}>Action</th>
+                                    <th style={{ textAlign: "center", width: "240px" }}>Action</th>
                                 </tr>
                             ) : (
                                 <tr>
@@ -871,13 +938,14 @@ const AdminRegistration = () => {
                                     <th>Email Address</th>
                                     <th>User ID</th>
                                     <th>Role / Status</th>
+                                    <th style={{ textAlign: "center", width: "130px" }}>Action</th>
                                 </tr>
                             )}
                         </thead>
                         <tbody>
                             {loadingTable ? (
                                 <tr>
-                                    <td colSpan={activeSubTab === "user" ? 6 : 5} className="text-center py-5">
+                                    <td colSpan={6} className="text-center py-5">
                                         <div className="d-flex flex-column align-items-center justify-content-center gap-2">
                                             <FiRefreshCw className="spin-animation text-primary" size={26} />
                                             <span className="text-muted small">Loading records...</span>
@@ -886,7 +954,7 @@ const AdminRegistration = () => {
                                 </tr>
                             ) : paginatedRecords.length === 0 ? (
                                 <tr>
-                                    <td colSpan={activeSubTab === "user" ? 6 : 5} className="p-0">
+                                    <td colSpan={6} className="p-0">
                                         <div className="reg-empty-state">
                                             <div className="reg-empty-icon">
                                                 <FiUsers />
@@ -908,6 +976,7 @@ const AdminRegistration = () => {
                                     const fullName = record.user_name || `${record.first_name || ""} ${record.last_name || ""}`.trim() || "User " + (record.user_id || index + 1);
                                     const currentId = record.user_id || record.id || record.client_id;
                                     const isPushing = pushingVerificationId === currentId;
+                                    const isDeleting = deletingId === currentId;
 
                                     if (activeSubTab === "user") {
                                         return (
@@ -943,29 +1012,49 @@ const AdminRegistration = () => {
                                                     </span>
                                                 </td>
                                                 <td style={{ textAlign: "center" }}>
-                                                    <button
-                                                        type="button"
-                                                        className="btn-push-verification"
-                                                        onClick={() => handlePushVerification(record)}
-                                                        disabled={isPushing}
-                                                        title="Push verification and generate file number"
-                                                    >
-                                                        {isPushing ? (
-                                                            <>
-                                                                <FiRefreshCw className="spin-animation" size={13} /> Verifying...
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <FiSend size={13} /> Push Verification
-                                                            </>
-                                                        )}
-                                                    </button>
+                                                    <div className="reg-action-group">
+                                                        <button
+                                                            type="button"
+                                                            className="btn-push-verification"
+                                                            onClick={() => handlePushVerification(record)}
+                                                            disabled={isPushing || isDeleting}
+                                                            title="Push verification and generate file number"
+                                                        >
+                                                            {isPushing ? (
+                                                                <>
+                                                                    <FiRefreshCw className="spin-animation" size={13} /> Verifying...
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <FiSend size={13} /> Push Verification
+                                                                </>
+                                                            )}
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            className="btn-delete-user"
+                                                            onClick={() => handleDeleteUser(record, "User")}
+                                                            disabled={isDeleting || isPushing}
+                                                            title="Delete unverified user"
+                                                        >
+                                                            {isDeleting ? (
+                                                                <>
+                                                                    <FiRefreshCw className="spin-animation" size={13} />
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <FiTrash2 size={13} /> Delete
+                                                                </>
+                                                            )}
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         );
                                     }
 
-                                    // Analyst Row (No action button as specified)
+                                    // Analyst Row with Delete Action
                                     return (
                                         <tr key={currentId || index}>
                                             <td className="text-muted fw-semibold">{rowNum}</td>
@@ -997,6 +1086,25 @@ const AdminRegistration = () => {
                                                 <span className="status-badge active">
                                                     <FiBriefcase size={13} /> Analyst
                                                 </span>
+                                            </td>
+                                            <td style={{ textAlign: "center" }}>
+                                                <button
+                                                    type="button"
+                                                    className="btn-delete-user"
+                                                    onClick={() => handleDeleteUser(record, "Analyst")}
+                                                    disabled={isDeleting}
+                                                    title="Delete analyst"
+                                                >
+                                                    {isDeleting ? (
+                                                        <>
+                                                            <FiRefreshCw className="spin-animation" size={13} />
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <FiTrash2 size={13} /> Delete
+                                                        </>
+                                                    )}
+                                                </button>
                                             </td>
                                         </tr>
                                     );

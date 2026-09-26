@@ -36,17 +36,17 @@ const AdminRoutes = () => {
                 <Route index element={<Navigate to={defaultLanding} replace />} />
                 <Route path="dashboard" element={<Navigate to={`../${defaultLanding}`} replace />} />
                 <Route path="login-history" element={<LoginHistory />} />
-                <Route path="payments" element={isAnalyst ? <Navigate to="../assigned-file-number" replace /> : <Payments />} />
+                <Route path="payments" element={isAnalyst ? <Navigate to="../all-records" replace /> : <Payments />} />
                 <Route path="referrals" element={<AdminReferrals />} />
                 <Route path="comments" element={<AdminComments />} />
                 <Route path="emails" element={<AdminEmails />} />
                 <Route path="call-us" element={<CallUs />} />
                 <Route path="careers" element={<AdminCareers />} />
-                <Route path="registration" element={<AdminRegistration />} />
+                <Route path="registration" element={isAnalyst ? <Navigate to="../all-records" replace /> : <AdminRegistration />} />
                 <Route path="settings" element={isAnalyst ? <Navigate to="../all-records" replace /> : <AdminSettings />} />
                 <Route path="all-records" element={<AllRecords />} />
-                <Route path="assigned-file-number" element={<AssignedFileNumber />} />
-                <Route path="to-be-assigned" element={<ToBeAssigned />} />
+                <Route path="assigned-file-number" element={isAnalyst ? <Navigate to="../all-records" replace /> : <AssignedFileNumber />} />
+                <Route path="to-be-assigned" element={isAnalyst ? <Navigate to="../all-records" replace /> : <ToBeAssigned />} />
                 <Route path="basic-info-pending" element={<BasicInfoPending />} />
                 <Route path="interview-pending" element={<InterviewPending />} />
                 <Route path="docs-upload-pending" element={<DocsUploadPending />} />

@@ -171,7 +171,7 @@ const Header = ({ onToggleSidebar }) => {
 
     const allNavItems = [
         { label: "Login History", path: `${prefix}/login-history` },
-        { label: "Tax Year", isDropdown: true, path: `${prefix}/${isAnalyst ? "assigned-file-number" : "all-records"}` },
+        { label: "Tax Year", isDropdown: true, path: `${prefix}/all-records` },
         { label: "Payments", path: `${prefix}/payments` },
         { label: "Referrals", path: `${prefix}/referrals` },
         { label: "Comments", path: `${prefix}/comments` },
@@ -275,7 +275,7 @@ const Header = ({ onToggleSidebar }) => {
 
                         <div
                             className="header-logo-container d-flex align-items-center"
-                            onClick={() => navigate(isAnalyst ? `${prefix}/assigned-file-number` : `${prefix}/all-records`)}
+                            onClick={() => navigate(`${prefix}/all-records`)}
                         >
                             <img
                                 src={logoImg}

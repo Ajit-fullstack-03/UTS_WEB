@@ -15,6 +15,7 @@ const AdminReferrals = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [errorMsg, setErrorMsg] = useState("");
+    const [updatingId, setUpdatingId] = useState(null);
 
     // Helper to extract credentials
     const getCredentials = () => {
@@ -130,39 +131,60 @@ const AdminReferrals = () => {
         };
     }, [fetchReferrals]);
 
-    // View referral details modal
-    const handleViewReferral = (item) => {
-        Swal.fire({
-            title: `<span style="font-family:'Outfit',sans-serif;font-size:1.25rem;font-weight:700;color:#1e293b;">Referral Details</span>`,
-            html: `
-                <div style="text-align:left;font-family:'Outfit',sans-serif;font-size:0.9rem;color:#334155;line-height:1.8;">
-                    <div style="margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #e2e8f0;">
-                        <strong style="color:#1b2e6b;">Referrer Info:</strong><br/>
-                        <b>File / Name:</b> ${item.referral_name}<br/>
-                        <b>Email:</b> ${item.referral_email}<br/>
-                        <b>Phone:</b> ${item.referral_phone}
-                    </div>
-                    <div style="margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #e2e8f0;">
-                        <strong style="color:#1b2e6b;">Referred Person:</strong><br/>
-                        <b>Name:</b> ${item.referral_to_name}<br/>
-                        <b>Email:</b> ${item.referral_to_email}<br/>
-                        <b>Phone:</b> ${item.referral_to_phone}
-                    </div>
-                    <div>
-                        <b>Registration Status:</b> 
-                        <span style="font-weight:600;color:${item.registered_status === "Registered" ? "#16a34a" : "#94a3b8"};">
-                            ${item.registered_status}
-                        </span>
-                    </div>
-                </div>
-            `,
-            confirmButtonText: "Close",
-            confirmButtonColor: "#1b2e6b",
-            customClass: {
-                confirmButton: "btn btn-primary px-4 py-2"
-            },
-            buttonsStyling: false
-        });
+    // Update referral status handler
+    const handleStatusUpdate = async (item, selectedOption) => {
+        if (!selectedOption) return;
+
+        try {
+            setUpdatingId(item.id);
+
+            const payload = {
+                rf_id: item.id,
+                status: selectedOption,
+                comment: `Status updated to ${selectedOption}`
+            };
+
+            const res = await adminServices.updatereferralstatus(payload);
+
+            if (res && (res.status === 200 || res.data?.status === true || res.data?.http_code === 200)) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Status Updated",
+                    text: res.data?.status_smessage || `Referral status updated to "${selectedOption}".`,
+                    timer: 2000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: "top-end"
+                });
+
+                // Update local list state
+                setReferralsList((prevList) =>
+                    prevList.map((ref) =>
+                        ref.id === item.id
+                            ? {
+                                ...ref,
+                                registered_status: selectedOption
+                            }
+                            : ref
+                    )
+                );
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Update Failed",
+                    text: res?.data?.status_smessage || "Failed to update referral status. Please try again."
+                });
+            }
+        } catch (err) {
+            console.error("Error updating referral status:", err);
+            Swal.fire({
+                icon: "error",
+                title: "Update Failed",
+                text: err?.response?.data?.status_smessage || "Failed to update referral status. Please try again."
+            });
+        } finally {
+            setUpdatingId(null);
+        }
     };
 
     // Calculate category counts
@@ -440,7 +462,7 @@ const AdminReferrals = () => {
                                 <th>Referral To Name ID</th>
                                 <th>Referral To Email</th>
                                 <th>Referral To Phone</th>
-                                <th>Action</th>
+                                <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -486,23 +508,48 @@ const AdminReferrals = () => {
                                         <td className="ref-cell-email">{item.referral_to_email}</td>
                                         <td className="ref-cell-phone">{item.referral_to_phone}</td>
                                         <td>
-                                            <button
-                                                className="ref-view-link"
-                                                onClick={() => handleViewReferral(item)}
-                                            >
-                                                View
-                                            </button>
-                                        </td>
-                                        <td>
                                             <span
                                                 className={
                                                     item.registered_status === "Registered"
                                                         ? "ref-status-registered"
+                                                        : item.registered_status === "Not Interested" || item.registered_status === "Not Intrested"
+                                                        ? "ref-status-not-interested"
+                                                        : item.registered_status === "To Be Registered"
+                                                        ? "ref-status-to-be-registered"
                                                         : "ref-status-not-registered"
                                                 }
                                             >
                                                 {item.registered_status}
                                             </span>
+                                        </td>
+                                        <td>
+                                            {item.registered_status === "Registered" ? (
+                                                <span className="text-muted fw-semibold">-</span>
+                                            ) : (
+                                                <div className="ref-action-select-wrap">
+                                                    <select
+                                                        className="ref-action-select"
+                                                        value={
+                                                            item.registered_status === "Not Interested" || item.registered_status === "Not Intrested"
+                                                                ? "Not Interested"
+                                                                : item.registered_status === "To Be Registered"
+                                                                ? "To Be Registered"
+                                                                : ""
+                                                        }
+                                                        disabled={updatingId === item.id}
+                                                        onChange={(e) => handleStatusUpdate(item, e.target.value)}
+                                                    >
+                                                        <option value="" disabled>Select Action</option>
+                                                        <option value="Not Interested">Not Interested</option>
+                                                        <option value="To Be Registered">To Be Registered</option>
+                                                    </select>
+                                                    {updatingId === item.id ? (
+                                                        <span className="ref-action-mini-spinner"></span>
+                                                    ) : (
+                                                        <FiChevronDown className="ref-action-select-chevron" />
+                                                    )}
+                                                </div>
+                                            )}
                                         </td>
                                     </tr>
                                 ))

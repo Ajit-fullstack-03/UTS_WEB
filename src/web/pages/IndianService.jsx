@@ -137,7 +137,7 @@ const IndianService = () => {
                     <div className="srv-hero-content">
                         <div className="srv-hero-badge">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2l7 3v6c0 5-3.4 8.6-7 11-3.6-2.4-7-6-7-11V5l7-3z" stroke="#1B2E6B" strokeWidth="1.6" strokeLinejoin="round" fill="none" /><path d="M9 12l2 2 4-4" stroke="#1B2E6B" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
-                            <span>Indian Tax Service</span>
+                            <span>Indian Tax Services</span>
                         </div>
                         <h1 className="srv-hero-heading">
                             Complete Indian Tax &amp; <br />

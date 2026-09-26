@@ -257,10 +257,86 @@
 }
 
 .ref-status-registered {
-    color: #1e293b;
+    color: #107c41;
     font-size: 0.88rem;
     font-weight: 600;
     white-space: nowrap;
+}
+
+.ref-status-not-interested {
+    color: #ef4444;
+    font-size: 0.88rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.ref-status-to-be-registered {
+    color: #d97706;
+    font-size: 0.88rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Action Dropdown */
+.ref-action-select-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 150px;
+}
+
+.ref-action-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 100%;
+    background-color: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 28px 6px 10px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #1e293b;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.ref-action-select:hover:not(:disabled) {
+    border-color: #cbd5e1;
+    background-color: #ffffff;
+}
+
+.ref-action-select:focus {
+    border-color: #1b2e6b;
+    box-shadow: 0 0 0 3px rgba(27, 46, 107, 0.08);
+    background-color: #ffffff;
+}
+
+.ref-action-select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.ref-action-select-chevron {
+    position: absolute;
+    right: 8px;
+    pointer-events: none;
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+.ref-action-mini-spinner {
+    position: absolute;
+    right: 8px;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #cbd5e1;
+    border-top-color: #1b2e6b;
+    border-radius: 50%;
+    animation: ref-spin 0.6s linear infinite;
+    pointer-events: none;
 }
 
 /* Pagination Footer */

@@ -72,7 +72,7 @@ const Sidebar = ({ isOpen = false, onClose }) => {
                     all: totalSum,
                     to_be_assigned: countMap["0"] !== undefined ? countMap["0"] : (countMap["to_be_assigned"] || 0),
                     basic_info_pending: countMap["1"] !== undefined ? countMap["1"] : (countMap["basic_info_pending"] || 0),
-                    interview_pending: countMap["2"] !== undefined ? countMap["2"] : (countMap["3"] !== undefined ? countMap["3"] : (countMap["interview_pending"] || countMap["scheduling_pending"] || 0)),
+                    interview_pending: countMap["3"] !== undefined ? countMap["3"] : (countMap["interview_pending"] !== undefined ? countMap["interview_pending"] : (countMap["2"] || 0)),
                     docs_upload_pending: countMap["4"] !== undefined ? countMap["4"] : (countMap["docs_upload_pending"] || countMap["documents_upload_pending"] || 0),
                     other_docs_pending: countMap["5"] !== undefined ? countMap["5"] : (countMap["other_docs_upload_pending"] || countMap["other_docs_pending"] || 0),
                     prep_pending: countMap["6"] !== undefined ? countMap["6"] : (countMap["preparation_pending"] || countMap["prep_pending"] || 0),
@@ -112,7 +112,9 @@ const Sidebar = ({ isOpen = false, onClose }) => {
         { id: "review_upload_pending", path: `${prefix}/review-upload-pending`, label: "Review Upload Pending", count: counts.review_upload_pending }
     ];
 
-    const sidebarItems = allSidebarItems;
+    const sidebarItems = isAnalyst
+        ? allSidebarItems.filter((item) => item.id !== "assigned_file_number" && item.id !== "to_be_assigned")
+        : allSidebarItems;
 
     const handleNavigation = (path) => {
         if (typeof onClose === "function" && window.innerWidth <= 991.98) {
@@ -171,11 +173,6 @@ const Sidebar = ({ isOpen = false, onClose }) => {
                         const isActive =
                             location.pathname === item.path ||
                             (item.path === `${prefix}/all-records` &&
-                                (location.pathname === prefix ||
-                                    location.pathname === `${prefix}/` ||
-                                    location.pathname === `${prefix}/dashboard`)) ||
-                            (isAnalyst &&
-                                item.path === `${prefix}/assigned-file-number` &&
                                 (location.pathname === prefix ||
                                     location.pathname === `${prefix}/` ||
                                     location.pathname === `${prefix}/dashboard`));

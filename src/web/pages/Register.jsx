@@ -46,20 +46,9 @@ const Register = () => {
         password: false,
     });
 
-    // Inline paste error messages for Email and Confirm Email fields
-    const [emailPasteError, setEmailPasteError] = useState("");
+    // Inline paste error message for Confirm Email field
     const [confirmEmailPasteError, setConfirmEmailPasteError] = useState("");
-    const emailPasteTimer = useRef(null);
     const confirmEmailPasteTimer = useRef(null);
-
-    const handleEmailPaste = (e) => {
-        e.preventDefault();
-        setEmailPasteError("Pasting is disabled for Email Id. Please type manually.");
-        clearTimeout(emailPasteTimer.current);
-        emailPasteTimer.current = setTimeout(() => {
-            setEmailPasteError("");
-        }, 4000);
-    };
 
     const handleConfirmEmailPaste = (e) => {
         e.preventDefault();
@@ -317,7 +306,7 @@ const Register = () => {
                             <div className="auth-title-container">
                                 <h3 className="auth-title">Start Filing Smarter</h3>
                                 <p className="auth-subtitle">
-                                    Enter your email and password to access your account.
+                                    Enter your details to create your account.
                                 </p>
                             </div>
 
@@ -326,7 +315,7 @@ const Register = () => {
                                 <div className="row g-2 mb-2">
                                     <div className="col-md-12 text-start">
                                         <label className="auth-input-label">
-                                            First Name
+                                            First Name <span className="text-danger">*</span>
                                         </label>
                                         <input
                                             type="text"
@@ -339,7 +328,7 @@ const Register = () => {
                                     </div>
                                     <div className="col-md-12 text-start">
                                         <label className="auth-input-label">
-                                            Last Name
+                                            Last Name <span className="text-danger">*</span>
                                         </label>
                                         <input
                                             type="text"
@@ -355,7 +344,7 @@ const Register = () => {
                                 {/* Phone Number Field */}
                                 <div className="auth-input-group mb-2">
                                     <label className="auth-input-label">
-                                        Phone Number
+                                        Phone Number <span className="text-danger">*</span>
                                     </label>
                                     <div className="row g-2">
                                         <div className="col-4 col-sm-4 col-md-4 position-relative" ref={phoneDropdownRef}>
@@ -500,31 +489,22 @@ const Register = () => {
                                 {/* Email ID */}
                                 <div className="auth-input-group mb-2">
                                     <label className="auth-input-label">
-                                        Email Id
+                                        Email ID <span className="text-danger">*</span>
                                     </label>
                                     <input
                                         type="email"
-                                        className={`auth-input ${(emailPasteError || (touched.email && emailError)) ? "auth-input-invalid" : ""}`}
+                                        className={`auth-input ${touched.email && emailError ? "auth-input-invalid" : ""}`}
                                         placeholder="example@gmail.com"
                                         value={email}
                                         onChange={(e) => {
                                             setEmail(e.target.value);
-                                            setEmailPasteError("");
                                             setTouched((prev) => ({ ...prev, email: true }));
                                         }}
                                         onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
-                                        onPaste={handleEmailPaste}
-                                        onCopy={(e) => e.preventDefault()}
-                                        onCut={(e) => e.preventDefault()}
-                                        onDrop={(e) => e.preventDefault()}
                                         autoComplete="email"
                                         required
                                     />
-                                    {emailPasteError ? (
-                                        <p className="auth-error-text">
-                                            <IoAlertCircleOutline size={14} /> {emailPasteError}
-                                        </p>
-                                    ) : touched.email && emailError ? (
+                                    {touched.email && emailError ? (
                                         <p className="auth-error-text">
                                             <IoAlertCircleOutline size={14} /> {emailError}
                                         </p>
@@ -534,7 +514,7 @@ const Register = () => {
                                 {/* Confirm Email ID */}
                                 <div className="auth-input-group mb-2">
                                     <label className="auth-input-label">
-                                        Confirm Email Id
+                                        Confirm Email ID <span className="text-danger">*</span>
                                     </label>
                                     <input
                                         type="email"
@@ -575,7 +555,7 @@ const Register = () => {
 
                                 <div className="auth-input-group mb-3 position-relative">
                                     <label className="auth-input-label">
-                                        Password
+                                        Password <span className="text-danger">*</span>
                                     </label>
                                     <div className="input-group-auth">
                                         <input

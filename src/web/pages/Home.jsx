@@ -21,7 +21,7 @@ import Book_keeping_4 from "../../assets/image/Book_keeping_4.png";
 import wcuwrapperimg from "../../assets/image/Frame_12.png";
 import { ArrowLeft, ArrowRight } from "iconsax-reactjs";
 import dollar_bag from "../../assets/image/Dollar_bag.png";
-
+import { allTestimonials } from "../data/testimonialsData";
 
 const services = [
     { id: 1, image: onePlatformImg1, label: "Free Tax Estimate." },
@@ -32,48 +32,7 @@ const services = [
     { id: 6, image: Book_keeping_4, label: "Audit Representation." },
 ];
 
-const testimonials = [
-    {
-        id: 1,
-        text: "I highly recommend Umpire Tax Solutions! They were incredibly helpful, not only during the tax filing process but also with any questions or support I needed afterward. Their team guided me through every step, making sure I understood my options. Even after my taxes were filed, they stayed responsive, answering follow-up questions and providing valuable advice. Their commitment to excellent service and ongoing support makes them stand out.",
-        rating: 5,
-        name: "yasaswi sykam",
-        time: "1 week ago",
-        avatarType: "person",
-    },
-    {
-        id: 2,
-        text: "I have been using Umpire Tax Solutions for the past three years. They have a fantastic team with extensive knowledge, providing excellent service. They help me understand the filing process and ensure all paperwork is filed correctly. I highly recommend them.",
-        rating: 5,
-        name: "Gangadhar kondati",
-        time: "10 days ago",
-        avatarType: "brand",
-    },
-    {
-        id: 3,
-        text: "I have been doing my taxes with Umpire tax from quite some time now, They have been really helpful in assessing the documents and filing them correctly. Vinay, especially had helped me from past two years by being available on phone and answering the emails promptly.",
-        rating: 5,
-        name: "kalasamudram kavya",
-        time: "2 weeks ago",
-        avatarType: "brand",
-    },
-    {
-        id: 4,
-        text: "I have been using umpire tax solutions services from last 4 years. they do tremendous job in playing their role and in process of explaining things and providing services to customers. i satisfied with their prompt response through calls and emails..thanks team for all you done for me. i definitely recommend this consultant to anyone there looking for TAX FILINGS.",
-        rating: 5,
-        name: "Motupalli Chaitanya",
-        time: "3 weeks ago",
-        avatarType: "person",
-    },
-    {
-        id: 5,
-        text: "The level of service provided is exceptional! The team's responsiveness to my phone calls and inquiries is nearly instantaneous. Additionally, they possess a wealth of knowledge when it comes to taxes and the intricacies of the rules involved. It's evident that the team is well-versed in these areas and can provide valuable insights and guidance. Their expertise in navigating tax regulations and rules is truly commendable. I appreciate the team's prompt assistance and their ability to offer comprehensive information. Thank you.",
-        rating: 5,
-        name: "Nanda Pai",
-        time: "1 month ago",
-        avatarType: "person",
-    },
-];
+const testimonials = allTestimonials;
 
 
 const IconArrow = ({ color = "#1B2E6B" }) => (
@@ -679,7 +638,7 @@ const Home = () => {
                             </h2>
 
                             <p className="fs-description">
-                                Accurate filling. Maximum refund.
+                                Accurate filing. Maximum refund.
                                 <br />
                                 100% hassle-free.
                             </p>
@@ -704,7 +663,7 @@ const Home = () => {
                                 </svg>
                             </span>
                             <div className="fs-feature-text">
-                                <span className="fs-feature-title">Accurate Filling</span>
+                                <span className="fs-feature-title">Accurate Filing</span>
                                 <span className="fs-feature-sub">Zero Error</span>
                             </div>
                         </div>
@@ -790,12 +749,12 @@ const Home = () => {
                             Read reviews
                         </Link>
 
-                        <h2 className="tm-heading">Quoted with clarity. Tax solutions,</h2>
+                        <h2 className="tm-heading">Quoted with clarity, trusted for our tax solutions.</h2>
 
                         <div className="tm-rating">
                             <span>4.8/5</span>
                             <StarIcon />
-                            <span>Based on 267 reviews</span>
+                            <span>Based on 123 reviews</span>
                         </div>
                     </div>
 

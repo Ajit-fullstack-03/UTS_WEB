@@ -645,6 +645,15 @@
     border: 1px solid #c7d2fe;
 }
 
+/* Action Groups & Buttons */
+.reg-action-group {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
 /* Action: Push Verification Button */
 .btn-push-verification {
     background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
@@ -680,6 +689,36 @@
     box-shadow: none;
     cursor: default;
     border: 1px solid #cbd5e1;
+}
+
+/* Action: Delete User Button */
+.btn-delete-user {
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+    color: #e11d48;
+    padding: 6px 13px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-delete-user:hover:not(:disabled) {
+    background: #e11d48;
+    color: #ffffff;
+    border-color: #e11d48;
+    box-shadow: 0 3px 8px rgba(225, 29, 72, 0.28);
+    transform: translateY(-1px);
+}
+
+.btn-delete-user:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
 }
 
 /* =========================================================

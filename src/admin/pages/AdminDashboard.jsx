@@ -237,16 +237,40 @@ const AdminDashboard = () => {
                             {filteredClients.length > 0 ? (
                                 filteredClients.map((client) => (
                                     <tr key={client.id}>
-                                        <td className="fw-semibold text-dark">{client.id}</td>
+                                        <td className="fw-semibold">
+                                            <button
+                                                type="button"
+                                                onClick={() => handleClientClick(client.id)}
+                                                className="btn btn-link client-name-link p-0 text-decoration-none text-start text-primary fw-semibold"
+                                                title={`View details for ${client.id}`}
+                                            >
+                                                {client.id}
+                                            </button>
+                                        </td>
                                         <td>
                                             <button
+                                                type="button"
                                                 onClick={() => handleClientClick(client.id)}
                                                 className="btn btn-link client-name-link p-0 text-decoration-none text-start text-primary fw-medium"
+                                                title={`View details for ${client.name}`}
                                             >
                                                 {client.name}
                                             </button>
                                         </td>
-                                        <td className="text-secondary">{client.email}</td>
+                                        <td>
+                                            {client.email && client.email !== "-" ? (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleClientClick(client.id)}
+                                                    className="btn btn-link client-name-link p-0 text-decoration-none text-start text-primary fw-medium"
+                                                    title={`View details for ${client.email}`}
+                                                >
+                                                    {client.email}
+                                                </button>
+                                            ) : (
+                                                <span className="text-secondary">-</span>
+                                            )}
+                                        </td>
                                         <td className="text-secondary">{client.phone}</td>
                                         <td>
                                             <span className={`badge status-pill-badge ${client.statusId}`}>

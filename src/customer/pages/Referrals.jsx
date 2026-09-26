@@ -382,7 +382,7 @@ const Referrals = () => {
                         <span className="profile-pre-heading">INVITE</span>
                         <h1 className="profile-page-title mb-1">Refer a friend</h1>
                         <p className="ref-form-subtitle text-muted mb-0 small">
-                            Tell us who to invite. We'll email them your referral code right away, and let you know as soon as they start filling.
+                            Tell us who to invite. We'll email them your referral code right away, and let you know as soon as they start filing.
                         </p>
                     </header>
 

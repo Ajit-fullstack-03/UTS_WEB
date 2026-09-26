@@ -17,7 +17,8 @@ import {
     FiPackage,
     FiExternalLink,
     FiSend,
-    FiEdit2
+    FiEdit2,
+    FiSlash
 } from "react-icons/fi";
 import { adminServices } from "../services/AdminServices";
 import { getStoredTaxYear, getStoredTaxYearsList } from "../../utils/taxYear";
@@ -37,9 +38,9 @@ const filestateMap = {
     2: 2,
     "scheduling_pending": 2,
     "SCHEDULING_PENDING": 2,
-    "interview_pending": 2,
-    "INTERVIEW_PENDING": 2,
     3: 3,
+    "interview_pending": 3,
+    "INTERVIEW_PENDING": 3,
     4: 4,
     "docs_upload_pending": 4,
     "DOCS_UPLOAD_PENDING": 4,
@@ -116,11 +117,25 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
         statusFilterKey === "docs_upload_pending" ||
         statusFilterKey === "payment_pending";
 
+    // Check if current view is the "All Records" tab
+    const isAllRecordsTab =
+        filestate === "ALL" ||
+        filestate === "all" ||
+        statusFilterKey === "all" ||
+        (typeof title === "string" && title.toLowerCase().includes("all"));
+
+    // Block User button is only in All Records tab for Admin (not in analyst)
+    const showBlockUserButton = !isAnalyst && isAllRecordsTab;
+
     // Show Action / Reminder column on Payment Pending page, Docs Pending page, or for Analysts
     const showReminderColumn = isAnalyst || isDocsOrPaymentPending || filestate === 8 || filestate === "8" || statusFilterKey === "payment_pending";
 
+    // Overall Action column visibility
+    const showActionColumn = showReminderColumn || showBlockUserButton;
+
     const [clients, setClients] = useState([]);
     const [sendingReminderId, setSendingReminderId] = useState(null);
+    const [blockingUserId, setBlockingUserId] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
@@ -444,6 +459,8 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
                     const assignedName = analystNameCandidate || (isAssigned ? "Assigned" : "Not Assigned");
 
                     const referral = item.referral || item.referral_to || "-";
+                    const rawPermissionStatus = item.permissionStatus !== undefined ? item.permissionStatus : (item.permission_status !== undefined ? item.permission_status : (item.is_blocked === 1 || item.blocked === 1 ? "1" : "0"));
+                    const isBlocked = String(rawPermissionStatus) === "1" || item.is_blocked === 1 || item.blocked === 1 || String(status).toLowerCase() === "blocked";
 
                     return {
                         id: filenumber,
@@ -460,6 +477,8 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
                         assigned: isAssigned,
                         assignedName,
                         referral,
+                        isBlocked,
+                        permissionStatus: String(rawPermissionStatus),
                         ssn: item.ssn || item.ssnitin || "-",
                         dob: item.dob || "-",
                         dependents: item.dependents || "No",
@@ -3431,6 +3450,97 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
         }
     };
 
+    // Handle Block User API (/api/member/blockuser) - Admin Only on All Records tab
+    const handleBlockUser = async (client, e) => {
+        if (e) e.stopPropagation();
+        const targetUserId =
+            client.user_id ||
+            client.client_id ||
+            client.rawData?.user_id ||
+            client.rawData?.u_user_id ||
+            client.rawData?.ps_user_id ||
+            client.rawData?.unlists_u_id ||
+            client.id;
+
+        if (!targetUserId) {
+            Swal.fire({
+                icon: "warning",
+                title: "Missing User ID",
+                text: "Could not find a valid user ID for this record.",
+                confirmButtonColor: "#1b2e6b"
+            });
+            return;
+        }
+
+        const isCurrentlyBlocked = Boolean(client.isBlocked || client.permissionStatus === "1" || client.rawData?.permissionStatus === "1");
+        const nextStatus = isCurrentlyBlocked ? "0" : "1";
+        const actionLabel = isCurrentlyBlocked ? "Unblock" : "Block";
+
+        const result = await Swal.fire({
+            title: `${actionLabel} User?`,
+            text: `Are you sure you want to ${actionLabel.toLowerCase()} user ${client.name} (${client.email || "File: " + client.id})?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: isCurrentlyBlocked ? "#10b981" : "#ef4444",
+            cancelButtonColor: "#94a3b8",
+            confirmButtonText: `Yes, ${actionLabel} User`,
+            cancelButtonText: "Cancel"
+        });
+
+        if (result.isConfirmed) {
+            const rowKey = client.user_id || client.client_id || client.rawData?.user_id || client.id;
+            setBlockingUserId(rowKey);
+
+            try {
+                const payload = {
+                    user_id: isNaN(Number(targetUserId)) ? targetUserId : Number(targetUserId),
+                    permissionStatus: nextStatus
+                };
+
+                const response = await adminServices.blockuser(payload);
+
+                if (
+                    response?.status === 200 ||
+                    response?.data?.http_code === 200 ||
+                    response?.data?.status === true ||
+                    response?.data?.status === 1 ||
+                    response?.data?.success === true
+                ) {
+                    const msg =
+                        response?.data?.status_smessage ||
+                        response?.data?.message ||
+                        `User ${actionLabel.toLowerCase()}ed successfully.`;
+
+                    Swal.fire({
+                        icon: "success",
+                        title: `${actionLabel} Successful`,
+                        text: msg,
+                        confirmButtonColor: "#1b2e6b"
+                    });
+
+                    loadRecords();
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Action Failed",
+                        text: response?.data?.status_smessage || response?.data?.message || `Failed to ${actionLabel.toLowerCase()} user.`,
+                        confirmButtonColor: "#1b2e6b"
+                    });
+                }
+            } catch (err) {
+                console.error("Block user error:", err);
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: err?.response?.data?.status_smessage || err?.response?.data?.message || `Failed to ${actionLabel.toLowerCase()} user.`,
+                    confirmButtonColor: "#1b2e6b"
+                });
+            } finally {
+                setBlockingUserId(null);
+            }
+        }
+    };
+
     // List Table View
     return (
         <div className="card shadow-sm border-0 rounded-3 p-4">
@@ -3460,13 +3570,13 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
                             <th>File Status</th>
                             <th>Assigned</th>
                             <th>Referral</th>
-                            {showReminderColumn && <th className="text-center">Action</th>}
+                            {showActionColumn && <th className="text-center">Action</th>}
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
                             <tr>
-                                <td colSpan={showReminderColumn ? 8 : 7} className="text-center py-5 text-muted">
+                                <td colSpan={showActionColumn ? 8 : 7} className="text-center py-5 text-muted">
                                     <div className="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
                                     Loading client records...
                                 </td>
@@ -3475,12 +3585,30 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
                             filteredClients.map((client) => {
                                 const rowKey = client.user_id || client.client_id || client.rawData?.user_id || client.rawData?.u_user_id || client.id;
                                 const isSending = sendingReminderId === rowKey;
+                                const isBlocking = blockingUserId === rowKey;
 
                                 return (
                                 <tr key={client.id}>
-                                    <td className="fw-semibold text-dark">{client.id}</td>
+                                    <td className="fw-semibold">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setSelectedClient(client);
+                                                const resolved = filestateMap[client.status] !== undefined
+                                                    ? filestateMap[client.status]
+                                                    : (client.filestatus !== undefined ? client.filestatus : 1);
+                                                setSelectedFileState(Number(resolved));
+                                                setStatusComment("");
+                                            }}
+                                            className="btn btn-link client-name-link p-0 text-decoration-none text-start text-primary fw-semibold"
+                                            title={`View details for ${client.id}`}
+                                        >
+                                            {client.id}
+                                        </button>
+                                    </td>
                                     <td>
                                         <button
+                                            type="button"
                                             onClick={() => {
                                                 setSelectedClient(client);
                                                 const resolved = filestateMap[client.status] !== undefined
@@ -3490,11 +3618,32 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
                                                 setStatusComment("");
                                             }}
                                             className="btn btn-link client-name-link p-0 text-decoration-none text-start text-primary fw-medium"
+                                            title={`View details for ${client.name}`}
                                         >
                                             {client.name}
                                         </button>
                                     </td>
-                                    <td>{client.email}</td>
+                                    <td>
+                                        {client.email && client.email !== "-" ? (
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setSelectedClient(client);
+                                                    const resolved = filestateMap[client.status] !== undefined
+                                                        ? filestateMap[client.status]
+                                                        : (client.filestatus !== undefined ? client.filestatus : 1);
+                                                    setSelectedFileState(Number(resolved));
+                                                    setStatusComment("");
+                                                }}
+                                                className="btn btn-link client-name-link p-0 text-decoration-none text-start text-primary fw-medium"
+                                                title={`View details for ${client.email}`}
+                                            >
+                                                {client.email}
+                                            </button>
+                                        ) : (
+                                            <span className="text-muted">-</span>
+                                        )}
+                                    </td>
                                     <td>{client.phone}</td>
                                     <td>
                                         <span className="badge bg-light text-danger border">
@@ -3511,35 +3660,58 @@ const ClientRecordsTable = ({ filestate = "ALL", title = "All Client Records", s
                                             {client.referral}
                                         </span>
                                     </td>
-                                    {showReminderColumn && (
+                                    {showActionColumn && (
                                         <td className="text-center">
-                                            <button
-                                                type="button"
-                                                className="btn btn-sm btn-primary d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill fw-semibold shadow-sm"
-                                                style={{ fontSize: "0.82rem", background: "linear-gradient(135deg, #1b2e6b 0%, #254294 100%)", border: "none" }}
-                                                onClick={(e) => handleSendReminder(client, e)}
-                                                disabled={isSending}
-                                                title={`Send notification to ${client.name}`}
-                                            >
-                                                {isSending ? (
-                                                    <>
-                                                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: "11px", height: "11px" }}></span>
-                                                        <span>Sending...</span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <FiSend size={12} />
-                                                        <span>Send</span>
-                                                    </>
-                                                )}
-                                            </button>
+                                            {showBlockUserButton ? (
+                                                <button
+                                                    type="button"
+                                                    className={`btn btn-sm ${client.isBlocked ? "btn-outline-success" : "btn-outline-danger"} d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill fw-semibold shadow-sm`}
+                                                    style={{ fontSize: "0.80rem" }}
+                                                    onClick={(e) => handleBlockUser(client, e)}
+                                                    disabled={isBlocking}
+                                                    title={`${client.isBlocked ? "Unblock" : "Block"} User Account`}
+                                                >
+                                                    {isBlocking ? (
+                                                        <>
+                                                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: "11px", height: "11px" }}></span>
+                                                            <span>{client.isBlocked ? "Unblocking..." : "Blocking..."}</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <FiSlash size={12} />
+                                                            <span>{client.isBlocked ? "Unblock User" : "Block User"}</span>
+                                                        </>
+                                                    )}
+                                                </button>
+                                            ) : showReminderColumn ? (
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm btn-primary d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill fw-semibold shadow-sm"
+                                                    style={{ fontSize: "0.82rem", background: "linear-gradient(135deg, #1b2e6b 0%, #254294 100%)", border: "none" }}
+                                                    onClick={(e) => handleSendReminder(client, e)}
+                                                    disabled={isSending}
+                                                    title={`Send notification to ${client.name}`}
+                                                >
+                                                    {isSending ? (
+                                                        <>
+                                                            <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: "11px", height: "11px" }}></span>
+                                                            <span>Sending...</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <FiSend size={12} />
+                                                            <span>Send</span>
+                                                        </>
+                                                    )}
+                                                </button>
+                                            ) : null}
                                         </td>
                                     )}
                                 </tr>
                             );})
                         ) : (
                             <tr>
-                                <td colSpan={showReminderColumn ? 8 : 7} className="text-center py-5 text-muted">
+                                <td colSpan={showActionColumn ? 8 : 7} className="text-center py-5 text-muted">
                                     No records found.
                                 </td>
                             </tr>

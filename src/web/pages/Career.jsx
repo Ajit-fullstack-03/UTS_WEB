@@ -16,7 +16,7 @@ const faqs = [
 ];
 
 const values = [
-    { id: "01", title: "Real ownership, story", description: "You won't be a cog in the machine. From day one, you own your work, make real decisions, and see your contributions shape our products and client outcomes directly." },
+    { id: "01", title: "Real ownership", description: "You won't be a cog in the machine. From day one, you own your work, make real decisions, and see your contributions shape our products and client outcomes directly." },
     { id: "02", title: "Cross-function exposure", description: "Collaborate with tax experts, engineers, designers, and client success teams. We believe the best work happens when different minds solve the same problem together." },
     { id: "03", title: "Ambitious and experienced", description: "Join a team that's both driven and seasoned. We set bold goals, move fast, and have the experience to know when to slow down and get it right." },
 ];
@@ -347,7 +347,7 @@ const Career = () => {
                             A few words from us
                         </p>
                         <h2 className="cr-culture-heading">Diversity isn't a policy here. <span className="cr-culture-heading-light">It's how the work gets done.</span></h2>
-                        <p className="cr-culture-desc">Every one of us is personally accountable for holding a high-performance environment — because the best output of any organization is what its clients can experience, if they can't get solutions.</p>
+                        <p className="cr-culture-desc">Every one of us is personally accountable for holding a high-performance environment ... because the best measure of any organization is the experience its clients get when they need solutions.</p>
                         <div className="cr-skill-tags">
                             {skills.map((s) => (<span className="cr-skill-tag" key={s}>{s}</span>))}
                         </div>

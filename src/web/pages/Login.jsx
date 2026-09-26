@@ -215,7 +215,7 @@ const Login = () => {
 
                                 <div className="auth-input-group position-relative">
                                     <label className="auth-input-label">
-                                        Password
+                                        Password <span className="text-danger">*</span>
                                     </label>
                                     <div className="input-group-auth">
                                         <input
@@ -263,7 +263,7 @@ const Login = () => {
                                         disabled={forgotLoading}
                                         className="auth-link text-decoration-none border-0 bg-transparent p-0 cursor-pointer"
                                     >
-                                        {forgotLoading ? "Sending Link..." : "Forget Password?"}
+                                        {forgotLoading ? "Sending Link..." : "Forgot Password?"}
                                     </button>
                                 </div>
 

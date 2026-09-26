@@ -34,7 +34,7 @@ const IndiaFlag = () => (
 const US_SERVICES = [
     {
         id: "us-1",
-        label: "Tax Filling",
+        label: "Tax Filing",
         route: "/services/us-tax-filing",
     },
     {
@@ -49,7 +49,7 @@ const US_SERVICES = [
     },
     {
         id: "us-4",
-        label: "Bookkeeping & Payrole Services",
+        label: "Bookkeeping & Payroll Services",
         route: "/services/bookkeeping",
     },
 ];
@@ -151,7 +151,7 @@ const Navbar = () => {
                                     onClick={() => setActiveRegion((prev) => (prev === "us" ? null : "us"))}
                                 >
                                     <span className="nav-sd-flag"><USFlag /></span>
-                                    <span className="nav-sd-region-label">US Tax Services</span>
+                                    <span className="nav-sd-region-label">US Services</span>
                                 </button>
 
                                 {/* Indian Service — direct navigation link, no sub-items */}
@@ -165,7 +165,7 @@ const Navbar = () => {
                                     }}
                                 >
                                     <span className="nav-sd-flag"><IndiaFlag /></span>
-                                    <span className="nav-sd-region-label">Indian Tax Services</span>
+                                    <span className="nav-sd-region-label">Indian Services</span>
                                 </Link>
                             </div>
 
@@ -207,10 +207,6 @@ const Navbar = () => {
                     <Link to="/register" className="nav-btn nav-btn-primary">
                         Register
                     </Link>
-                    <Link to="/login" className="nav-btn nav-btn-primary" style={{ width: "120px" }}>
-                        <img src={gameiconscash} alt="" className="image-icon" style={{ paddingRight: "3px", height: "24px" }} />
-                        Refer & Earn
-                    </Link>
                 </div>
 
                 {/* Mobile Menu Icon */}
@@ -221,6 +217,14 @@ const Navbar = () => {
                 </button>
 
             </div>
+
+            {/* Floating Refer & Earn Button */}
+            <Link to="/login" className="floating-refer-btn" title="Refer & Earn">
+                <span className="floating-refer-icon-wrap">
+                    <img src={gameiconscash} alt="Refer & Earn" className="floating-refer-icon" />
+                </span>
+                <span className="floating-refer-text">Refer & Earn</span>
+            </Link>
 
             {/* Mobile Menu */}
             <div className={`mobile-menu ${menuOpen ? "active" : ""}`}>
